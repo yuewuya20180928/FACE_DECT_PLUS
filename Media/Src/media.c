@@ -123,7 +123,7 @@ int Media_SetVideoDisp(MEDIA_SENSOR_E sensorIdx, MEDIA_VIDEO_DISP_S *pDispParam)
 
     if (pDispParam == NULL)
     {
-        prtMD("invalid input pDispParam = ^%p\n", pDispParam);
+        prtMD("invalid input pDispParam = %p\n", pDispParam);
         return -1;
     }
 
