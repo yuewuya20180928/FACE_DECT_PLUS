@@ -36,7 +36,7 @@ int Media_Vo_InitVoLayer(VO_LAYER VoLayer, MEDIA_LCD_IDX_E enLcdIdx);
 
 int Media_Vo_InitMipiTx(void);
 
-int Media_Vo_StartChn(VO_LAYER VoLayer, VO_CHN voChn, MEDIA_RECT_S *pRect);
+int Media_Vo_StartChn(VO_LAYER VoLayer, VO_CHN voChn, MEDIA_VIDEO_DISP_S *pDispParam);
 
 #ifdef __cplusplus
 }

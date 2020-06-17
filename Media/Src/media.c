@@ -142,7 +142,7 @@ int Media_SetVideoDisp(MEDIA_SENSOR_E sensorIdx, MEDIA_VIDEO_DISP_S *pDispParam)
             return s32Ret;
         }
 
-        s32Ret = Media_Vo_StartChn(voLayer, voChn, &pDispParam->stRect);
+        s32Ret = Media_Vo_StartChn(voLayer, voChn, pDispParam);
         if (HI_SUCCESS != s32Ret)
         {
             prtMD("Media_Vpss_StartChn error! s32Ret = %#x\n", s32Ret);

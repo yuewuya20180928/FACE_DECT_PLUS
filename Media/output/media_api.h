@@ -25,9 +25,18 @@ typedef struct
     unsigned int h;
 }MEDIA_RECT_S;
 
+typedef enum
+{
+    MEDIA_ROTATION_0 = 0,
+    MEDIA_ROTATION_90,
+    MEDIA_ROTATION_180,
+    MEDIA_ROTATION_270,
+}MEDIA_ROTATION_E;
+
 typedef struct
 {
     bool bOpen;
+    MEDIA_ROTATION_E enRotation;
     MEDIA_RECT_S stRect;
 }MEDIA_VIDEO_DISP_S;
 

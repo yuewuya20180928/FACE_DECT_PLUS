@@ -1,12 +1,14 @@
 #include "media_api.h"
 #include <stdio.h>
 
+unsigned int sensorNumber = 1;
+
 int main()
 {
     int s32Ret = 0;
     MEDIA_VIDEO_DISP_S stVideoDisp = {0};
 
-    s32Ret = Media_Init(1);
+    s32Ret = Media_Init(sensorNumber);
     if (0 != s32Ret)
     {
         printf("Media_Init error! s32Ret = %#x\n", s32Ret);

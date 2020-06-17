@@ -199,15 +199,16 @@ int Media_Vo_Init(void)
     return 0;
 }
 
-int Media_Vo_StartChn(VO_LAYER VoLayer, VO_CHN voChn, MEDIA_RECT_S *pRect)
+int Media_Vo_StartChn(VO_LAYER VoLayer, VO_CHN voChn, MEDIA_VIDEO_DISP_S *pDispParam)
 {
     VO_VIDEO_LAYER_ATTR_S stLayerAttr = {0};
     VO_CHN_ATTR_S stChnAttr = {0};
     HI_S32 s32Ret = HI_SUCCESS;
+    ROTATION_E enRotation = ROTATION_0;
 
-    if (pRect == NULL)
+    if (pDispParam == NULL)
     {
-        prtMD("invalid input pRect = %p\n", pRect);
+        prtMD("invalid input pDispParam = %p\n", pDispParam);
         return -1;
     }
 
@@ -218,10 +219,10 @@ int Media_Vo_StartChn(VO_LAYER VoLayer, VO_CHN voChn, MEDIA_RECT_S *pRect)
         return s32Ret;
     }
 
-    stChnAttr.stRect.s32X = pRect->x;
-    stChnAttr.stRect.s32Y = pRect->y;
-    stChnAttr.stRect.u32Width = pRect->w;
-    stChnAttr.stRect.u32Height = pRect->h;
+    stChnAttr.stRect.s32X = pDispParam->stRect.x;
+    stChnAttr.stRect.s32Y = pDispParam->stRect.y;
+    stChnAttr.stRect.u32Width = pDispParam->stRect.w;
+    stChnAttr.stRect.u32Height = pDispParam->stRect.h;
     stChnAttr.u32Priority = 0;
     stChnAttr.bDeflicker = HI_FALSE;
 
@@ -239,7 +240,26 @@ int Media_Vo_StartChn(VO_LAYER VoLayer, VO_CHN voChn, MEDIA_RECT_S *pRect)
         return -1;
     }
 
-    s32Ret = HI_MPI_VO_SetChnRotation(VoLayer, voChn, 3);
+    switch (pDispParam->enRotation)
+    {
+        case MEDIA_ROTATION_0:
+            enRotation = ROTATION_0;
+            break;
+        case MEDIA_ROTATION_90:
+            enRotation = ROTATION_90;
+            break;
+        case MEDIA_ROTATION_180:
+            enRotation = ROTATION_180;
+            break;
+        case MEDIA_ROTATION_270:
+            enRotation = ROTATION_270;
+            break;
+        default:
+            enRotation = ROTATION_0;
+            break;
+    }
+
+    s32Ret = HI_MPI_VO_SetChnRotation(VoLayer, voChn, enRotation);
     if (HI_SUCCESS != s32Ret)
     {
         prtMD("HI_MPI_VO_EnableChn error! s32Ret = %#x\n", s32Ret);
