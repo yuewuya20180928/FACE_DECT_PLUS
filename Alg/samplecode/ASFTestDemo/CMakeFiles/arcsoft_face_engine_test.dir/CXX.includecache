@@ -1,0 +1,44 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/yuewuya/Public/share/FACE_PLUSPLUS/Project/Alg/samplecode/ASFTestDemo/samplecode.cpp
+arcsoft_face_sdk.h
+/home/yuewuya/Public/share/FACE_PLUSPLUS/Project/Alg/samplecode/ASFTestDemo/arcsoft_face_sdk.h
+amcomdef.h
+/home/yuewuya/Public/share/FACE_PLUSPLUS/Project/Alg/samplecode/ASFTestDemo/amcomdef.h
+asvloffscreen.h
+/home/yuewuya/Public/share/FACE_PLUSPLUS/Project/Alg/samplecode/ASFTestDemo/asvloffscreen.h
+merror.h
+/home/yuewuya/Public/share/FACE_PLUSPLUS/Project/Alg/samplecode/ASFTestDemo/merror.h
+iostream
+-
+string
+-
+stdio.h
+-
+stdlib.h
+-
+string.h
+-
+time.h
+-
+
+inc/amcomdef.h
+
+inc/arcsoft_face_sdk.h
+amcomdef.h
+inc/amcomdef.h
+asvloffscreen.h
+inc/asvloffscreen.h
+
+inc/asvloffscreen.h
+amcomdef.h
+inc/amcomdef.h
+
+inc/merror.h
+

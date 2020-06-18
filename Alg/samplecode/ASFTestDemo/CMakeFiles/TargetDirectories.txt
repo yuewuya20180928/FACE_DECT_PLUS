@@ -1,0 +1,3 @@
+/home/yuewuya/Public/share/FACE_PLUSPLUS/Project/Alg/samplecode/ASFTestDemo/CMakeFiles/rebuild_cache.dir
+/home/yuewuya/Public/share/FACE_PLUSPLUS/Project/Alg/samplecode/ASFTestDemo/CMakeFiles/edit_cache.dir
+/home/yuewuya/Public/share/FACE_PLUSPLUS/Project/Alg/samplecode/ASFTestDemo/CMakeFiles/arcsoft_face_engine_test.dir

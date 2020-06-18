@@ -1,0 +1,1 @@
+/usr/bin/c++    -rdynamic CMakeFiles/arcsoft_face_engine_test.dir/samplecode.cpp.o  -o arcsoft_face_engine_test   -L/home/yuewuya/Public/share/FACE_PLUSPLUS/Project/Alg/samplecode/ASFTestDemo/./linux_so  -Wl,-rpath,/home/yuewuya/Public/share/FACE_PLUSPLUS/Project/Alg/samplecode/ASFTestDemo/./linux_so -larcsoft_face -larcsoft_face_engine 
