@@ -47,6 +47,46 @@ VI_DEV_ATTR_S DEV_ATTR_IMX327_2M_BASE =
     DATA_RATE_X1
 };
 
+VI_DEV_ATTR_S DEV_ATTR_IMX327_720P_BASE =
+{
+    VI_MODE_MIPI,
+    VI_WORK_MODE_1Multiplex,
+    {0xFFF00000,    0x0},
+    VI_SCAN_PROGRESSIVE,
+    {-1, -1, -1, -1},
+    VI_DATA_SEQ_YUYV,
+
+    {
+    /*port_vsync   port_vsync_neg     port_hsync        port_hsync_neg        */
+    VI_VSYNC_PULSE, VI_VSYNC_NEG_LOW, VI_HSYNC_VALID_SINGNAL,VI_HSYNC_NEG_HIGH,VI_VSYNC_VALID_SINGAL,VI_VSYNC_VALID_NEG_HIGH,
+
+    /*hsync_hfb    hsync_act    hsync_hhb*/
+    {0,            1280,        0,
+    /*vsync0_vhb vsync0_act vsync0_hhb*/
+     0,            720,        0,
+    /*vsync1_vhb vsync1_act vsync1_hhb*/
+     0,            0,            0}
+    },
+    VI_DATA_TYPE_RGB,
+    HI_FALSE,
+    {1280, 720},
+    {
+        {
+            {1280 , 720},
+
+        },
+        {
+            VI_REPHASE_MODE_NONE,
+            VI_REPHASE_MODE_NONE
+        }
+    },
+    {
+        WDR_MODE_NONE,
+        720
+    },
+    DATA_RATE_X1
+};
+
 VI_PIPE_ATTR_S PIPE_ATTR_1920x1080_RAW12_420_3DNR_RFR =
 {
     VI_PIPE_BYPASS_NONE, HI_FALSE, HI_FALSE,
@@ -65,9 +105,39 @@ VI_PIPE_ATTR_S PIPE_ATTR_1920x1080_RAW12_420_3DNR_RFR =
     { -1, -1}
 };
 
+VI_PIPE_ATTR_S PIPE_ATTR_1280x720_RAW12_420_3DNR_RFR =
+{
+    VI_PIPE_BYPASS_NONE, HI_FALSE, HI_FALSE,
+    1280, 720,
+    PIXEL_FORMAT_RGB_BAYER_12BPP,
+    COMPRESS_MODE_NONE,
+    DATA_BITWIDTH_12,
+    HI_FALSE,
+    {
+        PIXEL_FORMAT_YVU_SEMIPLANAR_420,
+        DATA_BITWIDTH_8,
+        VI_NR_REF_FROM_RFR,
+        COMPRESS_MODE_NONE
+    },
+    HI_FALSE,
+    { -1, -1}
+};
+
 VI_CHN_ATTR_S CHN_ATTR_1920x1080_420_SDR8_LINEAR =
 {
     {1920, 1080},
+    PIXEL_FORMAT_YVU_SEMIPLANAR_420,
+    DYNAMIC_RANGE_SDR8,
+    VIDEO_FORMAT_LINEAR,
+    COMPRESS_MODE_NONE,
+    0,      0,
+    0,
+    { -1, -1}
+};
+
+VI_CHN_ATTR_S CHN_ATTR_1280x720_420_SDR8_LINEAR =
+{
+    {1280, 720},
     PIXEL_FORMAT_YVU_SEMIPLANAR_420,
     DYNAMIC_RANGE_SDR8,
     VIDEO_FORMAT_LINEAR,
@@ -101,14 +171,7 @@ int Media_VideoIn_GetConfig(MEDIA_VI_PARAM_S *pViParam, unsigned int sensorNum)
         pViParam->s32WorkingViId[i] = i;
 
         #if 0
-        if (SensorenWDRMode[i] == WDR_MODE_2To1_LINE)
-        {
-            pViParam->stViInfo[i].stSnsInfo.enSnsType = SONY_IMX327_MIPI_2M_30FPS_12BIT_WDR2TO1;
-        }
-        else
-        {
-            pViParam->stViInfo[i].stSnsInfo.enSnsType = SONY_IMX327_MIPI_2M_30FPS_12BIT;
-        }
+        pViParam->stViInfo[i].stSnsInfo.enSnsType = SONY_IMX327_2L_MIPI_720P_30FPS_12BIT;
         #else
         pViParam->stViInfo[i].stSnsInfo.enSnsType = SONY_IMX327_2L_MIPI_2M_30FPS_12BIT;
         #endif
@@ -171,6 +234,11 @@ int Media_VideoIn_GetSnsWH(VI_SNS_TYPE_E enSnsType, unsigned int *pWidth, unsign
             *pHeight = 1080;
             break;
 
+        case SONY_IMX327_2L_MIPI_720P_30FPS_12BIT:
+            *pWidth = 1280;
+            *pHeight = 720;
+            break;
+
         default:
             *pWidth = 1920;
             *pHeight = 1080;
@@ -229,6 +297,10 @@ int Media_Vi_GetDevAttr(VI_SNS_TYPE_E enSnsType, VI_DEV_ATTR_S* pstViDevAttr)
         case SONY_IMX327_2L_MIPI_2M_30FPS_12BIT:
         case SONY_IMX327_2L_MIPI_2M_30FPS_12BIT_WDR2TO1:
             hi_memcpy(pstViDevAttr, sizeof(VI_DEV_ATTR_S), &DEV_ATTR_IMX327_2M_BASE, sizeof(VI_DEV_ATTR_S));
+            break;
+
+        case SONY_IMX327_2L_MIPI_720P_30FPS_12BIT:
+            hi_memcpy(pstViDevAttr, sizeof(VI_DEV_ATTR_S), &DEV_ATTR_IMX327_720P_BASE, sizeof(VI_DEV_ATTR_S));
             break;
 
         case SONY_IMX327_MIPI_2M_30FPS_12BIT_WDR2TO1:
@@ -442,6 +514,10 @@ int Media_VideoIn_GetPipeAttr(VI_SNS_TYPE_E enSnsType, VI_PIPE_ATTR_S *pPipeAttr
             memcpy_s(pPipeAttr, sizeof(VI_PIPE_ATTR_S), &PIPE_ATTR_1920x1080_RAW12_420_3DNR_RFR, sizeof(VI_PIPE_ATTR_S));
             break;
 
+        case SONY_IMX327_2L_MIPI_720P_30FPS_12BIT:
+            memcpy_s(pPipeAttr, sizeof(VI_PIPE_ATTR_S), &PIPE_ATTR_1280x720_RAW12_420_3DNR_RFR, sizeof(VI_PIPE_ATTR_S));
+            break;
+
         case SONY_IMX327_MIPI_2M_30FPS_12BIT_WDR2TO1:
             memcpy_s(pPipeAttr, sizeof(VI_PIPE_ATTR_S), &PIPE_ATTR_1920x1080_RAW12_420_3DNR_RFR, sizeof(VI_PIPE_ATTR_S));
             pPipeAttr->enPixFmt = PIXEL_FORMAT_RGB_BAYER_10BPP;
@@ -571,6 +647,10 @@ int Media_VideoIn_GetChnAttr(VI_SNS_TYPE_E enSnsType, VI_CHN_ATTR_S* pstChnAttr)
         case SONY_IMX327_2L_MIPI_2M_30FPS_12BIT:
         case SONY_IMX327_2L_MIPI_2M_30FPS_12BIT_WDR2TO1:
             memcpy_s(pstChnAttr, sizeof(VI_CHN_ATTR_S), &CHN_ATTR_1920x1080_420_SDR8_LINEAR, sizeof(VI_CHN_ATTR_S));
+            break;
+
+        case SONY_IMX327_2L_MIPI_720P_30FPS_12BIT:
+            memcpy_s(pstChnAttr, sizeof(VI_CHN_ATTR_S), &CHN_ATTR_1280x720_420_SDR8_LINEAR, sizeof(VI_CHN_ATTR_S));
             break;
 
         default:

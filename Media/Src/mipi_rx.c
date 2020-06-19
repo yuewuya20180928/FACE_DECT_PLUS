@@ -52,6 +52,40 @@ combo_dev_attr_t MIPI_2lane_CHN0_SENSOR_IMX327_12BIT_2M_NOWDR_ATTR =
     }
 };
 
+combo_dev_attr_t MIPI_2lane_CHN0_SENSOR_IMX327_12BIT_720P_NOWDR_ATTR =
+{
+    .devno = 0,
+    .input_mode = INPUT_MODE_MIPI,
+    .data_rate = MIPI_DATA_RATE_X1,
+    .img_rect = {0, 0, 1280, 720},
+
+    {
+        .mipi_attr =
+        {
+            DATA_TYPE_RAW_12BIT,
+            HI_MIPI_WDR_MODE_NONE,
+            {0, 2, -1, -1}
+        }
+    }
+};
+
+combo_dev_attr_t MIPI_2lane_CHN1_SENSOR_IMX327_12BIT_720P_NOWDR_ATTR =
+{
+    .devno = 1,
+    .input_mode = INPUT_MODE_MIPI,
+    .data_rate = MIPI_DATA_RATE_X1,
+    .img_rect = {0, 0, 1280, 720},
+
+    {
+        .mipi_attr =
+        {
+            DATA_TYPE_RAW_12BIT,
+            HI_MIPI_WDR_MODE_NONE,
+            {0, 2, -1, -1}
+        }
+    }
+};
+
 combo_dev_attr_t MIPI_2lane_CHN1_SENSOR_IMX327_12BIT_2M_NOWDR_ATTR =
 {
     .devno = 1,
@@ -297,6 +331,17 @@ int Media_MipiRx_GetAttr(VI_SNS_TYPE_E enSnsType, combo_dev_t MipiDev, combo_dev
             else if (1 == MipiDev)
             {
                 memcpy(pComboAttr, &MIPI_2lane_CHN1_SENSOR_IMX327_12BIT_2M_NOWDR_ATTR, sizeof(combo_dev_attr_t));
+            }
+            break;
+
+        case SONY_IMX327_2L_MIPI_720P_30FPS_12BIT:
+            if (0 == MipiDev)
+            {
+                memcpy(pComboAttr, &MIPI_2lane_CHN0_SENSOR_IMX327_12BIT_720P_NOWDR_ATTR, sizeof(combo_dev_attr_t));
+            }
+            else if (1 == MipiDev)
+            {
+                memcpy(pComboAttr, &MIPI_2lane_CHN1_SENSOR_IMX327_12BIT_720P_NOWDR_ATTR, sizeof(combo_dev_attr_t));
             }
             break;
 

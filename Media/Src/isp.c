@@ -13,6 +13,16 @@ ISP_PUB_ATTR_S ISP_PUB_ATTR_IMX327_2M_30FPS =
     0,
 };
 
+ISP_PUB_ATTR_S ISP_PUB_ATTR_IMX327_720P_30FPS =
+{
+    {0, 0, 1280, 720},
+    {1280, 720},
+    30,
+    BAYER_RGGB,
+    WDR_MODE_NONE,
+    0,
+};
+
 ISP_PUB_ATTR_S ISP_PUB_ATTR_IMX327_2M_30FPS_WDR2TO1 =
 {
     {0, 0, 1920, 1080},
@@ -36,6 +46,10 @@ int Media_Isp_GetAttr(VI_SNS_TYPE_E enSnsType, ISP_PUB_ATTR_S *pPubAttr)
         case SONY_IMX327_MIPI_2M_30FPS_12BIT:
         case SONY_IMX327_2L_MIPI_2M_30FPS_12BIT:
             memcpy(pPubAttr, &ISP_PUB_ATTR_IMX327_2M_30FPS, sizeof(ISP_PUB_ATTR_S));
+            break;
+
+        case SONY_IMX327_2L_MIPI_720P_30FPS_12BIT:
+            memcpy(pPubAttr, &ISP_PUB_ATTR_IMX327_720P_30FPS, sizeof(ISP_PUB_ATTR_S));
             break;
 
         case SONY_IMX327_MIPI_2M_30FPS_12BIT_WDR2TO1:
