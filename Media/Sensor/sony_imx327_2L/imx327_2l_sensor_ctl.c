@@ -177,15 +177,18 @@ void imx327_2l_restart(VI_PIPE ViPipe)
 #define IMX327_SENSOR_1080P_30FPS_LINEAR_MODE         (1)
 #define IMX327_SENSOR_1080P_30FPS_WDR_2to1_MODE       (2)
 #define IMX327_SENSOR_1080P_30FPS_FRAME_WDR_2to1_MODE (3)
+#define IMX327_SENSOR_720P_30FPS_LINEAR_MODE          (4)
 
 void imx327_2l_wdr_1080p30_2to1_init(VI_PIPE ViPipe);
 void imx327_2l_linear_1080p30_init(VI_PIPE ViPipe);
+void imx327_2l_linear_720p30_init(VI_PIPE ViPipe);
 
 void imx327_2l_default_reg_init(VI_PIPE ViPipe)
 {
     HI_U32 i;
 
-    for (i = 0; i < g_pastImx327_2l[ViPipe]->astRegsInfo[0].u32RegNum; i++) {
+    for (i = 0; i < g_pastImx327_2l[ViPipe]->astRegsInfo[0].u32RegNum; i++)
+    {
         imx327_2l_write_register(ViPipe, g_pastImx327_2l[ViPipe]->astRegsInfo[0].astI2cData[i].u32RegAddr, g_pastImx327_2l[ViPipe]->astRegsInfo[0].astI2cData[i].u32Data);
     }
 }
@@ -203,24 +206,65 @@ void imx327_2l_init(VI_PIPE ViPipe)
     imx327_2l_i2c_init(ViPipe);
 
     /* When sensor first init, config all registers */
-    if (bInit == HI_FALSE) {
-        if (WDR_MODE_2To1_LINE == enWDRMode) {
-            if (IMX327_SENSOR_1080P_30FPS_WDR_2to1_MODE == u8ImgMode) {  /* IMX327_SENSOR_1080P_30FPS_WDR_2to1_MODE */
+    if (bInit == HI_FALSE)
+    {
+        if (WDR_MODE_2To1_LINE == enWDRMode)
+        {
+            if (IMX327_SENSOR_1080P_30FPS_WDR_2to1_MODE == u8ImgMode)
+            {
+                /* IMX327_SENSOR_1080P_30FPS_WDR_2to1_MODE */
                 imx327_2l_wdr_1080p30_2to1_init(ViPipe);
-            } else {
             }
-        } else {
-            imx327_2l_linear_1080p30_init(ViPipe);
+            else
+            {
+                printf("Func:%s, Line:%d, unsupported enWDRMode = %d, u8ImgMode = %d\n", __FUNCTION__, __LINE__, enWDRMode, u8ImgMode);
+            }
         }
-    } else {
-    /* When sensor switch mode(linear<->WDR or resolution), config different registers(if possible) */
-        if (WDR_MODE_2To1_LINE == enWDRMode) {
-            if (IMX327_SENSOR_1080P_30FPS_WDR_2to1_MODE == u8ImgMode) {  /* IMX327_SENSOR_1080P_30FPS_WDR_2to1_MODE */
-                imx327_2l_wdr_1080p30_2to1_init(ViPipe);
-            } else {
+        else
+        {
+            if (IMX327_SENSOR_1080P_30FPS_LINEAR_MODE == u8ImgMode)
+            {
+                imx327_2l_linear_1080p30_init(ViPipe);
             }
-        } else {
-            imx327_2l_linear_1080p30_init(ViPipe);
+            else if (IMX327_SENSOR_720P_30FPS_LINEAR_MODE == u8ImgMode)
+            {
+                imx327_2l_linear_720p30_init(ViPipe);
+            }
+            else
+            {
+                imx327_2l_linear_1080p30_init(ViPipe);
+            }
+        }
+    }
+    else
+    {
+        /* When sensor switch mode(linear<->WDR or resolution), config different registers(if possible) */
+        if (WDR_MODE_2To1_LINE == enWDRMode)
+        {
+            if (IMX327_SENSOR_1080P_30FPS_WDR_2to1_MODE == u8ImgMode)
+            {
+                /* IMX327_SENSOR_1080P_30FPS_WDR_2to1_MODE */
+                imx327_2l_wdr_1080p30_2to1_init(ViPipe);
+            }
+            else
+            {
+                printf("Func:%s, Line:%d, unsupported enWDRMode = %d, u8ImgMode = %d\n", __FUNCTION__, __LINE__, enWDRMode, u8ImgMode);
+            }
+        }
+        else
+        {
+            if (IMX327_SENSOR_1080P_30FPS_LINEAR_MODE == u8ImgMode)
+            {
+                imx327_2l_linear_1080p30_init(ViPipe);
+            }
+            else if (IMX327_SENSOR_720P_30FPS_LINEAR_MODE == u8ImgMode)
+            {
+                imx327_2l_linear_720p30_init(ViPipe);
+            }
+            else
+            {
+                imx327_2l_linear_1080p30_init(ViPipe);
+            }
         }
     }
 
@@ -237,6 +281,78 @@ void imx327_2l_exit(VI_PIPE ViPipe)
 
 /* 1080P30 and 1080P25 */
 void imx327_2l_linear_1080p30_init(VI_PIPE ViPipe)
+{
+    printf("Func:%s, Line:%d, start!\n", __FUNCTION__, __LINE__);
+    imx327_2l_write_register(ViPipe, 0x3000, 0x01);  /* STANDBY */
+    imx327_2l_write_register(ViPipe, 0x3002, 0x00);  /* XTMSTA */
+    imx327_2l_write_register(ViPipe, 0x3005, 0x01);
+    imx327_2l_write_register(ViPipe, 0x3007, 0x00);
+    imx327_2l_write_register(ViPipe, 0x3009, 0x02);
+    imx327_2l_write_register(ViPipe, 0x300a, 0xf0);
+    imx327_2l_write_register(ViPipe, 0x3011, 0x02);
+    imx327_2l_write_register(ViPipe, 0x3018, 0x65);  /* Vmax */
+    imx327_2l_write_register(ViPipe, 0x3019, 0x04);  /* Vmax */
+    imx327_2l_write_register(ViPipe, 0x301c, 0x30);  /* Hmax */
+    imx327_2l_write_register(ViPipe, 0x301d, 0x11);  /* Hmax */
+    imx327_2l_write_register(ViPipe, 0x3046, 0x01);  /* ODBIT */
+    imx327_2l_write_register(ViPipe, 0x304b, 0x0a);
+
+    imx327_2l_write_register(ViPipe, 0x305c, 0x18);  /* inck1 */
+    imx327_2l_write_register(ViPipe, 0x305d, 0x03);  /* inck2 */
+    imx327_2l_write_register(ViPipe, 0x305e, 0x20);  /* inck3 */
+    imx327_2l_write_register(ViPipe, 0x305f, 0x01);
+    imx327_2l_write_register(ViPipe, 0x309e, 0x4a);
+    imx327_2l_write_register(ViPipe, 0x309f, 0x4a);
+    imx327_2l_write_register(ViPipe, 0x30d2, 0x19);
+    imx327_2l_write_register(ViPipe, 0x30d7, 0x03);
+
+    imx327_2l_write_register(ViPipe, 0x3129, 0x00);  /* ADBIT1 */
+    imx327_2l_write_register(ViPipe, 0x313b, 0x61);
+    imx327_2l_write_register(ViPipe, 0x315e, 0x1a);  /* inck5 */
+    imx327_2l_write_register(ViPipe, 0x3164, 0x1a);  /* inck6 */
+    imx327_2l_write_register(ViPipe, 0x317c, 0x00);  /* ADBIT2 */
+    imx327_2l_write_register(ViPipe, 0x31ec, 0x0e);  /* ADBIT3 */
+
+    imx327_2l_write_register(ViPipe, 0x3405, 0x10);
+    imx327_2l_write_register(ViPipe, 0x3407, 0x01);
+    imx327_2l_write_register(ViPipe, 0x3414, 0x0a);
+    imx327_2l_write_register(ViPipe, 0x3418, 0x49);
+    imx327_2l_write_register(ViPipe, 0x3419, 0x04);
+    imx327_2l_write_register(ViPipe, 0x3441, 0x0c);
+    imx327_2l_write_register(ViPipe, 0x3442, 0x0c);
+    imx327_2l_write_register(ViPipe, 0x3443, 0x01);
+    imx327_2l_write_register(ViPipe, 0x3444, 0x20);
+    imx327_2l_write_register(ViPipe, 0x3445, 0x25);
+    imx327_2l_write_register(ViPipe, 0x3446, 0x57);
+    imx327_2l_write_register(ViPipe, 0x3447, 0x00);
+    imx327_2l_write_register(ViPipe, 0x3448, 0x37);
+    imx327_2l_write_register(ViPipe, 0x3449, 0x00);
+    imx327_2l_write_register(ViPipe, 0x344a, 0x1f);
+    imx327_2l_write_register(ViPipe, 0x344b, 0x00);
+    imx327_2l_write_register(ViPipe, 0x344c, 0x1f);
+    imx327_2l_write_register(ViPipe, 0x344d, 0x00);
+    imx327_2l_write_register(ViPipe, 0x344e, 0x1f);
+    imx327_2l_write_register(ViPipe, 0x344f, 0x00);
+    imx327_2l_write_register(ViPipe, 0x3450, 0x77);
+    imx327_2l_write_register(ViPipe, 0x3451, 0x00);
+    imx327_2l_write_register(ViPipe, 0x3452, 0x1f);
+    imx327_2l_write_register(ViPipe, 0x3453, 0x00);
+    imx327_2l_write_register(ViPipe, 0x3454, 0x17);
+    imx327_2l_write_register(ViPipe, 0x3455, 0x00);
+    imx327_2l_write_register(ViPipe, 0x3472, 0x9c);
+    imx327_2l_write_register(ViPipe, 0x3473, 0x07);
+    imx327_2l_write_register(ViPipe, 0x3480, 0x49);
+
+    imx327_2l_default_reg_init(ViPipe);
+
+    imx327_2l_write_register(ViPipe, 0x3000, 0x00);  /* standby */
+
+    printf("Func:%s, Line:%d, end!\n", __FUNCTION__, __LINE__);
+    return;
+}
+
+/* 720P30 and 720P25 */
+void imx327_2l_linear_720p30_init(VI_PIPE ViPipe)
 {
     printf("Func:%s, Line:%d, start!\n", __FUNCTION__, __LINE__);
     imx327_2l_write_register(ViPipe, 0x3000, 0x01);  /* STANDBY */
