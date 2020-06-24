@@ -95,8 +95,7 @@ extern int  imx327_2l_read_register(VI_PIPE ViPipe, int addr);
 #define IMX327_INCREASE_LINES                         (1) /* make real fps less than stand fps because NVR require */
 
 #define IMX327_VMAX_1080P30_LINEAR                    (1125+IMX327_INCREASE_LINES)
-#define IMX327_VMAX_720P30_LINEAR                     (1125+IMX327_INCREASE_LINES)  /* TODO FYF */
-// #define IMX327_VMAX_1080P60TO30_WDR                   (1156+IMX327_INCREASE_LINES)  // 12bit
+#define IMX327_VMAX_720P30_LINEAR                     (750+IMX327_INCREASE_LINES)
 #define IMX327_VMAX_1080P60TO30_WDR                   (1220+IMX327_INCREASE_LINES)   // 10bit
 
 // sensor fps mode
@@ -106,6 +105,7 @@ extern int  imx327_2l_read_register(VI_PIPE ViPipe, int addr);
 #define IMX327_SENSOR_720P_30FPS_LINEAR_MODE          (4)
 
 #define IMX327_RES_IS_1080P(w, h)      ((w) <= 1920 && (h) <= 1080)
+#define IMX327_RES_IS_720P(w, h)      ((w) <= 1280 && (h) <= 720)
 
 #define IMX327_2L_ERR_MODE_PRINT(pstSensorImageMode, pstSnsState)\
     do{\
@@ -123,6 +123,8 @@ static HI_S32 cmos_get_ae_default(VI_PIPE ViPipe, AE_SENSOR_DEFAULT_S *pstAeSnsD
     CMOS_CHECK_POINTER(pstAeSnsDft);
     IMX327_SENSOR_GET_CTX(ViPipe, pstSnsState);
     CMOS_CHECK_POINTER(pstSnsState);
+
+    printf("Func:%s, Line:%d, enWDRMode:%d\n", __FUNCTION__, __LINE__, pstSnsState->enWDRMode);
 
     memset(&pstAeSnsDft->stAERouteAttr, 0, sizeof(ISP_AE_ROUTE_S));
 
@@ -145,9 +147,12 @@ static HI_S32 cmos_get_ae_default(VI_PIPE ViPipe, AE_SENSOR_DEFAULT_S *pstAeSnsD
     pstAeSnsDft->u32MinISPDgainTarget = 1 << pstAeSnsDft->u32ISPDgainShift;
     pstAeSnsDft->u32MaxISPDgainTarget = 2 << pstAeSnsDft->u32ISPDgainShift;
 
-    if (g_au32LinesPer500ms[ViPipe] == 0) {
+    if (g_au32LinesPer500ms[ViPipe] == 0)
+    {
         pstAeSnsDft->u32LinesPer500ms = pstSnsState->u32FLStd * 30 / 2;
-    } else {
+    }
+    else
+    {
         pstAeSnsDft->u32LinesPer500ms = g_au32LinesPer500ms[ViPipe];
     }
 
@@ -158,7 +163,8 @@ static HI_S32 cmos_get_ae_default(VI_PIPE ViPipe, AE_SENSOR_DEFAULT_S *pstAeSnsD
     pstAeSnsDft->stAERouteAttr.u32TotalNum = 0;
     pstAeSnsDft->stAERouteAttrEx.u32TotalNum = 0;
 
-    switch (pstSnsState->enWDRMode) {
+    switch (pstSnsState->enWDRMode)
+    {
         default:
         case WDR_MODE_NONE:   /* linear mode */
             pstAeSnsDft->au8HistThresh[0] = 0xd;
@@ -239,10 +245,13 @@ static HI_S32 cmos_get_ae_default(VI_PIPE ViPipe, AE_SENSOR_DEFAULT_S *pstAeSnsD
 
             pstAeSnsDft->u32InitExposure = g_au32InitExposure[ViPipe] ? g_au32InitExposure[ViPipe] : 52000;
 
-            if (genFSWDRMode[ViPipe] == ISP_FSWDR_LONG_FRAME_MODE) {
+            if (genFSWDRMode[ViPipe] == ISP_FSWDR_LONG_FRAME_MODE)
+            {
                 pstAeSnsDft->u8AeCompensation = 64;
                 pstAeSnsDft->enAeExpMode = AE_EXP_HIGHLIGHT_PRIOR;
-            } else {
+            }
+            else
+            {
                 pstAeSnsDft->u8AeCompensation = 32;
                 pstAeSnsDft->enAeExpMode = AE_EXP_LOWLIGHT_PRIOR;
                 pstAeSnsDft->u16ManRatioEnable = HI_TRUE;
@@ -262,12 +271,32 @@ static HI_VOID cmos_fps_set(VI_PIPE ViPipe, HI_FLOAT f32Fps, AE_SENSOR_DEFAULT_S
     ISP_SNS_STATE_S *pstSnsState = HI_NULL;
     HI_U32 u32VMAX = IMX327_VMAX_1080P30_LINEAR;
 
+    if (pstAeSnsDft == NULL)
+    {
+        printf("Func:%s, Line:%d, invalid input pstAeSnsDft = %p\n", __FUNCTION__, __LINE__, pstAeSnsDft);
+        return;
+    }
+
     CMOS_CHECK_POINTER_VOID(pstAeSnsDft);
     IMX327_SENSOR_GET_CTX(ViPipe, pstSnsState);
     CMOS_CHECK_POINTER_VOID(pstSnsState);
 
     switch (pstSnsState->u8ImgMode)
     {
+        case IMX327_SENSOR_720P_30FPS_LINEAR_MODE:
+            if ((f32Fps <= 30) && (f32Fps >= 0.119))
+            {
+                u32VMAX = IMX327_VMAX_720P30_LINEAR * 30 / DIV_0_TO_1_FLOAT(f32Fps);
+            }
+            else
+            {
+                ISP_ERR_TRACE("Not support Fps: %f\n", f32Fps);
+                return;
+            }
+            u32VMAX = (u32VMAX > IMX327_FULL_LINES_MAX) ? IMX327_FULL_LINES_MAX : u32VMAX;
+            pstAeSnsDft->u32LinesPer500ms = IMX327_VMAX_720P30_LINEAR * 15;
+            break;
+
         case IMX327_SENSOR_1080P_30FPS_WDR_2to1_MODE:
             if ((f32Fps <= 30) && (f32Fps >= 16.51))
             {
@@ -295,8 +324,6 @@ static HI_VOID cmos_fps_set(VI_PIPE ViPipe, HI_FLOAT f32Fps, AE_SENSOR_DEFAULT_S
             }
             u32VMAX = (u32VMAX > IMX327_FULL_LINES_MAX) ? IMX327_FULL_LINES_MAX : u32VMAX;
             pstAeSnsDft->u32LinesPer500ms = IMX327_VMAX_1080P30_LINEAR*15;
-            break;
-        case IMX327_SENSOR_720P_30FPS_LINEAR_MODE:
             break;
         default:
             return;
@@ -350,31 +377,46 @@ static HI_VOID cmos_slow_framerate_set(VI_PIPE ViPipe, HI_U32 u32FullLines, AE_S
     IMX327_SENSOR_GET_CTX(ViPipe, pstSnsState);
     CMOS_CHECK_POINTER_VOID(pstSnsState);
 
-    if (pstSnsState->enWDRMode == WDR_MODE_2To1_LINE) {
+    if (pstSnsState->enWDRMode == WDR_MODE_2To1_LINE)
+    {
         u32FullLines = (u32FullLines > 2 * IMX327_FULL_LINES_MAX_2TO1_WDR) ? 2 * IMX327_FULL_LINES_MAX_2TO1_WDR : u32FullLines;
         pstSnsState->au32FL[0] = (u32FullLines >> 1) << 1;
         g_astimx327_2l_State[ViPipe].u32RHS1_MAX = pstSnsState->au32FL[0] - g_astimx327_2l_State[ViPipe].u32BRL * 2 - 21;
-    } else if (pstSnsState->enWDRMode == WDR_MODE_2To1_FRAME) {
+    }
+    else if (pstSnsState->enWDRMode == WDR_MODE_2To1_FRAME)
+    {
         u32FullLines = (u32FullLines > IMX327_FULL_LINES_MAX) ? IMX327_FULL_LINES_MAX : u32FullLines;
         pstSnsState->au32FL[0] = u32FullLines;
-    } else {
+    }
+    else
+    {
         u32FullLines = (u32FullLines > IMX327_FULL_LINES_MAX) ? IMX327_FULL_LINES_MAX : u32FullLines;
         pstSnsState->au32FL[0] = u32FullLines;
     }
 
-    if (pstSnsState->enWDRMode == WDR_MODE_NONE) {
+    printf("Func:%s, Line:%d, u32FullLines = %d\n", __FUNCTION__, __LINE__, u32FullLines);
+
+    if (pstSnsState->enWDRMode == WDR_MODE_NONE)
+    {
         pstSnsState->astRegsInfo[0].astI2cData[5].u32Data = (pstSnsState->au32FL[0] & 0xFF);
         pstSnsState->astRegsInfo[0].astI2cData[6].u32Data = ((pstSnsState->au32FL[0] & 0xFF00) >> 8);
         pstSnsState->astRegsInfo[0].astI2cData[7].u32Data = ((pstSnsState->au32FL[0] & 0xF0000) >> 16);
-    } else if (pstSnsState->enWDRMode == WDR_MODE_2To1_LINE) {
+    }
+    else if (pstSnsState->enWDRMode == WDR_MODE_2To1_LINE)
+    {
         pstSnsState->astRegsInfo[0].astI2cData[8].u32Data = ((pstSnsState->au32FL[0] >> 1) & 0xFF);
         pstSnsState->astRegsInfo[0].astI2cData[9].u32Data = (((pstSnsState->au32FL[0] >> 1) & 0xFF00) >> 8);
         pstSnsState->astRegsInfo[0].astI2cData[10].u32Data = (((pstSnsState->au32FL[0] >> 1) & 0xF0000) >> 16);
-    } else if (pstSnsState->enWDRMode == WDR_MODE_2To1_FRAME) {
+    }
+    else if (pstSnsState->enWDRMode == WDR_MODE_2To1_FRAME)
+    {
         pstSnsState->astRegsInfo[0].astI2cData[8].u32Data = (pstSnsState->au32FL[0] & 0xFF);
         pstSnsState->astRegsInfo[0].astI2cData[9].u32Data = ((pstSnsState->au32FL[0] & 0xFF00) >> 8);
         pstSnsState->astRegsInfo[0].astI2cData[10].u32Data = (((pstSnsState->au32FL[0] & 0x30000)) >> 16);
-    } else {
+    }
+    else
+    {
+        printf("Func:%s, Line:%d, unsupported enWDRMode = %d\n", __FUNCTION__, __LINE__, pstSnsState->enWDRMode);
     }
 
     pstAeSnsDft->u32FullLines = pstSnsState->au32FL[0];
@@ -403,12 +445,18 @@ static HI_VOID cmos_inttime_update(VI_PIPE ViPipe, HI_U32 u32IntTime)
     IMX327_SENSOR_GET_CTX(ViPipe, pstSnsState);
     CMOS_CHECK_POINTER_VOID(pstSnsState);
 
-    if (pstSnsState->enWDRMode == WDR_MODE_2To1_LINE) {
-        if (bFirst[ViPipe]) { /* short exposure */
+    if (pstSnsState->enWDRMode == WDR_MODE_2To1_LINE)
+    {
+        if (bFirst[ViPipe])
+        {
+            /* short exposure */
             pstSnsState->au32WDRIntTime[0] = u32IntTime;
             u32ShortIntTime[ViPipe] = u32IntTime;
             bFirst[ViPipe] = HI_FALSE;
-        } else { /* long exposure */
+        }
+        else
+        {
+            /* long exposure */
             pstSnsState->au32WDRIntTime[1] = u32IntTime;
             u32LongIntTime[ViPipe] = u32IntTime;
 
@@ -438,21 +486,28 @@ static HI_VOID cmos_inttime_update(VI_PIPE ViPipe, HI_U32 u32IntTime)
 
             bFirst[ViPipe] = HI_TRUE;
         }
-    } else if (pstSnsState->enWDRMode == WDR_MODE_2To1_FRAME) {
-        if (bFirst[ViPipe]) { /* short exposure */
+    }
+    else if (pstSnsState->enWDRMode == WDR_MODE_2To1_FRAME)
+    {
+        if (bFirst[ViPipe])
+        { /* short exposure */
             u32Value = pstSnsState->au32FL[0] - u32IntTime - 1;
             pstSnsState->astRegsInfo[0].astI2cData[0].u32Data = (u32Value & 0xFF);
             pstSnsState->astRegsInfo[0].astI2cData[1].u32Data = ((u32Value & 0xFF00) >> 8);
             pstSnsState->astRegsInfo[0].astI2cData[2].u32Data = ((u32Value & 0x30000) >> 16);
             bFirst[ViPipe] = HI_FALSE;
-        } else { /* long exposure */
+        }
+        else
+        { /* long exposure */
             u32Value = pstSnsState->au32FL[0] - u32IntTime - 1;
             pstSnsState->astRegsInfo[0].astI2cData[5].u32Data = (u32Value & 0xFF);
             pstSnsState->astRegsInfo[0].astI2cData[6].u32Data = ((u32Value & 0xFF00) >> 8);
             pstSnsState->astRegsInfo[0].astI2cData[7].u32Data = ((u32Value & 0x30000) >> 16);
             bFirst[ViPipe] = HI_TRUE;
         }
-    } else {
+    }
+    else
+    {
         u32Value = pstSnsState->au32FL[0] - u32IntTime - 1;
 
         pstSnsState->astRegsInfo[0].astI2cData[0].u32Data = (u32Value & 0xFF);
@@ -491,14 +546,17 @@ static HI_VOID cmos_again_calc_table(VI_PIPE ViPipe, HI_U32 *pu32AgainLin, HI_U3
     CMOS_CHECK_POINTER_VOID(pu32AgainLin);
     CMOS_CHECK_POINTER_VOID(pu32AgainDb);
 
-    if (*pu32AgainLin >= gain_table[230]) {
+    if (*pu32AgainLin >= gain_table[230])
+    {
         *pu32AgainLin = gain_table[230];
         *pu32AgainDb = 230;
         return;
     }
 
-    for (i = 1; i < 231; i++) {
-        if (*pu32AgainLin < gain_table[i]) {
+    for (i = 1; i < 231; i++)
+    {
+        if (*pu32AgainLin < gain_table[i])
+        {
             *pu32AgainLin = gain_table[i - 1];
             *pu32AgainDb = i - 1;
             break;
@@ -514,19 +572,23 @@ static HI_VOID cmos_dgain_calc_table(VI_PIPE ViPipe, HI_U32 *pu32DgainLin, HI_U3
     CMOS_CHECK_POINTER_VOID(pu32DgainLin);
     CMOS_CHECK_POINTER_VOID(pu32DgainDb);
 
-    if (*pu32DgainLin >= gain_table[140]) {
+    if (*pu32DgainLin >= gain_table[140])
+    {
         *pu32DgainLin = gain_table[140];
         *pu32DgainDb = 140;
         return;
     }
 
-    for (i = 1; i < 141; i++) {
-        if (*pu32DgainLin < gain_table[i]) {
+    for (i = 1; i < 141; i++)
+    {
+        if (*pu32DgainLin < gain_table[i])
+        {
             *pu32DgainLin = gain_table[i - 1];
             *pu32DgainDb = i - 1;
             break;
         }
     }
+
     return;
 }
 
@@ -539,7 +601,8 @@ static HI_VOID cmos_gains_update(VI_PIPE ViPipe, HI_U32 u32Again, HI_U32 u32Dgai
     IMX327_SENSOR_GET_CTX(ViPipe, pstSnsState);
     CMOS_CHECK_POINTER_VOID(pstSnsState);
 
-    if (u32Again >= 27) {
+    if (u32Again >= 27)
+    {
         u32HCG = u32HCG | 0x10;  // bit[4] HCG  .Reg0x3009[7:0]
         u32Again = u32Again - 27;
     }
@@ -571,9 +634,12 @@ static HI_VOID cmos_get_inttime_max(VI_PIPE ViPipe, HI_U16 u16ManRatioEnable, HI
 
     u32ShortTimeMinLimit = 2;
 
-    if (pstSnsState->enWDRMode == WDR_MODE_2To1_FRAME) {
+    if (pstSnsState->enWDRMode == WDR_MODE_2To1_FRAME)
+    {
         u32IntTimeMaxTmp = ((pstSnsState->au32FL[0] - 2) << 6) / DIV_0_TO_1(au32Ratio[0]);
-    } else if (pstSnsState->enWDRMode == WDR_MODE_2To1_LINE) {
+    }
+    else if (pstSnsState->enWDRMode == WDR_MODE_2To1_LINE)
+    {
         /*  limitation for line base WDR
 
             SHS1 limitation:
@@ -593,14 +659,17 @@ static HI_VOID cmos_get_inttime_max(VI_PIPE ViPipe, HI_U16 u16ManRatioEnable, HI
             ExposureShort + ExposureLong <= FSC - 6
             short exposure time <= (FSC - 6) / (ratio + 1)
         */
-        if (genFSWDRMode[ViPipe] == ISP_FSWDR_LONG_FRAME_MODE) {
+        if (genFSWDRMode[ViPipe] == ISP_FSWDR_LONG_FRAME_MODE)
+        {
             u32IntTimeMaxTmp0 = pstSnsState->au32FL[1] - 6 - pstSnsState->au32WDRIntTime[0];
             u32IntTimeMaxTmp = pstSnsState->au32FL[0] - 10;
             u32IntTimeMaxTmp = (u32IntTimeMaxTmp0 < u32IntTimeMaxTmp) ? u32IntTimeMaxTmp0 : u32IntTimeMaxTmp;
             au32IntTimeMax[0] = u32IntTimeMaxTmp;
             au32IntTimeMin[0] = u32ShortTimeMinLimit;
             return;
-        } else {
+        }
+        else
+        {
             u32IntTimeMaxTmp0 = ((pstSnsState->au32FL[1] - 6 - pstSnsState->au32WDRIntTime[0]) * 0x40)  / DIV_0_TO_1(au32Ratio[0]);
             u32IntTimeMaxTmp  = ((pstSnsState->au32FL[0] - 6) * 0x40)  / DIV_0_TO_1(au32Ratio[0] + 0x40);
             u32IntTimeMaxTmp  = (u32IntTimeMaxTmp0 < u32IntTimeMaxTmp) ? u32IntTimeMaxTmp0 : u32IntTimeMaxTmp;
@@ -608,17 +677,24 @@ static HI_VOID cmos_get_inttime_max(VI_PIPE ViPipe, HI_U16 u16ManRatioEnable, HI
             u32IntTimeMaxTmp  = (u32IntTimeMaxTmp == 0) ? 1 : u32IntTimeMaxTmp;
         }
 
-    } else {
+    }
+    else
+    {
+        printf("Func:%s, Line:%d, unsupported pstSnsState->enWDRMode = %d\n", __FUNCTION__, __LINE__, pstSnsState->enWDRMode);
     }
 
-    if (u32IntTimeMaxTmp >= u32ShortTimeMinLimit) {
-        if (pstSnsState->enWDRMode == WDR_MODE_2To1_FRAME) {
+    if (u32IntTimeMaxTmp >= u32ShortTimeMinLimit)
+    {
+        if (pstSnsState->enWDRMode == WDR_MODE_2To1_FRAME)
+        {
             au32IntTimeMax[0] = u32IntTimeMaxTmp;
             au32IntTimeMax[1] = (pstSnsState->au32FL[0] - 2);
             au32IntTimeMin[0] = 2;
             au32IntTimeMin[1] = au32IntTimeMin[0] * au32Ratio[0] >> 6;
         }
-        if (IS_LINE_WDR_MODE(pstSnsState->enWDRMode)) {
+
+        if (IS_LINE_WDR_MODE(pstSnsState->enWDRMode))
+        {
             au32IntTimeMax[0] = u32IntTimeMaxTmp;
             au32IntTimeMax[1] = au32IntTimeMax[0] * au32Ratio[0] >> 6;
             au32IntTimeMax[2] = au32IntTimeMax[1] * au32Ratio[1] >> 6;
@@ -627,31 +703,44 @@ static HI_VOID cmos_get_inttime_max(VI_PIPE ViPipe, HI_U16 u16ManRatioEnable, HI
             au32IntTimeMin[1] = au32IntTimeMin[0] * au32Ratio[0] >> 6;
             au32IntTimeMin[2] = au32IntTimeMin[1] * au32Ratio[1] >> 6;
             au32IntTimeMin[3] = au32IntTimeMin[2] * au32Ratio[2] >> 6;
-        } else {
         }
-    } else {
-        if (u16ManRatioEnable == 1) {
+    }
+    else
+    {
+        if (u16ManRatioEnable == 1)
+        {
             ISP_ERR_TRACE("Manaul ExpRatio is too large!\n");
             return;
-        } else {
+        }
+        else
+        {
             u32IntTimeMaxTmp = u32ShortTimeMinLimit;
 
-            if (pstSnsState->enWDRMode == WDR_MODE_2To1_FRAME) {
-                for (i = 0x40; i <= 0xFFF; i++) {
-                    if ((u32IntTimeMaxTmp * i >> 6) > (pstSnsState->au32FL[0] - 2)) {
+            if (pstSnsState->enWDRMode == WDR_MODE_2To1_FRAME)
+            {
+                for (i = 0x40; i <= 0xFFF; i++)
+                {
+                    if ((u32IntTimeMaxTmp * i >> 6) > (pstSnsState->au32FL[0] - 2))
+                    {
                         break;
                     }
                 }
 
                 au32IntTimeMax[0] = u32IntTimeMaxTmp;
                 au32IntTimeMax[1] = (pstSnsState->au32FL[0] - 2);
-            } else if (pstSnsState->enWDRMode == WDR_MODE_2To1_LINE) {
+            }
+            else if (pstSnsState->enWDRMode == WDR_MODE_2To1_LINE)
+            {
                 u32RatioTmp = 0xFFF;
                 au32IntTimeMax[0] = u32IntTimeMaxTmp;
                 au32IntTimeMax[1] = au32IntTimeMax[0] * u32RatioTmp >> 6;
-            } else if (pstSnsState->enWDRMode == WDR_MODE_3To1_LINE) {
-                for (i = 0x40; i <= 0xFFF; i++) {
-                    if ((u32IntTimeMaxTmp + (u32IntTimeMaxTmp * i >> 6) + (u32IntTimeMaxTmp * i * i >> 12)) > (pstSnsState->au32FL[0] - 12)) {
+            }
+            else if (pstSnsState->enWDRMode == WDR_MODE_3To1_LINE)
+            {
+                for (i = 0x40; i <= 0xFFF; i++)
+                {
+                    if ((u32IntTimeMaxTmp + (u32IntTimeMaxTmp * i >> 6) + (u32IntTimeMaxTmp * i * i >> 12)) > (pstSnsState->au32FL[0] - 12))
+                    {
                         u32RatioTmp = i - 1;
                         break;
                     }
@@ -659,7 +748,10 @@ static HI_VOID cmos_get_inttime_max(VI_PIPE ViPipe, HI_U16 u16ManRatioEnable, HI
                 au32IntTimeMax[0] = u32IntTimeMaxTmp;
                 au32IntTimeMax[1] = au32IntTimeMax[0] * u32RatioTmp >> 6;
                 au32IntTimeMax[2] = au32IntTimeMax[1] * u32RatioTmp >> 6;
-            } else {
+            }
+            else
+            {
+                printf("Func:%s, Line:%d, pstSnsState->enWDRMode = %d\n", __FUNCTION__, __LINE__, pstSnsState->enWDRMode);
             }
             au32IntTimeMin[0] = au32IntTimeMax[0];
             au32IntTimeMin[1] = au32IntTimeMax[1];
@@ -727,7 +819,6 @@ static HI_S32 cmos_get_awb_default(VI_PIPE ViPipe, AWB_SENSOR_DEFAULT_S *pstAwbS
     memset(pstAwbSnsDft, 0, sizeof(AWB_SENSOR_DEFAULT_S));
     pstAwbSnsDft->u16WbRefTemp = 4950;
 
-
     pstAwbSnsDft->au16GainOffset[0] = CALIBRATE_STATIC_WB_R_GAIN;
     pstAwbSnsDft->au16GainOffset[1] = CALIBRATE_STATIC_WB_GR_GAIN;
     pstAwbSnsDft->au16GainOffset[2] = CALIBRATE_STATIC_WB_GB_GAIN;
@@ -743,7 +834,8 @@ static HI_S32 cmos_get_awb_default(VI_PIPE ViPipe, AWB_SENSOR_DEFAULT_S *pstAwbS
     pstAwbSnsDft->u16GoldenRgain = GOLDEN_RGAIN;
     pstAwbSnsDft->u16GoldenBgain = GOLDEN_BGAIN;
 
-    switch (pstSnsState->enWDRMode) {
+    switch (pstSnsState->enWDRMode)
+    {
         default:
         case WDR_MODE_NONE:
             memcpy(&pstAwbSnsDft->stCcm, &g_stAwbCcm, sizeof(AWB_CCM_S));
@@ -906,6 +998,11 @@ static HI_S32 cmos_get_isp_default(VI_PIPE ViPipe, ISP_CMOS_DEFAULT_S *pstDef)
             pstDef->stSensorMode.stDngRawFormat.u32WhiteLevel = 4095;
             break;
 
+        case IMX327_SENSOR_720P_30FPS_LINEAR_MODE:
+            pstDef->stSensorMode.stDngRawFormat.u8BitsPerSample = 12;
+            pstDef->stSensorMode.stDngRawFormat.u32WhiteLevel = 4095;
+            break;
+
         case IMX327_SENSOR_1080P_30FPS_WDR_2to1_MODE:
             pstDef->stSensorMode.stDngRawFormat.u8BitsPerSample = 10;
             pstDef->stSensorMode.stDngRawFormat.u32WhiteLevel = 1023;
@@ -946,13 +1043,15 @@ static HI_S32 cmos_get_isp_black_level(VI_PIPE ViPipe, ISP_CMOS_BLACK_LEVEL_S *p
     pstBlackLevel->bUpdate = HI_FALSE;
 
     /* black level of linear mode */
-    if (pstSnsState->enWDRMode == WDR_MODE_NONE) {
-        for (i = 0; i < 4; i++) {
+    if (pstSnsState->enWDRMode == WDR_MODE_NONE)
+    {
+        for (i = 0; i < 4; i++)
+        {
             pstBlackLevel->au16BlackLevel[i] = 0xF0;    // 240
         }
-    } else {
-
-    /* black level of DOL mode */
+    } else
+    {
+        /* black level of DOL mode */
         pstBlackLevel->au16BlackLevel[0] = 0xf0;
         pstBlackLevel->au16BlackLevel[1] = 0xf0;
         pstBlackLevel->au16BlackLevel[2] = 0xf0;
@@ -971,21 +1070,31 @@ static HI_VOID cmos_set_pixel_detect(VI_PIPE ViPipe, HI_BOOL bEnable)
     IMX327_SENSOR_GET_CTX(ViPipe, pstSnsState);
     CMOS_CHECK_POINTER_VOID(pstSnsState);
 
-    if (pstSnsState->enWDRMode == WDR_MODE_2To1_LINE) {
+    if (pstSnsState->enWDRMode == WDR_MODE_2To1_LINE)
+    {
         return;
-    } else {
-        if ((pstSnsState->u8ImgMode == IMX327_SENSOR_1080P_30FPS_LINEAR_MODE) || \
-            (pstSnsState->u8ImgMode == IMX327_SENSOR_1080P_30FPS_FRAME_WDR_2to1_MODE)) {
+    }
+    else
+    {
+        if ((pstSnsState->u8ImgMode == IMX327_SENSOR_1080P_30FPS_LINEAR_MODE)
+            || (pstSnsState->u8ImgMode == IMX327_SENSOR_1080P_30FPS_FRAME_WDR_2to1_MODE))
+        {
             u32FullLines_5Fps = (IMX327_VMAX_1080P30_LINEAR * 30) / 5;
-        } else {
-
+        }
+        else if (pstSnsState->u8ImgMode == IMX327_SENSOR_720P_30FPS_LINEAR_MODE)
+        {
+            u32FullLines_5Fps = (IMX327_VMAX_720P30_LINEAR * 30) / 5;
+        }
+        else
+        {
             return;
         }
     }
 
     u32MaxIntTime_5Fps = 4;
 
-    if (bEnable) { /* setup for ISP pixel calibration mode */
+    if (bEnable)
+    { /* setup for ISP pixel calibration mode */
         imx327_2l_write_register(ViPipe, IMX327_GAIN_ADDR, 0x00);
 
         imx327_2l_write_register(ViPipe, IMX327_VMAX_ADDR, u32FullLines_5Fps & 0xFF);
@@ -996,7 +1105,9 @@ static HI_VOID cmos_set_pixel_detect(VI_PIPE ViPipe, HI_BOOL bEnable)
         imx327_2l_write_register(ViPipe, IMX327_SHS1_ADDR + 1, (u32MaxIntTime_5Fps & 0xFF00) >> 8);
         imx327_2l_write_register(ViPipe, IMX327_SHS1_ADDR + 2, (u32MaxIntTime_5Fps & 0xF0000) >> 16);
 
-    } else { /* setup for ISP 'normal mode' */
+    }
+    else
+    { /* setup for ISP 'normal mode' */
         pstSnsState->u32FLStd = (pstSnsState->u32FLStd > 0x1FFFF) ? 0x1FFFF : pstSnsState->u32FLStd;
         imx327_2l_write_register(ViPipe, IMX327_VMAX_ADDR, pstSnsState->u32FLStd & 0xFF);
         imx327_2l_write_register(ViPipe, IMX327_VMAX_ADDR + 1, (pstSnsState->u32FLStd & 0xFF00) >> 8);
@@ -1016,7 +1127,8 @@ static HI_S32 cmos_set_wdr_mode(VI_PIPE ViPipe, HI_U8 u8Mode)
 
     pstSnsState->bSyncInit = HI_FALSE;
 
-    switch (u8Mode & 0x3F) {
+    switch (u8Mode & 0x3F)
+    {
         case WDR_MODE_NONE:
             pstSnsState->enWDRMode = WDR_MODE_NONE;
             printf("linear mode\n");
@@ -1050,22 +1162,26 @@ static HI_S32 cmos_get_sns_regs_info(VI_PIPE ViPipe, ISP_SNS_REGS_INFO_S *pstSns
     IMX327_SENSOR_GET_CTX(ViPipe, pstSnsState);
     CMOS_CHECK_POINTER(pstSnsState);
 
-    if ((pstSnsState->bSyncInit == HI_FALSE) || (pstSnsRegsInfo->bConfig == HI_FALSE)) {
+    if ((pstSnsState->bSyncInit == HI_FALSE) || (pstSnsRegsInfo->bConfig == HI_FALSE))
+    {
         pstSnsState->astRegsInfo[0].enSnsType = ISP_SNS_I2C_TYPE;
         pstSnsState->astRegsInfo[0].unComBus.s8I2cDev = g_aunImx327_2l_BusInfo[ViPipe].s8I2cDev;
         pstSnsState->astRegsInfo[0].u8Cfg2ValidDelayMax = 2;
         pstSnsState->astRegsInfo[0].u32RegNum = 8;
 
-        if (pstSnsState->enWDRMode == WDR_MODE_2To1_FRAME) {
+        if (pstSnsState->enWDRMode == WDR_MODE_2To1_FRAME)
+        {
             pstSnsState->astRegsInfo[0].u32RegNum += 3;
             pstSnsState->astRegsInfo[0].u8Cfg2ValidDelayMax = 2;
-        } else if (pstSnsState->enWDRMode == WDR_MODE_2To1_LINE) {
-
+        }
+        else if (pstSnsState->enWDRMode == WDR_MODE_2To1_LINE)
+        {
             pstSnsState->astRegsInfo[0].u32RegNum = 16;
             pstSnsState->astRegsInfo[0].u8Cfg2ValidDelayMax = 2;
         }
 
-        for (i = 0; i < pstSnsState->astRegsInfo[0].u32RegNum; i++) {
+        for (i = 0; i < pstSnsState->astRegsInfo[0].u32RegNum; i++)
+        {
             pstSnsState->astRegsInfo[0].astI2cData[i].bUpdate = HI_TRUE;
             pstSnsState->astRegsInfo[0].astI2cData[i].u8DevAddr = imx327_2l_i2c_addr;
             pstSnsState->astRegsInfo[0].astI2cData[i].u32AddrByteNum = imx327_2l_addr_byte;
@@ -1092,7 +1208,8 @@ static HI_S32 cmos_get_sns_regs_info(VI_PIPE ViPipe, ISP_SNS_REGS_INFO_S *pstSns
         pstSnsState->astRegsInfo[0].astI2cData[7].u8DelayFrmNum = 0;
         pstSnsState->astRegsInfo[0].astI2cData[7].u32RegAddr = IMX327_VMAX_ADDR + 2;
 
-        if (pstSnsState->enWDRMode == WDR_MODE_2To1_FRAME) {
+        if (pstSnsState->enWDRMode == WDR_MODE_2To1_FRAME)
+        {
             pstSnsState->astRegsInfo[0].astI2cData[5].u8DelayFrmNum = 1;
             pstSnsState->astRegsInfo[0].astI2cData[5].u32RegAddr = IMX327_SHS1_ADDR;
             pstSnsState->astRegsInfo[0].astI2cData[6].u8DelayFrmNum = 1;
@@ -1107,7 +1224,9 @@ static HI_S32 cmos_get_sns_regs_info(VI_PIPE ViPipe, ISP_SNS_REGS_INFO_S *pstSns
             pstSnsState->astRegsInfo[0].astI2cData[10].u8DelayFrmNum = 0;
             pstSnsState->astRegsInfo[0].astI2cData[10].u32RegAddr = IMX327_VMAX_ADDR + 2;
 
-        } else if (pstSnsState->enWDRMode == WDR_MODE_2To1_LINE) {
+        }
+        else if (pstSnsState->enWDRMode == WDR_MODE_2To1_LINE)
+        {
         // DOL 2t1 Mode Regs
             pstSnsState->astRegsInfo[0].astI2cData[0].u8DelayFrmNum = 0;
             pstSnsState->astRegsInfo[0].astI2cData[1].u8DelayFrmNum = 0;
@@ -1140,17 +1259,23 @@ static HI_S32 cmos_get_sns_regs_info(VI_PIPE ViPipe, ISP_SNS_REGS_INFO_S *pstSns
             pstSnsState->astRegsInfo[0].astI2cData[15].u32RegAddr = IMX327_Y_OUT_SIZE_ADDR + 1;
         }
         pstSnsState->bSyncInit = HI_TRUE;
-    } else {
-        for (i = 0; i < pstSnsState->astRegsInfo[0].u32RegNum; i++) {
-            if (pstSnsState->astRegsInfo[0].astI2cData[i].u32Data == pstSnsState->astRegsInfo[1].astI2cData[i].u32Data) {
+    }
+    else
+    {
+        for (i = 0; i < pstSnsState->astRegsInfo[0].u32RegNum; i++)
+        {
+            if (pstSnsState->astRegsInfo[0].astI2cData[i].u32Data == pstSnsState->astRegsInfo[1].astI2cData[i].u32Data)
+            {
                 pstSnsState->astRegsInfo[0].astI2cData[i].bUpdate = HI_FALSE;
-            } else {
-
+            }
+            else
+            {
                 pstSnsState->astRegsInfo[0].astI2cData[i].bUpdate = HI_TRUE;
             }
         }
 
-        if (pstSnsState->enWDRMode == WDR_MODE_2To1_FRAME) {
+        if (pstSnsState->enWDRMode == WDR_MODE_2To1_FRAME)
+        {
             pstSnsState->astRegsInfo[0].astI2cData[0].bUpdate = HI_TRUE;
             pstSnsState->astRegsInfo[0].astI2cData[1].bUpdate = HI_TRUE;
             pstSnsState->astRegsInfo[0].astI2cData[2].bUpdate = HI_TRUE;
@@ -1181,43 +1306,73 @@ static HI_S32 cmos_set_image_mode(VI_PIPE ViPipe, ISP_CMOS_SENSOR_IMAGE_MODE_S *
     u8SensorImageMode      = pstSnsState->u8ImgMode;
     pstSnsState->bSyncInit = HI_FALSE;
 
-    if (pstSensorImageMode->f32Fps <= 30) {
-        if (pstSnsState->enWDRMode == WDR_MODE_NONE) {
-            if (IMX327_RES_IS_1080P(pstSensorImageMode->u16Width, pstSensorImageMode->u16Height)) {
+    printf("Func:%s, Line:%d, f32Fps = %lf, w = %d, h = %d\n",
+        __FUNCTION__, __LINE__, pstSensorImageMode->f32Fps, pstSensorImageMode->u16Width, pstSensorImageMode->u16Height);
+
+    if (pstSensorImageMode->f32Fps <= 30)
+    {
+        if (pstSnsState->enWDRMode == WDR_MODE_NONE)
+        {
+            if (IMX327_RES_IS_720P(pstSensorImageMode->u16Width, pstSensorImageMode->u16Height))
+            {
+                u8SensorImageMode                  = IMX327_SENSOR_720P_30FPS_LINEAR_MODE;
+                pstSnsState->u32FLStd              = IMX327_VMAX_720P30_LINEAR;
+                g_astimx327_2l_State[ViPipe].u8Hcg = 0x2;
+            }
+            else if (IMX327_RES_IS_1080P(pstSensorImageMode->u16Width, pstSensorImageMode->u16Height))
+            {
                 u8SensorImageMode                  = IMX327_SENSOR_1080P_30FPS_LINEAR_MODE;
                 pstSnsState->u32FLStd              = IMX327_VMAX_1080P30_LINEAR;
                 g_astimx327_2l_State[ViPipe].u8Hcg = 0x2;
-            } else {
+            }
+            else
+            {
                 IMX327_2L_ERR_MODE_PRINT(pstSensorImageMode, pstSnsState);
                 return HI_FAILURE;
             }
-        } else if (pstSnsState->enWDRMode == WDR_MODE_2To1_FRAME) {
-            if (IMX327_RES_IS_1080P(pstSensorImageMode->u16Width, pstSensorImageMode->u16Height)) {
+        }
+        else if (pstSnsState->enWDRMode == WDR_MODE_2To1_FRAME)
+        {
+            if (IMX327_RES_IS_1080P(pstSensorImageMode->u16Width, pstSensorImageMode->u16Height))
+            {
                 u8SensorImageMode                  = IMX327_SENSOR_1080P_30FPS_FRAME_WDR_2to1_MODE;
                 pstSnsState->u32FLStd              = IMX327_VMAX_1080P30_LINEAR;
                 g_astimx327_2l_State[ViPipe].u8Hcg = 0x2;
-            } else {
+            }
+            else
+            {
                 IMX327_2L_ERR_MODE_PRINT(pstSensorImageMode, pstSnsState);
                 return HI_FAILURE;
             }
-        } else if (pstSnsState->enWDRMode == WDR_MODE_2To1_LINE) {
-            if (IMX327_RES_IS_1080P(pstSensorImageMode->u16Width, pstSensorImageMode->u16Height)) {
+        }
+        else if (pstSnsState->enWDRMode == WDR_MODE_2To1_LINE)
+        {
+            if (IMX327_RES_IS_1080P(pstSensorImageMode->u16Width, pstSensorImageMode->u16Height))
+            {
                 u8SensorImageMode                   = IMX327_SENSOR_1080P_30FPS_WDR_2to1_MODE;
                 g_astimx327_2l_State[ViPipe].u32BRL = 1109;
                 g_astimx327_2l_State[ViPipe].u8Hcg  = 0x1;
                 pstSnsState->u32FLStd               = IMX327_VMAX_1080P60TO30_WDR * 2;
-            } else {
+            }
+            else
+            {
                 IMX327_2L_ERR_MODE_PRINT(pstSensorImageMode, pstSnsState);
                 return HI_FAILURE;
             }
-        } else {
+        }
+        else
+        {
             IMX327_2L_ERR_MODE_PRINT(pstSensorImageMode, pstSnsState);
             return HI_FAILURE;
         }
-    } else {
+    }
+    else
+    {
+        printf("Func:%s, Line:%d, fps = %lf\n", __FUNCTION__, __LINE__, pstSensorImageMode->f32Fps);
     }
 
-    if ((pstSnsState->bInit == HI_TRUE) && (u8SensorImageMode == pstSnsState->u8ImgMode)) {
+    if ((pstSnsState->bInit == HI_TRUE) && (u8SensorImageMode == pstSnsState->u8ImgMode))
+    {
         /* Don't need to switch SensorImageMode */
         return ISP_DO_NOT_NEED_SWITCH_IMAGEMODE;
     }
@@ -1238,11 +1393,11 @@ static HI_VOID sensor_global_init(VI_PIPE ViPipe)
 
     pstSnsState->bInit = HI_FALSE;
     pstSnsState->bSyncInit = HI_FALSE;
-    pstSnsState->u8ImgMode = IMX327_SENSOR_1080P_30FPS_LINEAR_MODE;
+    pstSnsState->u8ImgMode = IMX327_SENSOR_720P_30FPS_LINEAR_MODE;  //IMX327_SENSOR_1080P_30FPS_LINEAR_MODE;
     pstSnsState->enWDRMode = WDR_MODE_NONE;
-    pstSnsState->u32FLStd  = IMX327_VMAX_1080P30_LINEAR;
-    pstSnsState->au32FL[0] = IMX327_VMAX_1080P30_LINEAR;
-    pstSnsState->au32FL[1] = IMX327_VMAX_1080P30_LINEAR;
+    pstSnsState->u32FLStd  = IMX327_VMAX_720P30_LINEAR; //IMX327_VMAX_1080P30_LINEAR;
+    pstSnsState->au32FL[0] = IMX327_VMAX_720P30_LINEAR; //IMX327_VMAX_1080P30_LINEAR;
+    pstSnsState->au32FL[1] = IMX327_VMAX_720P30_LINEAR; //IMX327_VMAX_1080P30_LINEAR;
 
     memset(&pstSnsState->astRegsInfo[0], 0, sizeof(ISP_SNS_REGS_INFO_S));
     memset(&pstSnsState->astRegsInfo[1], 0, sizeof(ISP_SNS_REGS_INFO_S));
@@ -1284,9 +1439,11 @@ static HI_S32 sensor_ctx_init(VI_PIPE ViPipe)
 
     IMX327_SENSOR_GET_CTX(ViPipe, pastSnsStateCtx);
 
-    if (pastSnsStateCtx == HI_NULL) {
+    if (pastSnsStateCtx == HI_NULL)
+    {
         pastSnsStateCtx = (ISP_SNS_STATE_S *)malloc(sizeof(ISP_SNS_STATE_S));
-        if (pastSnsStateCtx == HI_NULL) {
+        if (pastSnsStateCtx == HI_NULL)
+        {
             ISP_ERR_TRACE("Isp[%d] SnsCtx malloc memory failed!\n", ViPipe);
             return HI_ERR_ISP_NOMEM;
         }
@@ -1320,8 +1477,8 @@ static HI_S32 sensor_register_callback(VI_PIPE ViPipe, ALG_LIB_S *pstAeLib, ALG_
     CMOS_CHECK_POINTER(pstAwbLib);
 
     s32Ret = sensor_ctx_init(ViPipe);
-
-    if (s32Ret != HI_SUCCESS) {
+    if (s32Ret != HI_SUCCESS)
+    {
         return HI_FAILURE;
     }
 
@@ -1329,24 +1486,24 @@ static HI_S32 sensor_register_callback(VI_PIPE ViPipe, ALG_LIB_S *pstAeLib, ALG_
 
     s32Ret  = cmos_init_sensor_exp_function(&stIspRegister.stSnsExp);
     s32Ret |= HI_MPI_ISP_SensorRegCallBack(ViPipe, &stSnsAttrInfo, &stIspRegister);
-
-    if (s32Ret != HI_SUCCESS) {
+    if (s32Ret != HI_SUCCESS)
+    {
         ISP_ERR_TRACE("sensor register callback function failed!\n");
         return s32Ret;
     }
 
     s32Ret  = cmos_init_ae_exp_function(&stAeRegister.stSnsExp);
     s32Ret |= HI_MPI_AE_SensorRegCallBack(ViPipe, pstAeLib, &stSnsAttrInfo, &stAeRegister);
-
-    if (s32Ret != HI_SUCCESS) {
+    if (s32Ret != HI_SUCCESS)
+    {
         ISP_ERR_TRACE("sensor register callback function to ae lib failed!\n");
         return s32Ret;
     }
 
     s32Ret  = cmos_init_awb_exp_function(&stAwbRegister.stSnsExp);
     s32Ret |= HI_MPI_AWB_SensorRegCallBack(ViPipe, pstAwbLib, &stSnsAttrInfo, &stAwbRegister);
-
-    if (s32Ret != HI_SUCCESS) {
+    if (s32Ret != HI_SUCCESS)
+    {
         ISP_ERR_TRACE("sensor register callback function to awb lib failed!\n");
         return s32Ret;
     }
@@ -1362,19 +1519,22 @@ static HI_S32 sensor_unregister_callback(VI_PIPE ViPipe, ALG_LIB_S *pstAeLib, AL
     CMOS_CHECK_POINTER(pstAwbLib);
 
     s32Ret = HI_MPI_ISP_SensorUnRegCallBack(ViPipe, IMX327_ID);
-    if (s32Ret != HI_SUCCESS) {
+    if (s32Ret != HI_SUCCESS)
+    {
         ISP_ERR_TRACE("sensor unregister callback function failed!\n");
         return s32Ret;
     }
 
     s32Ret = HI_MPI_AE_SensorUnRegCallBack(ViPipe, pstAeLib, IMX327_ID);
-    if (s32Ret != HI_SUCCESS) {
+    if (s32Ret != HI_SUCCESS)
+    {
         ISP_ERR_TRACE("sensor unregister callback function to ae lib failed!\n");
         return s32Ret;
     }
 
     s32Ret = HI_MPI_AWB_SensorUnRegCallBack(ViPipe, pstAwbLib, IMX327_ID);
-    if (s32Ret != HI_SUCCESS) {
+    if (s32Ret != HI_SUCCESS)
+    {
         ISP_ERR_TRACE("sensor unregister callback function to awb lib failed!\n");
         return s32Ret;
     }

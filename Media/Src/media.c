@@ -39,6 +39,8 @@ int Media_Init(unsigned int sensorNumber)
         return -1;
     }
 
+    prtMD("imageWidth = %d, imageheight = %d\n", imageWidth, imageHeight);
+
     stPoolCfg.poolNum = 2;
     stPoolCfg.stVbInfo[0].width = imageWidth;
     stPoolCfg.stVbInfo[0].height = imageHeight;

@@ -81,7 +81,7 @@ combo_dev_attr_t MIPI_2lane_CHN1_SENSOR_IMX327_12BIT_720P_NOWDR_ATTR =
         {
             DATA_TYPE_RAW_12BIT,
             HI_MIPI_WDR_MODE_NONE,
-            {0, 2, -1, -1}
+            {0, 1, -1, -1}
         }
     }
 };

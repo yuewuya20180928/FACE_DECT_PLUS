@@ -72,11 +72,13 @@ int imx327_2l_i2c_init(VI_PIPE ViPipe)
 
 int imx327_2l_i2c_exit(VI_PIPE ViPipe)
 {
-    if (g_fd[ViPipe] >= 0) {
+    if (g_fd[ViPipe] >= 0)
+    {
         close(g_fd[ViPipe]);
         g_fd[ViPipe] = -1;
         return HI_SUCCESS;
     }
+
     return HI_FAILURE;
 }
 
@@ -88,7 +90,8 @@ int imx327_2l_read_register(VI_PIPE ViPipe, int addr)
 
 int imx327_2l_write_register(VI_PIPE ViPipe, int addr, int data)
 {
-    if (g_fd[ViPipe] < 0) {
+    if (g_fd[ViPipe] < 0)
+    {
         return HI_SUCCESS;
     }
 
@@ -110,22 +113,30 @@ int imx327_2l_write_register(VI_PIPE ViPipe, int addr, int data)
     int ret;
     char buf[8];
 
-    if (imx327_2l_addr_byte == 2) {
+    if (imx327_2l_addr_byte == 2)
+    {
         buf[idx] = (addr >> 8) & 0xff;
         idx++;
         buf[idx] = addr & 0xff;
         idx++;
-    } else {
+    }
+    else
+    {
+
     }
 
-    if (imx327_2l_data_byte == 2) {
-    } else {
+    if (imx327_2l_data_byte == 2)
+    {
+    } 
+    else
+    {
         buf[idx] = data & 0xff;
         idx++;
     }
 
     ret = write(g_fd[ViPipe], buf, imx327_2l_addr_byte + imx327_2l_data_byte);
-    if (ret < 0) {
+    if (ret < 0)
+    {
         ISP_ERR_TRACE("I2C_WRITE error!\n");
         return HI_FAILURE;
     }
@@ -142,15 +153,21 @@ static void delay_ms(int ms)
 void imx327_2l_prog(VI_PIPE ViPipe, const int *rom)
 {
     int i = 0;
-    while (1) {
+    while (1)
+    {
         int lookup = rom[i++];
         int addr = (lookup >> 16) & 0xFFFF;
         int data = lookup & 0xFFFF;
-        if (addr == 0xFFFE) {
+        if (addr == 0xFFFE)
+        {
             delay_ms(data);
-        } else if (addr == 0xFFFF) {
+        }
+        else if (addr == 0xFFFF)
+        {
             return;
-        } else {
+        }
+        else
+        {
             imx327_2l_write_register(ViPipe, addr, data);
         }
     }
@@ -358,62 +375,74 @@ void imx327_2l_linear_720p30_init(VI_PIPE ViPipe)
     imx327_2l_write_register(ViPipe, 0x3000, 0x01);  /* STANDBY */
     imx327_2l_write_register(ViPipe, 0x3002, 0x00);  /* XTMSTA */
     imx327_2l_write_register(ViPipe, 0x3005, 0x01);
-    imx327_2l_write_register(ViPipe, 0x3007, 0x00);
+    imx327_2l_write_register(ViPipe, 0x3007, 0x04); /* 720P */
     imx327_2l_write_register(ViPipe, 0x3009, 0x02);
-    imx327_2l_write_register(ViPipe, 0x300a, 0xf0);
-    imx327_2l_write_register(ViPipe, 0x3011, 0x02);
-    imx327_2l_write_register(ViPipe, 0x3018, 0x65);  /* Vmax */
-    imx327_2l_write_register(ViPipe, 0x3019, 0x04);  /* Vmax */
-    imx327_2l_write_register(ViPipe, 0x301c, 0x30);  /* Hmax */
-    imx327_2l_write_register(ViPipe, 0x301d, 0x11);  /* Hmax */
-    imx327_2l_write_register(ViPipe, 0x3046, 0x01);  /* ODBIT */
+    imx327_2l_write_register(ViPipe, 0x300a, 0xf0); /* black level */
+    imx327_2l_write_register(ViPipe, 0x300b, 0x00);
+
+    #if 1
+    imx327_2l_write_register(ViPipe, 0x3011, 0x02); /* TODO FYF */
+    #endif
+
+    imx327_2l_write_register(ViPipe, 0x3018, 0xEE);  /* Vmax */
+    imx327_2l_write_register(ViPipe, 0x3019, 0x02);  /* Vmax */
+    imx327_2l_write_register(ViPipe, 0x301c, 0xC8);  /* Hmax */
+    imx327_2l_write_register(ViPipe, 0x301d, 0x19);  /* Hmax */
+    imx327_2l_write_register(ViPipe, 0x3044, 0x01);  /* ODBIT */
     imx327_2l_write_register(ViPipe, 0x304b, 0x0a);
 
-    imx327_2l_write_register(ViPipe, 0x305c, 0x18);  /* inck1 */
-    imx327_2l_write_register(ViPipe, 0x305d, 0x03);  /* inck2 */
+    imx327_2l_write_register(ViPipe, 0x305c, 0x20);  /* inck1 */
+    imx327_2l_write_register(ViPipe, 0x305d, 0x00);  /* inck2 */
     imx327_2l_write_register(ViPipe, 0x305e, 0x20);  /* inck3 */
-    imx327_2l_write_register(ViPipe, 0x305f, 0x01);
+    imx327_2l_write_register(ViPipe, 0x305f, 0x01);  /* inck4 */
+
+    #if 1
     imx327_2l_write_register(ViPipe, 0x309e, 0x4a);
     imx327_2l_write_register(ViPipe, 0x309f, 0x4a);
     imx327_2l_write_register(ViPipe, 0x30d2, 0x19);
     imx327_2l_write_register(ViPipe, 0x30d7, 0x03);
+    #endif
 
     imx327_2l_write_register(ViPipe, 0x3129, 0x00);  /* ADBIT1 */
+
+    #if 1
     imx327_2l_write_register(ViPipe, 0x313b, 0x61);
+    #endif
+
     imx327_2l_write_register(ViPipe, 0x315e, 0x1a);  /* inck5 */
     imx327_2l_write_register(ViPipe, 0x3164, 0x1a);  /* inck6 */
     imx327_2l_write_register(ViPipe, 0x317c, 0x00);  /* ADBIT2 */
     imx327_2l_write_register(ViPipe, 0x31ec, 0x0e);  /* ADBIT3 */
 
-    imx327_2l_write_register(ViPipe, 0x3405, 0x10);
+    imx327_2l_write_register(ViPipe, 0x3405, 0x10); /* global timing */
     imx327_2l_write_register(ViPipe, 0x3407, 0x01);
-    imx327_2l_write_register(ViPipe, 0x3414, 0x0a);
-    imx327_2l_write_register(ViPipe, 0x3418, 0x49);
-    imx327_2l_write_register(ViPipe, 0x3419, 0x04);
+    imx327_2l_write_register(ViPipe, 0x3414, 0x04);
+    imx327_2l_write_register(ViPipe, 0x3418, 0xD9);
+    imx327_2l_write_register(ViPipe, 0x3419, 0x02);
     imx327_2l_write_register(ViPipe, 0x3441, 0x0c);
     imx327_2l_write_register(ViPipe, 0x3442, 0x0c);
     imx327_2l_write_register(ViPipe, 0x3443, 0x01);
     imx327_2l_write_register(ViPipe, 0x3444, 0x20);
     imx327_2l_write_register(ViPipe, 0x3445, 0x25);
-    imx327_2l_write_register(ViPipe, 0x3446, 0x57);
+    imx327_2l_write_register(ViPipe, 0x3446, 0x4F);
     imx327_2l_write_register(ViPipe, 0x3447, 0x00);
-    imx327_2l_write_register(ViPipe, 0x3448, 0x37);
+    imx327_2l_write_register(ViPipe, 0x3448, 0x2F);
     imx327_2l_write_register(ViPipe, 0x3449, 0x00);
-    imx327_2l_write_register(ViPipe, 0x344a, 0x1f);
+    imx327_2l_write_register(ViPipe, 0x344a, 0x17);
     imx327_2l_write_register(ViPipe, 0x344b, 0x00);
-    imx327_2l_write_register(ViPipe, 0x344c, 0x1f);
+    imx327_2l_write_register(ViPipe, 0x344c, 0x17);
     imx327_2l_write_register(ViPipe, 0x344d, 0x00);
-    imx327_2l_write_register(ViPipe, 0x344e, 0x1f);
+    imx327_2l_write_register(ViPipe, 0x344e, 0x17);
     imx327_2l_write_register(ViPipe, 0x344f, 0x00);
-    imx327_2l_write_register(ViPipe, 0x3450, 0x77);
+    imx327_2l_write_register(ViPipe, 0x3450, 0x57);
     imx327_2l_write_register(ViPipe, 0x3451, 0x00);
-    imx327_2l_write_register(ViPipe, 0x3452, 0x1f);
+    imx327_2l_write_register(ViPipe, 0x3452, 0x17);
     imx327_2l_write_register(ViPipe, 0x3453, 0x00);
     imx327_2l_write_register(ViPipe, 0x3454, 0x17);
     imx327_2l_write_register(ViPipe, 0x3455, 0x00);
-    imx327_2l_write_register(ViPipe, 0x3472, 0x9c);
-    imx327_2l_write_register(ViPipe, 0x3473, 0x07);
-    imx327_2l_write_register(ViPipe, 0x3480, 0x49);
+    imx327_2l_write_register(ViPipe, 0x3472, 0x1C);
+    imx327_2l_write_register(ViPipe, 0x3473, 0x05);
+    imx327_2l_write_register(ViPipe, 0x3480, 0x49); /* inck7 */
 
     imx327_2l_default_reg_init(ViPipe);
 

@@ -170,7 +170,7 @@ int Media_VideoIn_GetConfig(MEDIA_VI_PARAM_S *pViParam, unsigned int sensorNum)
     {
         pViParam->s32WorkingViId[i] = i;
 
-        #if 0
+        #if 1
         pViParam->stViInfo[i].stSnsInfo.enSnsType = SONY_IMX327_2L_MIPI_720P_30FPS_12BIT;
         #else
         pViParam->stViInfo[i].stSnsInfo.enSnsType = SONY_IMX327_2L_MIPI_2M_30FPS_12BIT;
