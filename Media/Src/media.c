@@ -76,7 +76,7 @@ int Media_Init(unsigned int sensorNumber)
     /* 初始化VPSS */
     for (i = 0; i < sensorNumber; i++)
     {
-        ret = Media_Vpss_InitGroup(sensorIdx[i], imageHeight, imageWidth);
+        ret = Media_Vpss_InitGroup(sensorIdx[i], imageWidth, imageHeight);
         if (HI_SUCCESS != ret)
         {
             prtMD("Media_Vpss_InitGroup error! ret = %#x\n", ret);

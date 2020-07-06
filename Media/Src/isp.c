@@ -74,6 +74,7 @@ ISP_SNS_OBJ_S* Media_Isp_GetSnsObj(VI_SNS_TYPE_E enSnsType)
             return &stSnsImx327Obj;
 
         case SONY_IMX327_2L_MIPI_2M_30FPS_12BIT:
+        case SONY_IMX327_2L_MIPI_720P_30FPS_12BIT:
         case SONY_IMX327_2L_MIPI_2M_30FPS_12BIT_WDR2TO1:
             return &stSnsImx327_2l_Obj;
 

@@ -36,7 +36,7 @@ int Media_Sys_Init(MEDIA_POOL_S *pPool)
             return -1;
         }
 
-        stVbConfig.astCommPool[i].u64BlkSize = ALIGN_UP(pVbInfo->width, 16) * ALIGN_UP(pVbInfo->height, 16) * 3 >> 1;
+        stVbConfig.astCommPool[i].u64BlkSize = ALIGN_UP(pVbInfo->width, 32) * ALIGN_UP(pVbInfo->height, 32) * 3 >> 1;
         stVbConfig.astCommPool[i].u32BlkCnt = pVbInfo->count;
         stVbConfig.u32MaxPoolCnt ++;
     }

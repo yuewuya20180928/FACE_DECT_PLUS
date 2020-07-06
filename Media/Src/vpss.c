@@ -120,7 +120,7 @@ int Media_Vpss_StartChn(MEDIA_SENSOR_E sensorIdx, VPSS_CHN VpssChn, MEDIA_RECT_S
     stVpssChnAttr.stFrameRate.s32DstFrameRate = 30;
     stVpssChnAttr.u32Depth                    = 0;
     stVpssChnAttr.bMirror                     = HI_FALSE;
-    stVpssChnAttr.bFlip                       = HI_FALSE;
+    stVpssChnAttr.bFlip                       = HI_TRUE;
     stVpssChnAttr.stAspectRatio.enMode        = ASPECT_RATIO_NONE;
 
     s32Ret = HI_MPI_VPSS_SetChnAttr(VpssGrp, VpssChn, &stVpssChnAttr);

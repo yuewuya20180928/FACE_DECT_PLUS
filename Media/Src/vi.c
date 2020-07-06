@@ -1038,12 +1038,14 @@ int Media_VideoIn_Init(MEDIA_VI_PARAM_S *pViParam)
     }
 
     /* set the retation of vi chan */
+    #if 0
     s32Ret = Media_VideoIn_SetRotate(pViParam, enRotation);
     if (HI_SUCCESS != s32Ret)
     {
         prtMD("Media_VideoIn_StartVi error! s32Ret = %#x\n", s32Ret);
         return -1;
     }
+    #endif
 
     return HI_SUCCESS;
 }

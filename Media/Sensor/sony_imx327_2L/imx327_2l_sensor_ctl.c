@@ -371,12 +371,14 @@ void imx327_2l_linear_1080p30_init(VI_PIPE ViPipe)
 /* 720P30 and 720P25 */
 void imx327_2l_linear_720p30_init(VI_PIPE ViPipe)
 {
-    printf("Func:%s, Line:%d, start!\n", __FUNCTION__, __LINE__);
 #if 1
+
+    printf("Func:%s, Line:%d, start!\n", __FUNCTION__, __LINE__);
+
     imx327_2l_write_register(ViPipe, 0x3000, 0x01); /* STANDBY */
     imx327_2l_write_register(ViPipe, 0x3002, 0x00); /* XTMSTA */
     imx327_2l_write_register(ViPipe, 0x3005, 0x01); /* 12BIT */
-    imx327_2l_write_register(ViPipe, 0x3007, 0x04); /* 720P */
+    imx327_2l_write_register(ViPipe, 0x3007, 0x40); /* 720P */
     imx327_2l_write_register(ViPipe, 0x3009, 0x02); /* 30FPS */
     imx327_2l_write_register(ViPipe, 0x300a, 0xf0); /* black level */
     imx327_2l_write_register(ViPipe, 0x300b, 0x00);
@@ -386,16 +388,23 @@ void imx327_2l_linear_720p30_init(VI_PIPE ViPipe)
     #endif
 
     /* FPS: */
+    #if 1
+    imx327_2l_write_register(ViPipe, 0x3018, 0xEE);  /* Vmax */
+    imx327_2l_write_register(ViPipe, 0x3019, 0x02);  /* Vmax */
+    imx327_2l_write_register(ViPipe, 0x301c, 0xC8);  /* Hmax */
+    imx327_2l_write_register(ViPipe, 0x301d, 0x19);  /* Hmax */
+    #else
     imx327_2l_write_register(ViPipe, 0x3018, 0x48); /* Vmax */
     imx327_2l_write_register(ViPipe, 0x3019, 0x05); /* Vmax */
     imx327_2l_write_register(ViPipe, 0x301c, 0x98); /* Hmax */
     imx327_2l_write_register(ViPipe, 0x301d, 0x08); /* Hmax */
+    #endif
 
     #if 1
     imx327_2l_write_register(ViPipe, 0x303A, 0x0C); /* WINWV_OB */
 
     /* set the croping start point */
-    imx327_2l_write_register(ViPipe, 0x303C, 0xB4); /* VIMPV */
+    imx327_2l_write_register(ViPipe, 0x303C, 0x60); /* VIMPV */
     imx327_2l_write_register(ViPipe, 0x303D, 0x00); /* VIMPV */
 
     imx327_2l_write_register(ViPipe, 0x3040, 0x40); /* VIMPH */
