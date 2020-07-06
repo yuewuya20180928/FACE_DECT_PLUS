@@ -163,7 +163,7 @@ int main()
 		ASF_FaceFeature copyfeature1 = { 0 };
 		
 		/* face detect */
-		res = ASFDetectFacesEx(handle, &offscreen1, &detectedFaces1);;
+		res = ASFDetectFacesEx(handle, &offscreen1, &detectedFaces1);
 		if (res != MOK && detectedFaces1.faceNum > 0)
 		{
 			printf("%s ASFDetectFaces 1 fail: %ld\n", picPath1, res);
