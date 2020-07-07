@@ -14,8 +14,8 @@ using namespace std;
 #define APPID  "BxV8LNusqXi2NJbcRzXC2cBwY3xUt95JwGwx1E1kvhC8"
 #define SDKKEY "EK9DCw5txTGAu25jbmyUuYc2LuJ7fKGi11T55eZ4ytyC"
 
-#define NSCALE 16 
-#define FACENUM	5
+#define NSCALE 24 
+#define FACENUM	15
 
 #define SafeFree(p) { if ((p)) free(p); (p) = NULL; }
 #define SafeArrayDelete(p) { if ((p)) delete [] (p); (p) = NULL; } 

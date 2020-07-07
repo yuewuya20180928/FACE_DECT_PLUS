@@ -1044,7 +1044,7 @@ int Media_Vi_SetLDC(MEDIA_VI_INFO_S *pViInfo)
                 stLDCAttr.stAttr.s32XYRatio = 100;
                 stLDCAttr.stAttr.s32CenterXOffset = 0;
                 stLDCAttr.stAttr.s32CenterYOffset = 0;
-                stLDCAttr.stAttr.s32DistortionRatio = 500;
+                stLDCAttr.stAttr.s32DistortionRatio = 60;
                 s32Ret = HI_MPI_VI_SetChnLDCAttr(ViPipe, ViChn, &stLDCAttr);
                 if (HI_SUCCESS != s32Ret)
                 {
