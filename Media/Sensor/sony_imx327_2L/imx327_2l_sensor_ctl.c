@@ -450,7 +450,7 @@ void imx327_2l_linear_720p30_init(VI_PIPE ViPipe)
     imx327_2l_write_register(ViPipe, 0x3405, 0x10); /* global timing */
     imx327_2l_write_register(ViPipe, 0x3407, 0x01);
     imx327_2l_write_register(ViPipe, 0x3414, 0x04);
-    imx327_2l_write_register(ViPipe, 0x3418, 0xD9);
+    imx327_2l_write_register(ViPipe, 0x3418, 0xE0); /* WINWV:720P高+预留16像素 */
     imx327_2l_write_register(ViPipe, 0x3419, 0x02);
     imx327_2l_write_register(ViPipe, 0x3441, 0x0c);
     imx327_2l_write_register(ViPipe, 0x3442, 0x0c);
