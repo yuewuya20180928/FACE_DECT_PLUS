@@ -378,7 +378,7 @@ void imx327_2l_linear_720p30_init(VI_PIPE ViPipe)
     imx327_2l_write_register(ViPipe, 0x3000, 0x01); /* STANDBY */
     imx327_2l_write_register(ViPipe, 0x3002, 0x00); /* XTMSTA */
     imx327_2l_write_register(ViPipe, 0x3005, 0x01); /* 12BIT */
-    imx327_2l_write_register(ViPipe, 0x3007, 0x40); /* 720P */
+    imx327_2l_write_register(ViPipe, 0x3007, 0x40); /* crop */
     imx327_2l_write_register(ViPipe, 0x3009, 0x02); /* 30FPS */
     imx327_2l_write_register(ViPipe, 0x300a, 0xf0); /* black level */
     imx327_2l_write_register(ViPipe, 0x300b, 0x00);
@@ -404,18 +404,19 @@ void imx327_2l_linear_720p30_init(VI_PIPE ViPipe)
     imx327_2l_write_register(ViPipe, 0x303A, 0x0C); /* WINWV_OB */
 
     /* set the croping start point */
-    imx327_2l_write_register(ViPipe, 0x303C, 0x60); /* VIMPV */
+    /* V方向起始坐标可能有问题,需要进一步确认:TODO */
+    imx327_2l_write_register(ViPipe, 0x303C, 0xB4); /* VIMPV */
     imx327_2l_write_register(ViPipe, 0x303D, 0x00); /* VIMPV */
 
     imx327_2l_write_register(ViPipe, 0x3040, 0x40); /* VIMPH */
     imx327_2l_write_register(ViPipe, 0x3041, 0x01); /* VIMPH */
 
-    /* 720 */
-    imx327_2l_write_register(ViPipe, 0x303E, 0xD0); /* WINWV */
+    /* 720+预留16像素 */
+    imx327_2l_write_register(ViPipe, 0x303E, 0xE0); /* WINWV */
     imx327_2l_write_register(ViPipe, 0x303F, 0x02); /* WINWV */
 
-    /* 1280 */
-    imx327_2l_write_register(ViPipe, 0x3042, 0x00); /* VIMWH */
+    /* 1280+预留16像素 */
+    imx327_2l_write_register(ViPipe, 0x3042, 0x10); /* VIMWH */
     imx327_2l_write_register(ViPipe, 0x3043, 0x05); /* VIMWH */
 
     #endif
