@@ -55,6 +55,10 @@ int Media_VideoIn_Init(MEDIA_VI_PARAM_S *pViParam);
 
 int Media_VideoIn_GetSnsWH(VI_SNS_TYPE_E enSnsType, unsigned int *pWidth, unsigned int *pHeight);
 
+int Media_Vi_SetLDC(MEDIA_VI_INFO_S *pViInfo);
+
+int Media_VideoIn_SetLDC(MEDIA_VI_PARAM_S *pViParam);
+
 #ifdef __cplusplus
 }
 #endif

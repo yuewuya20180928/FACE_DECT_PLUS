@@ -1002,10 +1002,95 @@ int Media_VideoIn_SetRotate(MEDIA_VI_PARAM_S *pViParam, ROTATION_E enRotation)
     return s32Ret;
 }
 
+/* 设置VI镜头畸变校正（LDC）属性 */
+int Media_Vi_SetLDC(MEDIA_VI_INFO_S *pViInfo)
+{
+    VI_LDC_ATTR_S stLDCAttr;
+    HI_S32 s32Ret = HI_SUCCESS;
+    VI_CHN ViChn = 0;
+    VI_PIPE ViPipe = 0;
+    HI_BOOL bNeedChn = HI_FALSE;
+    unsigned int i = 0;
+
+    if (pViInfo == NULL)
+    {
+        prtMD("invalid input pViInfo = %p\n", pViInfo);
+        return -1;
+    }
+
+    for (i = 0; i < WDR_MAX_PIPE_NUM; i++)
+    {
+        bNeedChn = HI_FALSE;
+        if (pViInfo->stPipeInfo.aPipe[i] >= 0  && pViInfo->stPipeInfo.aPipe[i] < VI_MAX_PIPE_NUM)
+        {
+            ViPipe = pViInfo->stPipeInfo.aPipe[i];
+            ViChn  = pViInfo->stChnInfo.ViChn;
+            if (WDR_MODE_NONE == pViInfo->stDevInfo.enWDRMode)
+            {
+                bNeedChn = HI_TRUE;
+            }
+            else
+            {
+                bNeedChn = (i > 0) ? HI_FALSE : HI_TRUE;
+            }
+
+            if (bNeedChn)
+            {
+                memset(&stLDCAttr, 0, sizeof(stLDCAttr));
+                stLDCAttr.bEnable = HI_TRUE;
+                stLDCAttr.stAttr.bAspect = 0;
+                stLDCAttr.stAttr.s32XRatio = 100;
+                stLDCAttr.stAttr.s32YRatio = 100;
+                stLDCAttr.stAttr.s32XYRatio = 100;
+                stLDCAttr.stAttr.s32CenterXOffset = 0;
+                stLDCAttr.stAttr.s32CenterYOffset = 0;
+                stLDCAttr.stAttr.s32DistortionRatio = 500;
+                s32Ret = HI_MPI_VI_SetChnLDCAttr(ViPipe, ViChn, &stLDCAttr);
+                if (HI_SUCCESS != s32Ret)
+                {
+                    prtMD("HI_MPI_VI_SetChnLDCAttr failed witfh %d, ViPipe = %d, ViChn = %d\n", s32Ret, ViPipe, ViChn);
+                }
+            }
+        }
+    }
+
+    prtMD("HI_MPI_VI_SetChnLDCAttr OK! ViPipe = %d, ViChn = %d\n", ViPipe, ViChn);
+
+    return s32Ret;
+}
+
+int Media_VideoIn_SetLDC(MEDIA_VI_PARAM_S *pViParam)
+{
+    HI_S32              i = 0;
+    HI_S32              s32ViNum = 0;
+    HI_S32              s32Ret = HI_SUCCESS;
+    MEDIA_VI_INFO_S*    pViInfo = HI_NULL;
+
+    if (pViParam == NULL)
+    {
+        prtMD("invalid input pViParam = %p\n", pViParam);
+        return -1;
+    }
+
+    for (i = 0; i < pViParam->s32WorkingViNum; i++)
+    {
+        s32ViNum  = pViParam->s32WorkingViId[i];
+        pViInfo = &pViParam->stViInfo[s32ViNum];
+        s32Ret = Media_Vi_SetLDC(pViInfo);
+        if (s32Ret != HI_SUCCESS)
+        {
+            prtMD("Media_Vi_SetLDC error! s32Ret = %#x\n", s32Ret);
+            return s32Ret;
+        }
+    }
+
+    return s32Ret;
+}
+
 int Media_VideoIn_Init(MEDIA_VI_PARAM_S *pViParam)
 {
     HI_S32 s32Ret = HI_SUCCESS;
-    ROTATION_E enRotation = ROTATION_270;
+    ROTATION_E enRotation = ROTATION_0;
 
     if (pViParam == NULL)
     {
@@ -1038,14 +1123,20 @@ int Media_VideoIn_Init(MEDIA_VI_PARAM_S *pViParam)
     }
 
     /* set the retation of vi chan */
-    #if 0
     s32Ret = Media_VideoIn_SetRotate(pViParam, enRotation);
     if (HI_SUCCESS != s32Ret)
     {
         prtMD("Media_VideoIn_StartVi error! s32Ret = %#x\n", s32Ret);
         return -1;
     }
-    #endif
+
+    s32Ret = Media_VideoIn_SetLDC(pViParam);
+    if (HI_SUCCESS != s32Ret)
+    {
+        prtMD("Media_VideoIn_SetLDC error! s32Ret = %#x\n", s32Ret);
+        return -1;
+    }
 
     return HI_SUCCESS;
 }
+
