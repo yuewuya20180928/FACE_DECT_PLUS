@@ -1,9 +1,3 @@
-#
-# sensor lib Makefile
-#
-
-plat_form := hisi3516dv300
-
 AR = arm-himix200-linux-ar
 CC = arm-himix200-linux-gcc
 
@@ -16,7 +10,7 @@ CFLAGS  += -Wall -fPIC -O2 -g -lm
 
 CUR_INC := ./
 
-REL_INC := ../../Include/hisi/$(plat_form)/mpp
+REL_INC := ../../Include/hisi/hisi3516dv300/mpp
 
 $(warning $(REL_INC))
  

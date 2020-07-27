@@ -4,11 +4,11 @@ export platform
 ifeq ($(platform), hisi3516cv500)
 	#3516cv500
 	CROSS=arm-himix200-linux-
-	CFLAGS +=  -DHisi3516cv500=1   -DVDEC_FUNC=0 -DVI_FUNC=1 -DVENC_FUNC=0  -DVO_FUNC=1
+	CFLAGS += -DHisi3516cv500=1 -DVDEC_FUNC=0 -DVI_FUNC=1 -DVENC_FUNC=0 -DVO_FUNC=1
 else ifeq ($(platform), hisi3516dv300)
 	#3516dv300
 	CROSS=arm-himix200-linux-
-	CFLAGS +=  -DHisi3516cv500=1   -DVDEC_FUNC=0 -DVI_FUNC=1 -DVENC_FUNC=0  -DVO_FUNC=1
+	CFLAGS += -DHisi3516cv500=1 -DVDEC_FUNC=0 -DVI_FUNC=1 -DVENC_FUNC=0 -DVO_FUNC=1
 endif
 
 releaeType=debug
@@ -51,12 +51,12 @@ DEMO_MEDIA_LIB_PATH = ./Demo/Lib/media
 
 MODULE_NAME = decTest
 
-# 头文件路径  
+# 头文件路径
 LIBS_INC += -I ./Include \
-		  -I ./Include/hisi/$(platform)/mpp \
-		  -I ./common \
-		  -I ./output \
-		  -I ./Src \
+			-I ./Include/hisi/$(platform)/mpp \
+			-I ./common \
+			-I ./output \
+			-I ./Src \
 
 CFLAGS += $(LIBS_INC)
 # 源文件路径 
@@ -67,7 +67,7 @@ SRCS_PATH = $(shell find $(SRC_ROOT_PATH) -maxdepth 3 -type d)
 DEBUG_SUFFIX = debug
 COMPILE_PATH = $(BINDIR)/.objs
 
-# 所有.cpp .c 文件名   
+# 所有.cpp .c 文件名
 LIB_SRCS_C += $(foreach dir,$(SRCS_PATH),$(wildcard $(dir)/*.c))
 SRCS = $(LIB_SRCS_C)
 
@@ -116,17 +116,17 @@ ${COMPILE_PATH}/%.c.d:%.cpp
 	@mv $@.tmp $@
 
 ${COMPILE_PATH}/%.cpp.d:%.cpp
-	$(CPP)  $(CFLAGS) ${CFLAGS_NDBG} -MM -E $^ > $@
+	$(CPP) $(CFLAGS) ${CFLAGS_NDBG} -MM -E $^ > $@
 	@sed 's/.*\.o/${subst /,\/, $(dir $@)}&/g' $@ >$@.tmp
 	@mv $@.tmp $@
 
 ${COMPILE_PATH}/%.c.d.debug:%.cpp
-	$(CC)  $(CFLAGS) ${CFLAGS_DBG} -MM -E $^ > $@
+	$(CC) $(CFLAGS) ${CFLAGS_DBG} -MM -E $^ > $@
 	@sed 's/\(.*\)\.o/$(subst /,\/, $(dir $@))\1.${DEBUG_SUFFIX}.o/g' $@ >$@.tmp
 	@mv $@.tmp $@
 
 ${COMPILE_PATH}/%.cpp.d.debug:%.cpp
-	$(CPP)  $(CFLAGS) ${CFLAGS_DBG} -MM -E $^ > $@
+	$(CPP) $(CFLAGS) ${CFLAGS_DBG} -MM -E $^ > $@
 	@sed 's/\(.*\)\.o/$(subst /,\/, $(dir $@))\1.${DEBUG_SUFFIX}.o/g' $@ >$@.tmp
 	@mv $@.tmp $@
 

@@ -1,7 +1,5 @@
 #include "sys_init.h"
 
-
-
 int Media_Sys_Init(MEDIA_POOL_S *pPool)
 {
     unsigned int i = 0;

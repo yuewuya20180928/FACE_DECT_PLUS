@@ -1,12 +1,10 @@
-platform := hisi3516dv300
-
 CC=arm-himix200-linux-gcc
 CXX=arm-himix200-linux-g++
 
 INCLUDE = -I ./include/media \
 
 #海思平台库
-MPI_LIB_PATH := ./Lib/$(platform)/hi_mpp
+MPI_LIB_PATH := ./Lib/hisi3516dv300/hi_mpp
 
 MPI_LIBS += -L $(MPI_LIB_PATH)/ -laaccomm
 MPI_LIBS += -L $(MPI_LIB_PATH)/ -laacenc

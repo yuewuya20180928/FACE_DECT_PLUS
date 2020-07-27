@@ -14,8 +14,8 @@ using namespace std;
 #define APPID  "BxV8LNusqXi2NJbcRzXC2cBwY3xUt95JwGwx1E1kvhC8"
 #define SDKKEY "EK9DCw5txTGAu25jbmyUuYc2LuJ7fKGi11T55eZ4ytyC"
 
-#define NSCALE 24 
-#define FACENUM	15
+#define NSCALE 16
+#define FACENUM	16
 
 #define SafeFree(p) { if ((p)) free(p); (p) = NULL; }
 #define SafeArrayDelete(p) { if ((p)) delete [] (p); (p) = NULL; } 
@@ -134,9 +134,9 @@ int main()
 	FILE* fp1 = fopen(picPath1, "rb");
 	#else
 	char picPath1[64] = {0};
-	snprintf(picPath1, 64, "./images/1212x1406.NV21");
-	int Width1 = 1212;
-	int Height1 = 1406;
+	snprintf(picPath1, 64, "./images/3456x4608.NV21");
+	int Width1 = 3456;
+	int Height1 = 4608;
 	int Format1 = ASVL_PAF_NV21;
 	MUInt8* imageData1 = (MUInt8*)malloc(Height1*Width1*3/2);
 	FILE* fp1 = fopen(picPath1, "rb");
@@ -144,9 +144,9 @@ int main()
 
 	//测试2.nv21
 	char picPath2[64] = {0};
-	snprintf(picPath2, 64, "./images/640x480_2.NV21");
-	int Width2 = 640;
-	int Height2 = 480;
+	snprintf(picPath2, 64, "./images/1000x684.NV21");
+	int Width2 = 1000;
+	int Height2 = 684;
 	int Format2 = ASVL_PAF_NV21;
 	MUInt8* imageData2 = (MUInt8*)malloc(Height1*Width1*3/2);
 	FILE* fp2 = fopen(picPath2, "rb");

@@ -2,7 +2,7 @@
 
 #include "mipi_tx.h"
 
-combo_dev_cfg_t mipi_tx_cfg_100X1024_RP = {
+combo_dev_cfg_t mipi_tx_cfg_600X1024_RP = {
     .devno = 0,
     .lane_id = {0, 1, 2, 3},
     .output_mode = OUTPUT_MODE_DSI_VIDEO,
@@ -38,7 +38,7 @@ int Media_MipiTx_Init(void)
         return -1;
     }
 
-    s32Ret = ioctl(fd, HI_MIPI_TX_SET_DEV_CFG, &mipi_tx_cfg_100X1024_RP);
+    s32Ret = ioctl(fd, HI_MIPI_TX_SET_DEV_CFG, &mipi_tx_cfg_600X1024_RP);
     if (HI_SUCCESS != s32Ret)
     {
         prtMD("MIPI_TX SET_DEV_CONFIG failed! s32Ret = %#x, errno = %d\n", s32Ret, errno);
