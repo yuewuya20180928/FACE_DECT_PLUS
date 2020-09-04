@@ -47,6 +47,90 @@ VI_DEV_ATTR_S DEV_ATTR_IMX327_2M_BASE =
     DATA_RATE_X1
 };
 
+VI_DEV_ATTR_S DEV_ATTR_GC2145_UXGA_BASE =
+{
+    VI_MODE_MIPI,
+    VI_WORK_MODE_1Multiplex,
+    {0xFFC00000,    0x0},
+    VI_SCAN_PROGRESSIVE,
+    {-1, -1, -1, -1},
+    VI_DATA_SEQ_YUYV,
+
+    {
+        /*port_vsync   port_vsync_neg     port_hsync        port_hsync_neg        */
+        VI_VSYNC_PULSE, VI_VSYNC_NEG_LOW, VI_HSYNC_VALID_SINGNAL,VI_HSYNC_NEG_HIGH,VI_VSYNC_VALID_SINGAL,VI_VSYNC_VALID_NEG_HIGH,
+
+        {
+            /*hsync_hfb    hsync_act    hsync_hhb*/
+            0,            1600,        0,
+            /*vsync0_vhb vsync0_act vsync0_hhb*/
+            0,            1200,        0,
+            /*vsync1_vhb vsync1_act vsync1_hhb*/
+            0,            0,            0
+        }
+    },
+    VI_DATA_TYPE_RGB,
+    HI_FALSE,
+    {1600, 1200},
+    {
+        {
+            {1600 , 1200},
+
+        },
+        {
+            VI_REPHASE_MODE_NONE,
+            VI_REPHASE_MODE_NONE
+        }
+    },
+    {
+        WDR_MODE_NONE,
+        1200
+    },
+    DATA_RATE_X1
+};
+
+VI_DEV_ATTR_S DEV_ATTR_GC2145_960P_BASE =
+{
+    VI_MODE_MIPI,
+    VI_WORK_MODE_1Multiplex,
+    {0xFFC00000,    0x0},
+    VI_SCAN_PROGRESSIVE,
+    {-1, -1, -1, -1},
+    VI_DATA_SEQ_YUYV,
+
+    {
+        /*port_vsync   port_vsync_neg     port_hsync        port_hsync_neg        */
+        VI_VSYNC_PULSE, VI_VSYNC_NEG_LOW, VI_HSYNC_VALID_SINGNAL,VI_HSYNC_NEG_HIGH,VI_VSYNC_VALID_SINGAL,VI_VSYNC_VALID_NEG_HIGH,
+
+        {
+            /*hsync_hfb    hsync_act    hsync_hhb*/
+            0,            1280,        0,
+            /*vsync0_vhb vsync0_act vsync0_hhb*/
+            0,            960,        0,
+            /*vsync1_vhb vsync1_act vsync1_hhb*/
+            0,            0,            0
+        }
+    },
+    VI_DATA_TYPE_RGB,
+    HI_FALSE,
+    {1280, 960},
+    {
+        {
+            {1280 , 960},
+
+        },
+        {
+            VI_REPHASE_MODE_NONE,
+            VI_REPHASE_MODE_NONE
+        }
+    },
+    {
+        WDR_MODE_NONE,
+        960
+    },
+    DATA_RATE_X1
+};
+
 VI_DEV_ATTR_S DEV_ATTR_IMX327_720P_BASE =
 {
     VI_MODE_MIPI,
@@ -123,6 +207,42 @@ VI_PIPE_ATTR_S PIPE_ATTR_1280x720_RAW12_420_3DNR_RFR =
     { -1, -1}
 };
 
+VI_PIPE_ATTR_S PIPE_ATTR_UXGA_RAW10_420_3DNR_RFR =
+{
+    VI_PIPE_BYPASS_NONE, HI_FALSE, HI_FALSE,
+    1600, 1200,
+    PIXEL_FORMAT_RGB_BAYER_10BPP,
+    COMPRESS_MODE_NONE,
+    DATA_BITWIDTH_10,
+    HI_FALSE,
+    {
+        PIXEL_FORMAT_YVU_SEMIPLANAR_420,
+        DATA_BITWIDTH_8,
+        VI_NR_REF_FROM_RFR,
+        COMPRESS_MODE_NONE
+    },
+    HI_FALSE,
+    { -1, -1}
+};
+
+VI_PIPE_ATTR_S PIPE_ATTR_960P_RAW10_420_3DNR_RFR =
+{
+    VI_PIPE_BYPASS_NONE, HI_FALSE, HI_FALSE,
+    1280, 960,
+    PIXEL_FORMAT_RGB_BAYER_10BPP,
+    COMPRESS_MODE_NONE,
+    DATA_BITWIDTH_10,
+    HI_FALSE,
+    {
+        PIXEL_FORMAT_YVU_SEMIPLANAR_420,
+        DATA_BITWIDTH_8,
+        VI_NR_REF_FROM_RFR,
+        COMPRESS_MODE_NONE
+    },
+    HI_FALSE,
+    { -1, -1}
+};
+
 VI_CHN_ATTR_S CHN_ATTR_1920x1080_420_SDR8_LINEAR =
 {
     {1920, 1080},
@@ -138,6 +258,30 @@ VI_CHN_ATTR_S CHN_ATTR_1920x1080_420_SDR8_LINEAR =
 VI_CHN_ATTR_S CHN_ATTR_1280x720_420_SDR8_LINEAR =
 {
     {1280, 720},
+    PIXEL_FORMAT_YVU_SEMIPLANAR_420,
+    DYNAMIC_RANGE_SDR8,
+    VIDEO_FORMAT_LINEAR,
+    COMPRESS_MODE_NONE,
+    0,      0,
+    0,
+    { -1, -1}
+};
+
+VI_CHN_ATTR_S CHN_ATTR_UXGA_420_SDR8_LINEAR =
+{
+    {1600, 1200},
+    PIXEL_FORMAT_YVU_SEMIPLANAR_420,
+    DYNAMIC_RANGE_SDR8,
+    VIDEO_FORMAT_LINEAR,
+    COMPRESS_MODE_NONE,
+    0,      0,
+    0,
+    { -1, -1}
+};
+
+VI_CHN_ATTR_S CHN_ATTR_960P_420_SDR8_LINEAR =
+{
+    {1280, 960},
     PIXEL_FORMAT_YVU_SEMIPLANAR_420,
     DYNAMIC_RANGE_SDR8,
     VIDEO_FORMAT_LINEAR,
@@ -171,7 +315,8 @@ int Media_VideoIn_GetConfig(MEDIA_VI_PARAM_S *pViParam, unsigned int sensorNum)
         pViParam->s32WorkingViId[i] = i;
 
         #if 1
-        pViParam->stViInfo[i].stSnsInfo.enSnsType = SONY_IMX327_2L_MIPI_720P_30FPS_12BIT;
+        /* 设置sensor类型 */
+        pViParam->stViInfo[i].stSnsInfo.enSnsType = GALAXYCORE_GC2145_MIPI_960P_30FPS_10BIT;
         #else
         pViParam->stViInfo[i].stSnsInfo.enSnsType = SONY_IMX327_2L_MIPI_2M_30FPS_12BIT;
         #endif
@@ -180,7 +325,7 @@ int Media_VideoIn_GetConfig(MEDIA_VI_PARAM_S *pViParam, unsigned int sensorNum)
         pViParam->stViInfo[i].stSnsInfo.s32BusId = i;
         pViParam->stViInfo[i].stSnsInfo.s32SnsId = i;
         pViParam->stViInfo[i].stDevInfo.ViDev = i;                                      //SensorViDev[i];
-        pViParam->stViInfo[i].stDevInfo.enWDRMode = WDR_MODE_NONE;                 //SensorenWDRMode[i];
+        pViParam->stViInfo[i].stDevInfo.enWDRMode = WDR_MODE_NONE;                      //SensorenWDRMode[i];
 
         pViParam->stViInfo[i].stPipeInfo.enMastPipeMode = VI_OFFLINE_VPSS_OFFLINE;
 
@@ -237,6 +382,16 @@ int Media_VideoIn_GetSnsWH(VI_SNS_TYPE_E enSnsType, unsigned int *pWidth, unsign
         case SONY_IMX327_2L_MIPI_720P_30FPS_12BIT:
             *pWidth = 1280;
             *pHeight = 720;
+            break;
+
+        case GALAXYCORE_GC2145_MIPI_UXGA_30FPS_10BIT:
+            *pWidth = 1600;
+            *pHeight = 1200;
+            break;
+
+        case GALAXYCORE_GC2145_MIPI_960P_30FPS_10BIT:
+            *pWidth = 1280;
+            *pHeight = 960;
             break;
 
         default:
@@ -305,7 +460,15 @@ int Media_Vi_GetDevAttr(VI_SNS_TYPE_E enSnsType, VI_DEV_ATTR_S* pstViDevAttr)
 
         case SONY_IMX327_MIPI_2M_30FPS_12BIT_WDR2TO1:
             hi_memcpy(pstViDevAttr, sizeof(VI_DEV_ATTR_S), &DEV_ATTR_IMX327_2M_BASE, sizeof(VI_DEV_ATTR_S));
-            pstViDevAttr->au32ComponentMask[0] = 0xFFC00000;
+            pstViDevAttr->au32ComponentMask[0] = 0xFFC00000;    //TODO 这个可能要改成FFC
+            break;
+
+        case GALAXYCORE_GC2145_MIPI_UXGA_30FPS_10BIT:
+            hi_memcpy(pstViDevAttr, sizeof(VI_DEV_ATTR_S), &DEV_ATTR_GC2145_UXGA_BASE, sizeof(VI_DEV_ATTR_S));
+            break;
+
+        case GALAXYCORE_GC2145_MIPI_960P_30FPS_10BIT:
+            hi_memcpy(pstViDevAttr, sizeof(VI_DEV_ATTR_S), &DEV_ATTR_GC2145_960P_BASE, sizeof(VI_DEV_ATTR_S));
             break;
 
         default:
@@ -524,6 +687,14 @@ int Media_VideoIn_GetPipeAttr(VI_SNS_TYPE_E enSnsType, VI_PIPE_ATTR_S *pPipeAttr
             pPipeAttr->enBitWidth = DATA_BITWIDTH_10;
             break;
 
+        case GALAXYCORE_GC2145_MIPI_UXGA_30FPS_10BIT:
+            memcpy_s(pPipeAttr, sizeof(VI_PIPE_ATTR_S), &PIPE_ATTR_UXGA_RAW10_420_3DNR_RFR, sizeof(VI_PIPE_ATTR_S));
+            break;
+
+        case GALAXYCORE_GC2145_MIPI_960P_30FPS_10BIT:
+            memcpy_s(pPipeAttr, sizeof(VI_PIPE_ATTR_S), &PIPE_ATTR_960P_RAW10_420_3DNR_RFR, sizeof(VI_PIPE_ATTR_S));
+            break;
+
         default:
             memcpy_s(pPipeAttr, sizeof(VI_PIPE_ATTR_S), &PIPE_ATTR_1920x1080_RAW12_420_3DNR_RFR, sizeof(VI_PIPE_ATTR_S));
     }
@@ -651,6 +822,14 @@ int Media_VideoIn_GetChnAttr(VI_SNS_TYPE_E enSnsType, VI_CHN_ATTR_S* pstChnAttr)
 
         case SONY_IMX327_2L_MIPI_720P_30FPS_12BIT:
             memcpy_s(pstChnAttr, sizeof(VI_CHN_ATTR_S), &CHN_ATTR_1280x720_420_SDR8_LINEAR, sizeof(VI_CHN_ATTR_S));
+            break;
+
+        case GALAXYCORE_GC2145_MIPI_UXGA_30FPS_10BIT:
+            memcpy_s(pstChnAttr, sizeof(VI_CHN_ATTR_S), &CHN_ATTR_UXGA_420_SDR8_LINEAR, sizeof(VI_CHN_ATTR_S));
+            break;
+
+        case GALAXYCORE_GC2145_MIPI_960P_30FPS_10BIT:
+            memcpy_s(pstChnAttr, sizeof(VI_CHN_ATTR_S), &CHN_ATTR_960P_420_SDR8_LINEAR, sizeof(VI_CHN_ATTR_S));
             break;
 
         default:

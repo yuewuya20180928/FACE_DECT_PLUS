@@ -120,6 +120,40 @@ combo_dev_attr_t MIPI_2lane_CHN0_SENSOR_IMX327_12BIT_2M_WDR2to1_ATTR =
     }
 };
 
+combo_dev_attr_t MIPI_2lane_CHN0_SENSOR_GC2145_10BIT_UXGA_NOWDR_ATTR =
+{
+    .devno = 0,
+    .input_mode = INPUT_MODE_MIPI,
+    .data_rate = MIPI_DATA_RATE_X1,
+    .img_rect = {0, 0, 1600, 1200},
+
+    {
+        .mipi_attr =
+        {
+            DATA_TYPE_RAW_10BIT,
+            HI_MIPI_WDR_MODE_NONE,
+            {0, 2, -1, -1}
+        }
+    }
+};
+
+combo_dev_attr_t MIPI_2lane_CHN0_SENSOR_GC2145_10BIT_960P_NOWDR_ATTR =
+{
+    .devno = 0,
+    .input_mode = INPUT_MODE_MIPI,
+    .data_rate = MIPI_DATA_RATE_X1,
+    .img_rect = {0, 0, 1280, 960},
+
+    {
+        .mipi_attr =
+        {
+            DATA_TYPE_RAW_10BIT,
+            HI_MIPI_WDR_MODE_NONE,
+            {0, 2, -1, -1}
+        }
+    }
+};
+
 combo_dev_attr_t MIPI_2lane_CHN1_SENSOR_IMX327_12BIT_2M_WDR2to1_ATTR =
 {
     .devno = 1,
@@ -313,6 +347,8 @@ int Media_MipiRx_GetAttr(VI_SNS_TYPE_E enSnsType, combo_dev_t MipiDev, combo_dev
         return -1;
     }
 
+    prtMD("Media_MipiRx_GetAttr enSnsType = %d\n", enSnsType);
+
     switch (enSnsType)
     {
         case SONY_IMX327_MIPI_2M_30FPS_12BIT:
@@ -353,6 +389,28 @@ int Media_MipiRx_GetAttr(VI_SNS_TYPE_E enSnsType, combo_dev_t MipiDev, combo_dev
             else if (1 == MipiDev)
             {
                 memcpy(pComboAttr, &MIPI_2lane_CHN1_SENSOR_IMX327_12BIT_2M_WDR2to1_ATTR, sizeof(combo_dev_attr_t));
+            }
+            break;
+
+        case GALAXYCORE_GC2145_MIPI_UXGA_30FPS_10BIT:
+            if (0 == MipiDev)
+            {
+                memcpy(pComboAttr, &MIPI_2lane_CHN0_SENSOR_GC2145_10BIT_UXGA_NOWDR_ATTR, sizeof(combo_dev_attr_t));
+            }
+            else
+            {
+                prtMD("TO BE FINISHED!\N");
+            }
+            break;
+
+        case GALAXYCORE_GC2145_MIPI_960P_30FPS_10BIT:
+            if (0 == MipiDev)
+            {
+                memcpy(pComboAttr, &MIPI_2lane_CHN0_SENSOR_GC2145_10BIT_960P_NOWDR_ATTR, sizeof(combo_dev_attr_t));
+            }
+            else
+            {
+                prtMD("TO BE FINISHED!\N");
             }
             break;
 
@@ -512,7 +570,7 @@ int Media_MipiRx_Start(MEDIA_VI_PARAM_S *pViParam)
         prtMD("Media_MipiRx_EnableClock error! s32Ret = %#x\n", s32Ret);
         return -1;
     }
-    
+
     s32Ret = Media_MipiRx_ResetInterface(pViParam);
     if (HI_SUCCESS != s32Ret)
     {

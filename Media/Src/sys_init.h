@@ -7,8 +7,8 @@
 extern "C" {
 #endif
 
-#define MAX_VB_WIDTH 1920
-#define MAX_VB_HEIGHT 1080
+#define MAX_VB_WIDTH 3840
+#define MAX_VB_HEIGHT 2160
 #define MAX_VB_COUNT 15
 #define MAX_POOL_COUNT 3
 

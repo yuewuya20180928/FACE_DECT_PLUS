@@ -6,7 +6,7 @@
 #include "module.h"
 #include "vo.h"
 
-MEDIA_SENSOR_E sensorIdx[MAX_SENSOR_NUMBER] = 
+MEDIA_SENSOR_E sensorIdx[MAX_SENSOR_NUMBER] =
 {
     MEDIA_SENSOR_RGB,
     MEDIA_SENSOR_IR
@@ -99,12 +99,14 @@ int Media_Init(unsigned int sensorNumber)
     }
 
     /* 初始化VO */
+    #if 0
     ret = Media_Vo_Init();
     if (HI_SUCCESS != ret)
     {
         prtMD("Media_Vo_Init error! ret = %#x\n", ret);
         return -1;
     }
+    #endif
 
     return 0;
 }

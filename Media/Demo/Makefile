@@ -47,6 +47,7 @@ DECODE_TEST_TARGET = test
 LIBS += -L ./Lib/media -lmedia
 LIBS += -L ./Lib/sensor -lsns_imx327
 LIBS += -L ./Lib/sensor -lsns_imx327_2L
+LIBS += -L ./Lib/sensor -lsns_gc2145
 LIBS += $(MPI_LIBS)
 
 .PHONY : clean $(DECODE_TEST_TARGET)

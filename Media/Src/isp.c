@@ -33,6 +33,26 @@ ISP_PUB_ATTR_S ISP_PUB_ATTR_IMX327_2M_30FPS_WDR2TO1 =
     0,
 };
 
+ISP_PUB_ATTR_S ISP_PUB_ATTR_GC2145_UXGA_30FPS =
+{
+    {0, 0, 1600, 1200},
+    {1600, 1200},
+    30,
+    BAYER_RGGB,
+    WDR_MODE_NONE,
+    0,
+};
+
+ISP_PUB_ATTR_S ISP_PUB_ATTR_GC2145_960P_30FPS =
+{
+    {0, 0, 1280, 960},
+    {1280, 960},
+    30,
+    BAYER_RGGB,
+    WDR_MODE_NONE,
+    0,
+};
+
 int Media_Isp_GetAttr(VI_SNS_TYPE_E enSnsType, ISP_PUB_ATTR_S *pPubAttr)
 {
     if (pPubAttr == NULL)
@@ -57,6 +77,14 @@ int Media_Isp_GetAttr(VI_SNS_TYPE_E enSnsType, ISP_PUB_ATTR_S *pPubAttr)
             memcpy(pPubAttr, &ISP_PUB_ATTR_IMX327_2M_30FPS_WDR2TO1, sizeof(ISP_PUB_ATTR_S));
             break;
 
+        case GALAXYCORE_GC2145_MIPI_UXGA_30FPS_10BIT:
+            memcpy(pPubAttr, &ISP_PUB_ATTR_GC2145_UXGA_30FPS, sizeof(ISP_PUB_ATTR_S));
+            break;
+
+        case GALAXYCORE_GC2145_MIPI_960P_30FPS_10BIT:
+            memcpy(pPubAttr, &ISP_PUB_ATTR_GC2145_960P_30FPS, sizeof(ISP_PUB_ATTR_S));
+            break;
+
         default:
             memcpy(pPubAttr, &ISP_PUB_ATTR_IMX327_2M_30FPS, sizeof(ISP_PUB_ATTR_S));
             break;
@@ -78,7 +106,12 @@ ISP_SNS_OBJ_S* Media_Isp_GetSnsObj(VI_SNS_TYPE_E enSnsType)
         case SONY_IMX327_2L_MIPI_2M_30FPS_12BIT_WDR2TO1:
             return &stSnsImx327_2l_Obj;
 
+        case GALAXYCORE_GC2145_MIPI_UXGA_30FPS_10BIT:
+        case GALAXYCORE_GC2145_MIPI_960P_30FPS_10BIT:
+            return &stSnsGc2145Obj;
+
         default:
+            prtMD("unsupported! to be finished! enSnsType = %d\n", enSnsType);
             return HI_NULL;
     }
 }

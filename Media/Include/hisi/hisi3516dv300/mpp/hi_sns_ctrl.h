@@ -96,6 +96,7 @@ extern ISP_SNS_OBJ_S stSnsSharp8kObj;
 extern ISP_SNS_OBJ_S stSnsOv12870Obj;
 extern ISP_SNS_OBJ_S stSnsGc2053ForCarObj;
 extern ISP_SNS_OBJ_S stSnsImx415Obj;
+extern ISP_SNS_OBJ_S stSnsGc2145Obj;
 
 #define CMOS_CHECK_POINTER(ptr)\
     do {\

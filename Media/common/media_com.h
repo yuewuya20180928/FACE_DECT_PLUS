@@ -86,7 +86,7 @@ extern "C" {
 
 #define prtMD(fmt...)   \
     do {\
-        printf("[MEDIA] file:[%s][%s]-%d: ", __FILE__,__FUNCTION__, __LINE__);\
+        printf("[MEDIA] file:[%s][%d]: ", __FILE__, __LINE__);\
         printf(fmt);\
     }while(0)
 

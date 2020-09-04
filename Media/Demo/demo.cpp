@@ -1,5 +1,6 @@
 #include "media_api.h"
 #include <stdio.h>
+#include <unistd.h>
 
 unsigned int sensorNumber = 1;
 
@@ -22,7 +23,12 @@ int main()
         return -1;
     }
 
+    #if 0
     stVideoDisp.bOpen = 1;
+    #else
+    stVideoDisp.bOpen = 0;
+    #endif
+
     stVideoDisp.stRect.x = dispX;
     stVideoDisp.stRect.y = dispY;
     stVideoDisp.stRect.w = dispW;
@@ -33,6 +39,11 @@ int main()
     {
         printf("Media_SetVideoDisp error! s32Ret = %#x\n", s32Ret);
         return -1;
+    }
+
+    while (1)
+    {
+        usleep(1000000);
     }
 
     return 0;
