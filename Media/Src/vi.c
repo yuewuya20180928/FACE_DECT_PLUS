@@ -316,7 +316,7 @@ int Media_VideoIn_GetConfig(MEDIA_VI_PARAM_S *pViParam, unsigned int sensorNum)
 
         #if 1
         /* 设置sensor类型 */
-        pViParam->stViInfo[i].stSnsInfo.enSnsType = GALAXYCORE_GC2145_MIPI_960P_30FPS_10BIT;
+        pViParam->stViInfo[i].stSnsInfo.enSnsType = GALAXYCORE_GC2145_MIPI_UXGA_30FPS_10BIT;
         #else
         pViParam->stViInfo[i].stSnsInfo.enSnsType = SONY_IMX327_2L_MIPI_2M_30FPS_12BIT;
         #endif

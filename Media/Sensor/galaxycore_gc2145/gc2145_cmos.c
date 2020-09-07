@@ -109,7 +109,15 @@ extern void gc2145_mirror_flip(VI_PIPE ViPipe, ISP_SNS_MIRRORFLIP_TYPE_E eSnsMir
 #define GC2145_STATUS_ADDR                    (0x90)    // slow shutter via framerate or exptime//状态地址
 
 #define GC2145_INCREASE_LINES                 (0) /* make real fps less than stand fps because NVR require */
-#define GC2145_VMAX_1080P30_LINEAR            (1245 + GC2145_INCREASE_LINES)
+
+#define GC2145_VMAX_UXGA_30_LINEAR            (1245 + GC2145_INCREASE_LINES)
+
+#define GC2145_VMAX_960P_30_LINEAR            (1005 + GC2145_INCREASE_LINES)
+
+#define GC2145_SENSOR_UXGA_30FPS_LINEAR_MODE  (0)
+
+#define GC2145_SENSOR_960P_30FPS_LINEAR_MODE  (1)
+
 
 /* sensor fps mode */
 #define GC2145_SENSOR_1080P_30FPS_LINEAR_MODE (0)
@@ -194,22 +202,39 @@ static HI_S32 cmos_get_ae_default(VI_PIPE ViPipe, AE_SENSOR_DEFAULT_S *pstAeSnsD
 /* the function of sensor set fps */
 static HI_VOID cmos_fps_set(VI_PIPE ViPipe, HI_FLOAT f32Fps, AE_SENSOR_DEFAULT_S *pstAeSnsDft)
 {
-    HI_U32 u32VMAX = GC2145_VMAX_1080P30_LINEAR;
+    HI_U32 u32VMAX = GC2145_VMAX_UXGA_30_LINEAR;
     ISP_SNS_STATE_S *pstSnsState = HI_NULL;
 
     CMOS_CHECK_POINTER_VOID(pstAeSnsDft);
     GC2145_SENSOR_GET_CTX(ViPipe, pstSnsState);
     CMOS_CHECK_POINTER_VOID(pstSnsState);
 
-    switch (pstSnsState->u8ImgMode) {
-        case GC2145_SENSOR_1080P_30FPS_LINEAR_MODE:
-            if ((f32Fps <= 30) && (f32Fps > 2.06)) {
-                u32VMAX = GC2145_VMAX_1080P30_LINEAR * 30 / DIV_0_TO_1_FLOAT(f32Fps);
-            } else {
+    switch (pstSnsState->u8ImgMode)
+    {
+        case GC2145_SENSOR_UXGA_30FPS_LINEAR_MODE:
+            if ((f32Fps <= 30) && (f32Fps > 2.06))
+            {
+                u32VMAX = GC2145_VMAX_UXGA_30_LINEAR * 30 / DIV_0_TO_1_FLOAT(f32Fps);
+            }
+            else
+            {
                 ISP_ERR_TRACE("Not support Fps: %f\n", f32Fps);
                 return;
             }
-            pstAeSnsDft->u32LinesPer500ms = GC2145_VMAX_1080P30_LINEAR*15;
+            pstAeSnsDft->u32LinesPer500ms = GC2145_VMAX_UXGA_30_LINEAR * 15;
+            break;
+
+        case GC2145_SENSOR_960P_30FPS_LINEAR_MODE:
+            if ((f32Fps <= 30) && (f32Fps > 2.06))
+            {
+                u32VMAX = GC2145_VMAX_960P_30_LINEAR * 30 / DIV_0_TO_1_FLOAT(f32Fps);
+            }
+            else
+            {
+                ISP_ERR_TRACE("Not support Fps: %f\n", f32Fps);
+                return;
+            }
+            pstAeSnsDft->u32LinesPer500ms = GC2145_VMAX_960P_30_LINEAR * 15;
             break;
         default:
             break;
@@ -268,7 +293,7 @@ static HI_VOID cmos_inttime_update(VI_PIPE ViPipe, HI_U32 u32IntTime)
     return;
 }
 
-//暂时修改
+#if 0
 static HI_U32 regValTable[29][4] = {
     {0x00, 0x00, 0x01, 0x00}, // 0xb4 0xb3 0xb8 0xb9
     {0x00, 0x10, 0x01, 0x0c},
@@ -300,23 +325,25 @@ static HI_U32 regValTable[29][4] = {
     {0x02, 0x95, 0x3f, 0x3f},
     {0x00, 0xce, 0x3f, 0x3f},
 };
+#endif
 
+#if 0
 static HI_U32 analog_gain_table[29] = {//逻辑增益表
     1024, 1230, 1440, 1730, 2032, 2380, 2880, 3460, 4080, 4800, 5776,
     6760, 8064, 9500, 11552, 13600, 16132, 18912, 22528, 27036, 32340,
     38256, 45600, 53912, 63768, 76880, 92300, 108904, 123568,
 };
-//不需要修改
+#endif
+
 static HI_VOID cmos_again_calc_table(VI_PIPE ViPipe, HI_U32 *pu32AgainLin, HI_U32 *pu32AgainDb)
 {
+#if 0
     int again;
     int i;
     static HI_U8 againmax = 28;
 
     CMOS_CHECK_POINTER_VOID(pu32AgainLin);
     CMOS_CHECK_POINTER_VOID(pu32AgainDb);
-//自动增益简单注释掉
-/*
     again = *pu32AgainLin;
 
     if (again >= analog_gain_table[againmax]) {
@@ -331,20 +358,19 @@ static HI_VOID cmos_again_calc_table(VI_PIPE ViPipe, HI_U32 *pu32AgainLin, HI_U3
             }
         }
     }
-*/
+#endif
     return;
 }
-//不需要修改   不会修改  增益数组没有
+
 static HI_VOID cmos_gains_update(VI_PIPE ViPipe, HI_U32 u32Again, HI_U32 u32Dgain)
 {
+#if 0
     HI_U8 u8DgainHigh, u8DgainLow;
 
     ISP_SNS_STATE_S *pstSnsState = HI_NULL;
 
     GC2145_SENSOR_GET_CTX(ViPipe, pstSnsState);
     CMOS_CHECK_POINTER_VOID(pstSnsState);
-//自动增益  注释掉
-/*
     u8DgainHigh = (u32Dgain >> 6) & 0x0f;
     u8DgainLow = (u32Dgain & 0x3f) << 2;
 
@@ -355,7 +381,7 @@ static HI_VOID cmos_gains_update(VI_PIPE ViPipe, HI_U32 u32Again, HI_U32 u32Dgai
 
     pstSnsState->astRegsInfo[0].astI2cData[7].u32Data = u8DgainLow;
     pstSnsState->astRegsInfo[0].astI2cData[6].u32Data = u8DgainHigh;
-*/
+#endif
     return;
 }
 
@@ -531,7 +557,7 @@ static HI_S32 cmos_get_isp_default(VI_PIPE ViPipe, ISP_CMOS_DEFAULT_S *pstDef)
 
     switch (pstSnsState->u8ImgMode) {
         default:
-        case GC2145_SENSOR_1080P_30FPS_LINEAR_MODE:
+        case GC2145_SENSOR_UXGA_30FPS_LINEAR_MODE:
             pstDef->stSensorMode.stDngRawFormat.u8BitsPerSample = 10;
             pstDef->stSensorMode.stDngRawFormat.u32WhiteLevel = 1023;
             break;
@@ -557,6 +583,7 @@ static HI_S32 cmos_get_isp_default(VI_PIPE ViPipe, ISP_CMOS_DEFAULT_S *pstDef)
 
     return HI_SUCCESS;
 }
+
 //不需要修改
 static HI_S32 cmos_get_isp_black_level(VI_PIPE ViPipe, ISP_CMOS_BLACK_LEVEL_S *pstBlackLevel)
 {
@@ -574,6 +601,7 @@ static HI_S32 cmos_get_isp_black_level(VI_PIPE ViPipe, ISP_CMOS_BLACK_LEVEL_S *p
     return HI_SUCCESS;
 
 }
+
 //无需修改
 static HI_VOID cmos_set_pixel_detect(VI_PIPE ViPipe, HI_BOOL bEnable)
 {
@@ -584,6 +612,7 @@ static HI_VOID cmos_set_pixel_detect(VI_PIPE ViPipe, HI_BOOL bEnable)
 
     return;
 }
+
 //无需修改
 static HI_S32 cmos_set_wdr_mode(VI_PIPE ViPipe, HI_U8 u8Mode)
 {
@@ -593,15 +622,18 @@ static HI_S32 cmos_set_wdr_mode(VI_PIPE ViPipe, HI_U8 u8Mode)
     CMOS_CHECK_POINTER(pstSnsState);
     pstSnsState->bSyncInit = HI_FALSE;
 
-    switch (u8Mode) {
+    switch (u8Mode)
+    {
         case WDR_MODE_NONE:
             pstSnsState->enWDRMode = WDR_MODE_NONE;
-            printf("GC2145 SENSOR_1080P_30FPS_LINEAR_MODE\n");
             break;
+
         default:
             ISP_ERR_TRACE("cmos_set_wdr_mode_NOT support this mode!\n");
             return HI_FAILURE;
     }
+
+    printf("Func:%s, Line:%d, u8Mode = %d\n", __FUNCTION__, __LINE__, u8Mode);
 
     memset(pstSnsState->au32WDRIntTime, 0, sizeof(pstSnsState->au32WDRIntTime));
 
@@ -702,19 +734,40 @@ static HI_S32 cmos_set_image_mode(VI_PIPE ViPipe, ISP_CMOS_SENSOR_IMAGE_MODE_S *
     u8SensorImageMode = pstSnsState->u8ImgMode;
     pstSnsState->bSyncInit = HI_FALSE;
 
-    if ((pstSensorImageMode->u16Width <= 1600) && (pstSensorImageMode->u16Height <= 1200)) {//已经修改
-
-        if (pstSensorImageMode->f32Fps <= 30) {
-            u8SensorImageMode     = GC2145_SENSOR_1080P_30FPS_LINEAR_MODE;
-            pstSnsState->u32FLStd = GC2145_VMAX_1080P30_LINEAR;
-        } else {
+    if ((pstSensorImageMode->u16Width <= 1280) && (pstSensorImageMode->u16Height <= 960))
+    {
+        if (pstSensorImageMode->f32Fps <= 30)
+        {
+            u8SensorImageMode     = GC2145_SENSOR_960P_30FPS_LINEAR_MODE;
+            pstSnsState->u32FLStd = GC2145_VMAX_960P_30_LINEAR;
+        }
+        else
+        {
             ISP_ERR_TRACE("Not support! Width:%d, Height:%d, Fps:%f\n",
                       pstSensorImageMode->u16Width,
                       pstSensorImageMode->u16Height,
                       pstSensorImageMode->f32Fps);
             return HI_FAILURE;
         }
-    } else {
+    }
+    else if ((pstSensorImageMode->u16Width <= 1600) && (pstSensorImageMode->u16Height <= 1200))
+    {
+        if (pstSensorImageMode->f32Fps <= 30)
+        {
+            u8SensorImageMode     = GC2145_SENSOR_UXGA_30FPS_LINEAR_MODE;
+            pstSnsState->u32FLStd = GC2145_VMAX_UXGA_30_LINEAR;
+        }
+        else
+        {
+            ISP_ERR_TRACE("Not support! Width:%d, Height:%d, Fps:%f\n",
+                      pstSensorImageMode->u16Width,
+                      pstSensorImageMode->u16Height,
+                      pstSensorImageMode->f32Fps);
+            return HI_FAILURE;
+        }
+    }
+    else
+    {
         ISP_ERR_TRACE("Not support! Width:%d, Height:%d, Fps:%f\n",
                   pstSensorImageMode->u16Width,
                   pstSensorImageMode->u16Height,
@@ -722,9 +775,18 @@ static HI_S32 cmos_set_image_mode(VI_PIPE ViPipe, ISP_CMOS_SENSOR_IMAGE_MODE_S *
         return HI_FAILURE;
     }
 
-    if ((pstSnsState->bInit == HI_TRUE) && (u8SensorImageMode == pstSnsState->u8ImgMode)) {
+    printf("Func:%s, Line:%d, w:%d, h:%d, fps:%f\n",
+        __FUNCTION__,
+        __LINE__,
+        pstSensorImageMode->u16Width,
+        pstSensorImageMode->u16Height,
+        pstSensorImageMode->f32Fps);
+
+    if ((pstSnsState->bInit == HI_TRUE) && (u8SensorImageMode == pstSnsState->u8ImgMode))
+    {
         return ISP_DO_NOT_NEED_SWITCH_IMAGEMODE;
     }
+
     pstSnsState->u8ImgMode = u8SensorImageMode;
     pstSnsState->au32FL[0] = pstSnsState->u32FLStd;
     pstSnsState->au32FL[1] = pstSnsState->au32FL[0];
@@ -741,15 +803,16 @@ static HI_VOID sensor_global_init(VI_PIPE ViPipe)
 
     pstSnsState->bInit     = HI_FALSE;
     pstSnsState->bSyncInit = HI_FALSE;
-    pstSnsState->u8ImgMode = GC2145_SENSOR_1080P_30FPS_LINEAR_MODE;
+    pstSnsState->u8ImgMode = GC2145_SENSOR_UXGA_30FPS_LINEAR_MODE;
     pstSnsState->enWDRMode = WDR_MODE_NONE;
-    pstSnsState->u32FLStd = GC2145_VMAX_1080P30_LINEAR;
-    pstSnsState->au32FL[0] = GC2145_VMAX_1080P30_LINEAR;
-    pstSnsState->au32FL[1] = GC2145_VMAX_1080P30_LINEAR;
+    pstSnsState->u32FLStd = GC2145_VMAX_UXGA_30_LINEAR;
+    pstSnsState->au32FL[0] = GC2145_VMAX_UXGA_30_LINEAR;
+    pstSnsState->au32FL[1] = GC2145_VMAX_UXGA_30_LINEAR;
 
     memset(&pstSnsState->astRegsInfo[0], 0, sizeof(ISP_SNS_REGS_INFO_S));
     memset(&pstSnsState->astRegsInfo[1], 0, sizeof(ISP_SNS_REGS_INFO_S));
 
+    return;
 }
 
 static HI_S32 cmos_init_sensor_exp_function(ISP_SENSOR_EXP_FUNC_S *pstSensorExpFunc)
@@ -779,17 +842,19 @@ static HI_S32 gc2145_set_bus_info(VI_PIPE ViPipe, ISP_SNS_COMMBUS_U unSNSBusInfo
 
     return HI_SUCCESS;
 }
-//不需要修改
 
+//不需要修改
 static HI_S32 sensor_ctx_init(VI_PIPE ViPipe)
 {
     ISP_SNS_STATE_S *pastSnsStateCtx = HI_NULL;
 
     GC2145_SENSOR_GET_CTX(ViPipe, pastSnsStateCtx);
 
-    if (pastSnsStateCtx == HI_NULL) {
+    if (pastSnsStateCtx == HI_NULL)
+    {
         pastSnsStateCtx = (ISP_SNS_STATE_S *)malloc(sizeof(ISP_SNS_STATE_S));
-        if (pastSnsStateCtx == HI_NULL) {
+        if (pastSnsStateCtx == HI_NULL)
+        {
             ISP_ERR_TRACE("Isp[%d] SnsCtx malloc memory failed!\n", ViPipe);
             return HI_ERR_ISP_NOMEM;
         }
@@ -801,8 +866,8 @@ static HI_S32 sensor_ctx_init(VI_PIPE ViPipe)
 
     return HI_SUCCESS;
 }
-//不需要修改
 
+//不需要修改
 static HI_VOID sensor_ctx_exit(VI_PIPE ViPipe)
 {
     ISP_SNS_STATE_S *pastSnsStateCtx = HI_NULL;
@@ -810,7 +875,10 @@ static HI_VOID sensor_ctx_exit(VI_PIPE ViPipe)
     GC2145_SENSOR_GET_CTX(ViPipe, pastSnsStateCtx);
     SENSOR_FREE(pastSnsStateCtx);
     GC2145_SENSOR_RESET_CTX(ViPipe);
+
+    return;
 }
+
 //不需要修改
 static HI_S32 sensor_register_callback(VI_PIPE ViPipe, ALG_LIB_S *pstAeLib, ALG_LIB_S *pstAwbLib)
 {
@@ -824,8 +892,8 @@ static HI_S32 sensor_register_callback(VI_PIPE ViPipe, ALG_LIB_S *pstAeLib, ALG_
     CMOS_CHECK_POINTER(pstAwbLib);
 
     s32Ret = sensor_ctx_init(ViPipe);
-
-    if (s32Ret != HI_SUCCESS) {
+    if (s32Ret != HI_SUCCESS)
+    {
         return HI_FAILURE;
     }
 
@@ -833,24 +901,24 @@ static HI_S32 sensor_register_callback(VI_PIPE ViPipe, ALG_LIB_S *pstAeLib, ALG_
 
     s32Ret  = cmos_init_sensor_exp_function(&stIspRegister.stSnsExp);
     s32Ret |= HI_MPI_ISP_SensorRegCallBack(ViPipe, &stSnsAttrInfo, &stIspRegister);
-
-    if (s32Ret != HI_SUCCESS) {
+    if (s32Ret != HI_SUCCESS)
+    {
         ISP_ERR_TRACE("sensor register callback function failed!\n");
         return s32Ret;
     }
 
     s32Ret  = cmos_init_ae_exp_function(&stAeRegister.stSnsExp);
     s32Ret |= HI_MPI_AE_SensorRegCallBack(ViPipe, pstAeLib, &stSnsAttrInfo, &stAeRegister);
-
-    if (s32Ret != HI_SUCCESS) {
+    if (s32Ret != HI_SUCCESS)
+    {
         ISP_ERR_TRACE("sensor register callback function to ae lib failed!\n");
         return s32Ret;
     }
 
     s32Ret  = cmos_init_awb_exp_function(&stAwbRegister.stSnsExp);
     s32Ret |= HI_MPI_AWB_SensorRegCallBack(ViPipe, pstAwbLib, &stSnsAttrInfo, &stAwbRegister);
-
-    if (s32Ret != HI_SUCCESS) {
+    if (s32Ret != HI_SUCCESS)
+    {
         ISP_ERR_TRACE("sensor register callback function to awb lib failed!\n");
         return s32Ret;
     }
@@ -867,19 +935,22 @@ static HI_S32 sensor_unregister_callback(VI_PIPE ViPipe, ALG_LIB_S *pstAeLib, AL
     CMOS_CHECK_POINTER(pstAwbLib);
 
     s32Ret = HI_MPI_ISP_SensorUnRegCallBack(ViPipe, GC2145_ID);
-    if (s32Ret != HI_SUCCESS) {
+    if (s32Ret != HI_SUCCESS)
+    {
         ISP_ERR_TRACE("sensor unregister callback function failed!\n");
         return s32Ret;
     }
 
     s32Ret = HI_MPI_AE_SensorUnRegCallBack(ViPipe, pstAeLib, GC2145_ID);
-    if (s32Ret != HI_SUCCESS) {
+    if (s32Ret != HI_SUCCESS)
+    {
         ISP_ERR_TRACE("sensor unregister callback function to ae lib failed!\n");
         return s32Ret;
     }
 
     s32Ret = HI_MPI_AWB_SensorUnRegCallBack(ViPipe, pstAwbLib, GC2145_ID);
-    if (s32Ret != HI_SUCCESS) {
+    if (s32Ret != HI_SUCCESS)
+    {
         ISP_ERR_TRACE("sensor unregister callback function to awb lib failed!\n");
         return s32Ret;
     }
@@ -903,9 +974,11 @@ static HI_S32 sensor_set_init(VI_PIPE ViPipe, ISP_INIT_ATTR_S *pstInitAttr)
     g_au16SampleRgain[ViPipe]   = pstInitAttr->u16SampleRgain;
     g_au16SampleBgain[ViPipe]   = pstInitAttr->u16SampleBgain;
 
-    for (i = 0; i < CCM_MATRIX_SIZE; i++) {
+    for (i = 0; i < CCM_MATRIX_SIZE; i++)
+    {
         g_au16InitCCM[ViPipe][i] = pstInitAttr->au16CCM[i];
     }
+
     return HI_SUCCESS;
 }
 
@@ -928,3 +1001,4 @@ ISP_SNS_OBJ_S stSnsGc2145Obj = {
 
 #endif
 #endif /* __GC2145_CMOS_H_ */
+

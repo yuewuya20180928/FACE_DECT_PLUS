@@ -399,7 +399,7 @@ int Media_MipiRx_GetAttr(VI_SNS_TYPE_E enSnsType, combo_dev_t MipiDev, combo_dev
             }
             else
             {
-                prtMD("TO BE FINISHED!\N");
+                prtMD("TO BE FINISHED!\n");
             }
             break;
 
@@ -410,7 +410,7 @@ int Media_MipiRx_GetAttr(VI_SNS_TYPE_E enSnsType, combo_dev_t MipiDev, combo_dev
             }
             else
             {
-                prtMD("TO BE FINISHED!\N");
+                prtMD("TO BE FINISHED!\n");
             }
             break;
 

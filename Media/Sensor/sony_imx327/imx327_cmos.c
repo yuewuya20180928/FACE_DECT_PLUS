@@ -264,11 +264,15 @@ static HI_VOID cmos_fps_set(VI_PIPE ViPipe, HI_FLOAT f32Fps, AE_SENSOR_DEFAULT_S
     IMX327_SENSOR_GET_CTX(ViPipe, pstSnsState);
     CMOS_CHECK_POINTER_VOID(pstSnsState);
 
-    switch (pstSnsState->u8ImgMode) {
+    switch (pstSnsState->u8ImgMode)
+    {
         case IMX327_SENSOR_1080P_30FPS_WDR_2to1_MODE:
-            if ((f32Fps <= 30) && (f32Fps >= 16.51)) {
+            if ((f32Fps <= 30) && (f32Fps >= 16.51))
+            {
                 u32VMAX = IMX327_VMAX_1080P60TO30_WDR * 30 / DIV_0_TO_1_FLOAT(f32Fps);
-            } else {
+            }
+            else
+            {
                 ISP_ERR_TRACE("Not support Fps: %f\n", f32Fps);
                 return;
             }
