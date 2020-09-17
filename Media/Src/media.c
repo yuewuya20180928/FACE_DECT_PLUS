@@ -17,6 +17,8 @@ int Media_Init(unsigned int sensorNumber)
 {
     unsigned int i = 0;
     int ret = 0;
+    MEDIA_LCD_IDX_E lcdTypeIdx = LCD_IDX_3_480X640;     //屏幕类型根据实际情况进行设定,媒体需要兼容
+
     MEDIA_VI_PARAM_S stViParam = {0};
     MEDIA_BIND_INFO_S stSrcInfo = {0};
 
@@ -99,14 +101,12 @@ int Media_Init(unsigned int sensorNumber)
     }
 
     /* 初始化VO */
-    #if 0
-    ret = Media_Vo_Init();
+    ret = Media_Vo_Init(lcdTypeIdx);
     if (HI_SUCCESS != ret)
     {
         prtMD("Media_Vo_Init error! ret = %#x\n", ret);
         return -1;
     }
-    #endif
 
     return 0;
 }
@@ -197,3 +197,4 @@ int Media_SetVideoDisp(MEDIA_SENSOR_E sensorIdx, MEDIA_VIDEO_DISP_S *pDispParam)
 
     return HI_SUCCESS;
 }
+

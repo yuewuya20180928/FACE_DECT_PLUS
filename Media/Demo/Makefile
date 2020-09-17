@@ -12,7 +12,6 @@ MPI_LIBS += -L $(MPI_LIB_PATH)/ -laacdec
 MPI_LIBS += -L $(MPI_LIB_PATH)/ -l_hicalcflicker
 MPI_LIBS += -L $(MPI_LIB_PATH)/ -lmd
 MPI_LIBS += -L $(MPI_LIB_PATH)/ -lnnie
-MPI_LIBS += -L $(MPI_LIB_PATH)/ -lbin
 MPI_LIBS += -L $(MPI_LIB_PATH)/ -l_hiae
 MPI_LIBS += -L $(MPI_LIB_PATH)/ -l_hiawb_natura
 MPI_LIBS += -L $(MPI_LIB_PATH)/ -lhi_cipher

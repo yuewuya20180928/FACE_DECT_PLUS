@@ -4,15 +4,12 @@
 #include "media_com.h"
 #include "media_api.h"
 
+#include "mipi_tx.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef enum
-{
-    LCD_IDX_7_600X1024_RP = 0,
-    LCD_IDX_BUTT,
-}MEDIA_LCD_IDX_E;
 
 typedef struct
 {
@@ -28,13 +25,13 @@ typedef struct
 #define COLOR_RGB_CYN      0x00ffff
 #define COLOR_RGB_WHITE    0xffffff
 
-int Media_Vo_Init(void);
+int Media_Vo_Init(MEDIA_LCD_IDX_E lcdTypeIdx);
 
-int Media_Vo_InitDev(VO_DEV VoDev);
+int Media_Vo_InitDev(VO_DEV VoDev, MEDIA_LCD_IDX_E lcdTypeIdx);
 
 int Media_Vo_InitVoLayer(VO_LAYER VoLayer, MEDIA_LCD_IDX_E enLcdIdx);
 
-int Media_Vo_InitMipiTx(void);
+int Media_Vo_InitMipiTx(MEDIA_LCD_IDX_E lcdTypeIdx);
 
 int Media_Vo_StartChn(VO_LAYER VoLayer, VO_CHN voChn, MEDIA_VIDEO_DISP_S *pDispParam);
 

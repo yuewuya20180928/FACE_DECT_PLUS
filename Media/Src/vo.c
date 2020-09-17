@@ -1,15 +1,20 @@
 #include "vo.h"
 #include "mipi_tx.h"
 
-MEDIA_SIZE_S enDispSize[LCD_IDX_BUTT] = 
+MEDIA_SIZE_S enDispSize[LCD_IDX_BUTT] =
 {
     {
         1024,
         600
     },
+
+    {
+        640,
+        480
+    },
 };
 
-int Media_Vo_InitDev(VO_DEV VoDev)
+int Media_Vo_InitDev(VO_DEV VoDev, MEDIA_LCD_IDX_E lcdTypeIdx)
 {
     HI_S32 s32Ret = HI_SUCCESS;
     VO_PUB_ATTR_S stPubAttr = {0};
@@ -22,19 +27,61 @@ int Media_Vo_InitDev(VO_DEV VoDev)
     stPubAttr.enIntfSync = VO_OUTPUT_USER;
     stPubAttr.u32BgColor = COLOR_RGB_BLACK;
 
-    stPubAttr.stSyncInfo.bSynm = 0;
-    stPubAttr.stSyncInfo.bIop = 1;
-    stPubAttr.stSyncInfo.u16Vact = dispWidth;
-    stPubAttr.stSyncInfo.u16Vbb = 18;
-    stPubAttr.stSyncInfo.u16Vfb = 16;
-    stPubAttr.stSyncInfo.u16Hact = dispHeight;
-    stPubAttr.stSyncInfo.u16Hbb = 64;
-    stPubAttr.stSyncInfo.u16Hfb = 136;
-    stPubAttr.stSyncInfo.u16Hpw = 4;
-    stPubAttr.stSyncInfo.u16Vpw = 2;
-    stPubAttr.stSyncInfo.bIdv = 0;
-    stPubAttr.stSyncInfo.bIhs = 0;
-    stPubAttr.stSyncInfo.bIvs = 0;
+    if (lcdTypeIdx >= LCD_IDX_BUTT)
+    {
+        prtMD("invalid input lcdType = %d\n", lcdTypeIdx);
+        return 0;
+    }
+
+    dispWidth = enDispSize[lcdTypeIdx].w;
+    dispHeight = enDispSize[lcdTypeIdx].h;
+
+    if (lcdTypeIdx == LCD_IDX_7_600X1024_RP)
+    {
+        stPubAttr.stSyncInfo.bSynm = 0;
+        stPubAttr.stSyncInfo.bIop = 1;
+        stPubAttr.stSyncInfo.u16Vact = dispWidth;
+        stPubAttr.stSyncInfo.u16Vbb = 18;
+        stPubAttr.stSyncInfo.u16Vfb = 16;
+        stPubAttr.stSyncInfo.u16Hact = dispHeight;
+        stPubAttr.stSyncInfo.u16Hbb = 64;
+        stPubAttr.stSyncInfo.u16Hfb = 136;
+        stPubAttr.stSyncInfo.u16Hpw = 4;
+        stPubAttr.stSyncInfo.u16Vpw = 2;
+        stPubAttr.stSyncInfo.bIdv = 0;
+        stPubAttr.stSyncInfo.bIhs = 0;
+        stPubAttr.stSyncInfo.bIvs = 0;
+    }
+    else if (lcdTypeIdx == LCD_IDX_3_480X640)
+    {
+        stPubAttr.stSyncInfo.bSynm = 0;
+        stPubAttr.stSyncInfo.bIop = 1;
+
+        stPubAttr.stSyncInfo.u16Hmid = 1;
+        stPubAttr.stSyncInfo.u16Bvact = 1;
+        stPubAttr.stSyncInfo.u16Bvbb = 1;
+        stPubAttr.stSyncInfo.u16Bvfb = 1;
+
+        stPubAttr.stSyncInfo.u16Vact = dispHeight;
+        stPubAttr.stSyncInfo.u16Vbb = 18;
+        stPubAttr.stSyncInfo.u16Vfb = 17;
+        stPubAttr.stSyncInfo.u16Hact = dispWidth;
+        stPubAttr.stSyncInfo.u16Hbb = 240;
+        stPubAttr.stSyncInfo.u16Hfb = 120;
+        stPubAttr.stSyncInfo.u16Hpw = 120;
+        stPubAttr.stSyncInfo.u16Vpw = 5;
+
+        stPubAttr.stSyncInfo.bIdv = 0;
+        stPubAttr.stSyncInfo.bIhs = 0;
+        stPubAttr.stSyncInfo.bIvs = 0;
+
+        stPubAttr.u32BgColor = COLOR_RGB_RED;
+    }
+    else
+    {
+        prtMD("unsupported lcdTypeIdx! please check lcdTypeIdx = %d!\n", lcdTypeIdx);
+        return HI_FAILURE;
+    }
 
     s32Ret = HI_MPI_VO_SetPubAttr(VoDev, &stPubAttr);
     if (s32Ret != HI_SUCCESS)
@@ -43,14 +90,34 @@ int Media_Vo_InitDev(VO_DEV VoDev)
         return HI_FAILURE;
     }
 
-    stUserInfo.stUserIntfSyncAttr.enClkSource = VO_CLK_SOURCE_PLL;
-    stUserInfo.stUserIntfSyncAttr.stUserSyncPll.u32Fbdiv = 380;
-    stUserInfo.stUserIntfSyncAttr.stUserSyncPll.u32Frac = 0x3F7271;
-    stUserInfo.stUserIntfSyncAttr.stUserSyncPll.u32Refdiv = 4;
-    stUserInfo.stUserIntfSyncAttr.stUserSyncPll.u32Postdiv1 = 7;
-    stUserInfo.stUserIntfSyncAttr.stUserSyncPll.u32Postdiv2 = 7;
-    stUserInfo.u32DevDiv = 1;
-    stUserInfo.u32PreDiv = 1;
+    if (lcdTypeIdx == LCD_IDX_7_600X1024_RP)
+    {
+        stUserInfo.stUserIntfSyncAttr.enClkSource = VO_CLK_SOURCE_PLL;
+        stUserInfo.stUserIntfSyncAttr.stUserSyncPll.u32Fbdiv = 380;
+        stUserInfo.stUserIntfSyncAttr.stUserSyncPll.u32Frac = 0x3F7271;
+        stUserInfo.stUserIntfSyncAttr.stUserSyncPll.u32Refdiv = 4;
+        stUserInfo.stUserIntfSyncAttr.stUserSyncPll.u32Postdiv1 = 7;
+        stUserInfo.stUserIntfSyncAttr.stUserSyncPll.u32Postdiv2 = 7;
+        stUserInfo.u32DevDiv = 1;
+        stUserInfo.u32PreDiv = 1;
+    }
+    else if (lcdTypeIdx == LCD_IDX_3_480X640)
+    {
+        stUserInfo.bClkReverse = HI_TRUE;//时钟相位反向
+        stUserInfo.u32DevDiv = 1;
+        stUserInfo.u32PreDiv = 1;
+        stUserInfo.stUserIntfSyncAttr.enClkSource = VO_CLK_SOURCE_PLL;
+        stUserInfo.stUserIntfSyncAttr.stUserSyncPll.u32Fbdiv = 252;
+        stUserInfo.stUserIntfSyncAttr.stUserSyncPll.u32Frac = 0x599999;
+        stUserInfo.stUserIntfSyncAttr.stUserSyncPll.u32Refdiv = 4;
+        stUserInfo.stUserIntfSyncAttr.stUserSyncPll.u32Postdiv1 = 7;
+        stUserInfo.stUserIntfSyncAttr.stUserSyncPll.u32Postdiv2 = 7;
+    }
+    else
+    {
+        prtMD("unsupported lcdTypeIdx! please check lcdTypeIdx = %d!\n", lcdTypeIdx);
+        return HI_FAILURE;
+    }
 
     s32Ret = HI_MPI_VO_SetUserIntfSyncInfo(VoDev, &stUserInfo);
     if (s32Ret != HI_SUCCESS)
@@ -124,6 +191,8 @@ int Media_Vo_InitVoLayer(VO_LAYER VoLayer, MEDIA_LCD_IDX_E enLcdIdx)
 
     stLayerAttr.enDstDynamicRange = DYNAMIC_RANGE_SDR8;
 
+    prtMD("dispWidth = %d, dispHeight = %d\n", dispWidth, dispHeight);
+
     s32Ret = HI_MPI_VO_SetVideoLayerAttr(VoLayer, &stLayerAttr);
     if (s32Ret != HI_SUCCESS)
     {
@@ -155,17 +224,23 @@ int Media_Vo_InitVoLayer(VO_LAYER VoLayer, MEDIA_LCD_IDX_E enLcdIdx)
     return s32Ret;
 }
 
-int Media_Vo_InitMipiTx(void)
+int Media_Vo_InitMipiTx(MEDIA_LCD_IDX_E lcdTypeIdx)
 {
-    return Media_MipiTx_Init();
+    return Media_MipiTx_Init(lcdTypeIdx);
 }
 
-int Media_Vo_Init(void)
+int Media_Vo_Init(MEDIA_LCD_IDX_E lcdTypeIdx)
 {
     VO_DEV VoDev = 0;
     VO_LAYER VoLayer = 0;
     HI_S32 s32Ret = HI_SUCCESS;
     static unsigned int bInitFlag = 0;
+
+    if (lcdTypeIdx >= LCD_IDX_BUTT)
+    {
+        prtMD("invalid lcdTypeIdx = %d\n", lcdTypeIdx);
+        return 0;
+    }
 
     if (bInitFlag == 1)
     {
@@ -173,21 +248,21 @@ int Media_Vo_Init(void)
         return 0;
     }
 
-    s32Ret = Media_Vo_InitDev(VoDev);
+    s32Ret = Media_Vo_InitDev(VoDev, lcdTypeIdx);
     if (HI_SUCCESS != s32Ret)
     {
         prtMD("Media_Vo_InitDev error! s32Ret = %#x\n", s32Ret);
         return s32Ret;
     }
 
-    s32Ret = Media_Vo_InitVoLayer(VoLayer, LCD_IDX_7_600X1024_RP);
+    s32Ret = Media_Vo_InitVoLayer(VoLayer, lcdTypeIdx);
     if (HI_SUCCESS != s32Ret)
     {
         prtMD("Media_Vo_InitVoLayer error! s32Ret = %#x\n", s32Ret);
         return s32Ret;
     }
 
-    s32Ret = Media_Vo_InitMipiTx();
+    s32Ret = Media_Vo_InitMipiTx(lcdTypeIdx);
     if (HI_SUCCESS != s32Ret)
     {
         prtMD("Media_Vo_InitMipiTx error! s32Ret = %#x\n", s32Ret);

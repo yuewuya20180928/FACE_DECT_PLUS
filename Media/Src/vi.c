@@ -318,7 +318,7 @@ int Media_VideoIn_GetConfig(MEDIA_VI_PARAM_S *pViParam, unsigned int sensorNum)
         /* 设置sensor类型 */
         pViParam->stViInfo[i].stSnsInfo.enSnsType = GALAXYCORE_GC2145_MIPI_UXGA_30FPS_10BIT;
         #else
-        pViParam->stViInfo[i].stSnsInfo.enSnsType = SONY_IMX327_2L_MIPI_2M_30FPS_12BIT;
+        pViParam->stViInfo[i].stSnsInfo.enSnsType = SONY_IMX327_2L_MIPI_720P_30FPS_12BIT;
         #endif
 
         pViParam->stViInfo[i].stSnsInfo.MipiDev = i;
@@ -1270,6 +1270,7 @@ int Media_VideoIn_Init(MEDIA_VI_PARAM_S *pViParam)
 {
     HI_S32 s32Ret = HI_SUCCESS;
     ROTATION_E enRotation = ROTATION_0;
+    unsigned char bSetLdc = 0;
 
     if (pViParam == NULL)
     {
@@ -1309,11 +1310,15 @@ int Media_VideoIn_Init(MEDIA_VI_PARAM_S *pViParam)
         return -1;
     }
 
-    s32Ret = Media_VideoIn_SetLDC(pViParam);
-    if (HI_SUCCESS != s32Ret)
+    /* 设置镜头畸变矫正参数 */
+    if (bSetLdc)
     {
-        prtMD("Media_VideoIn_SetLDC error! s32Ret = %#x\n", s32Ret);
-        return -1;
+        s32Ret = Media_VideoIn_SetLDC(pViParam);
+        if (HI_SUCCESS != s32Ret)
+        {
+            prtMD("Media_VideoIn_SetLDC error! s32Ret = %#x\n", s32Ret);
+            return -1;
+        }
     }
 
     return HI_SUCCESS;

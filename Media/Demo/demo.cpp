@@ -11,8 +11,8 @@ int main()
     /* 显示区域位置设置 */
     unsigned int dispX = 0;
     unsigned int dispY = 0;
-    unsigned int dispW = 1024;
-    unsigned int dispH = 600;
+    unsigned int dispW = 640;   //1024;
+    unsigned int dispH = 480;   //600;
 
     MEDIA_VIDEO_DISP_S stVideoDisp = {0};
 
@@ -23,7 +23,7 @@ int main()
         return -1;
     }
 
-    #if 0
+    #if 1
     stVideoDisp.bOpen = 1;
     #else
     stVideoDisp.bOpen = 0;
@@ -48,3 +48,4 @@ int main()
 
     return 0;
 }
+

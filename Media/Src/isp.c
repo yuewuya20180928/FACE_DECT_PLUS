@@ -1,5 +1,8 @@
+#include<pthread.h>
+
 #include "isp.h"
 #include "vi.h"
+#include "isp_configure.h"
 
 pthread_t g_IspPid[MAX_ISP_NUM];
 
@@ -137,6 +140,7 @@ int Media_Isp_RegiterSensorCallback(ISP_DEV IspDev, VI_SNS_TYPE_E enSnsType)
 
     if (pstSnsObj->pfnRegisterCallback != HI_NULL)
     {
+        prtMD("pfnRegisterCallback IspDev = %d\n", IspDev);
         s32Ret = pstSnsObj->pfnRegisterCallback(IspDev, &stAeLib, &stAwbLib);
         if (s32Ret != HI_SUCCESS)
         {
@@ -169,6 +173,7 @@ int Media_Isp_BindSensor(ISP_DEV IspDev, VI_SNS_TYPE_E enSnsType, HI_S8 s8SnsDev
 
     if (HI_NULL != pstSnsObj->pfnSetBusInfo)
     {
+        prtMD("pfnSetBusInfo IspDev = %d\n", IspDev);
         s32Ret = pstSnsObj->pfnSetBusInfo(IspDev, uSnsBusInfo);
         if (s32Ret != HI_SUCCESS)
         {
@@ -192,6 +197,8 @@ int Media_Isp_Aelib_Callback(ISP_DEV IspDev)
 
     stAeLib.s32Id = IspDev;
     strncpy(stAeLib.acLibName, HI_AE_LIB_NAME, sizeof(HI_AE_LIB_NAME));
+
+    prtMD("HI_MPI_AE_Register IspDev = %d\n", IspDev);
     s32Ret = HI_MPI_AE_Register(IspDev, &stAeLib);
     if (HI_SUCCESS != s32Ret)
     {
@@ -208,6 +215,8 @@ int Media_Isp_Awblib_Callback(ISP_DEV IspDev)
 
     stAwbLib.s32Id = IspDev;
     strncpy(stAwbLib.acLibName, HI_AWB_LIB_NAME, sizeof(HI_AWB_LIB_NAME));
+
+    prtMD("HI_MPI_AWB_Register IspDev = %d\n", IspDev);
     s32Ret = HI_MPI_AWB_Register(IspDev, &stAwbLib);
     if (HI_SUCCESS != s32Ret)
     {
@@ -250,6 +259,103 @@ int Media_Isp_Run(ISP_DEV IspDev)
 
     return s32Ret;
 }
+
+#if 0
+int Media_Isp_LoadParam(ISP_DEV IspDev)
+{
+    HI_S32 s32Ret = HI_SUCCESS;
+    ISP_EXPOSURE_ATTR_S stExpAttr = {0};
+
+    prtMD("Start!\n");
+
+    s32Ret = HI_MPI_ISP_GetExposureAttr(IspDev, &stExpAttr);
+    if (HI_SUCCESS != s32Ret)
+    {
+        prtMD("s32Ret = %#x\n", s32Ret);
+        return 0;
+    }
+
+    stExpAttr.bByPass = HI_FALSE;
+    stExpAttr.enOpType = OP_TYPE_AUTO;
+
+    /* 曝光时间区间 */
+    stExpAttr.stAuto.stExpTimeRange.u32Max = 40000;
+    stExpAttr.stAuto.stExpTimeRange.u32Min = 40;
+
+    stExpAttr.stAuto.u8Speed = 0x80;
+
+    stExpAttr.stAuto.enAEStrategyMode = AE_EXP_HIGHLIGHT_PRIOR;
+    stExpAttr.stAuto.u16HistRatioSlope = 0x100;
+    stExpAttr.stAuto.u8MaxHistOffset = 0x40;
+
+    stExpAttr.stAuto.stAntiflicker.bEnable = HI_TRUE;
+    stExpAttr.stAuto.stAntiflicker.u8Frequency = 50;
+    stExpAttr.stAuto.stAntiflicker.enMode = ISP_ANTIFLICKER_NORMAL_MODE;
+
+    stExpAttr.stAuto.stAEDelayAttr.u16BlackDelayFrame = 10;
+    stExpAttr.stAuto.stAEDelayAttr.u16WhiteDelayFrame = 0;
+
+    s32Ret = HI_MPI_ISP_SetExposureAttr(IspDev, &stExpAttr);
+    if (HI_SUCCESS != s32Ret)
+    {
+        prtMD("s32Ret = %#x\n", s32Ret);
+        return 0;
+    }
+
+    return 0;
+}
+#else
+/* 根据ViPipe的值去 */
+int Media_Isp_LoadParam(VI_PIPE viPipe)
+{
+    char fileNames[512] = {0};
+    int s32Ret = 0;
+    ISPCFG_PARAM_S stIspParam = {0};
+
+    if (viPipe > VI_MAX_PIPE_NUM)
+    {
+        prtMD("invalid input viPipe = %d\n", viPipe);
+        return -1;
+    }
+
+    snprintf(fileNames, 512, "%s%d", ISP_CFG_FILE_PREFIX, viPipe);
+    prtMD("fileNames[%d]: %s\n", viPipe, fileNames);
+
+    /* 加载配置文件 */
+    s32Ret = ISPCFG_LoadFile(viPipe, fileNames);
+    if (0 != s32Ret)
+    {
+        prtMD("ISPCFG_LoadFile error! s32Ret = %#x\n", s32Ret);
+        return -1;
+    }
+
+    /* 获取参数 */
+    s32Ret = ISPCFG_GetParam(viPipe, &stIspParam);
+    if (0 != s32Ret)
+    {
+        prtMD("ISPCFG_GetParam error! s32Ret = %#x\n", s32Ret);
+        return -1;
+    }
+
+    /* 设置参数 */
+    s32Ret = ISPCFG_SetParam(viPipe, &stIspParam);
+    if (0 != s32Ret)
+    {
+        prtMD("ISPCFG_SetParam error! s32Ret = %#x\n", s32Ret);
+        return -1;
+    }
+
+    /* 卸载配置文件 */
+    s32Ret = ISPCFG_UnloadFile(viPipe);
+    if (0 != s32Ret)
+    {
+        prtMD("ISPCFG_UnloadFile error! s32Ret = %#x\n", s32Ret);
+        return -1;
+    }
+
+    return 0;
+}
+#endif
 
 int Media_VideoIn_StartIsp(MEDIA_VI_INFO_S* pViInfo)
 {
@@ -347,6 +453,7 @@ int Media_VideoIn_StartIsp(MEDIA_VI_INFO_S* pViInfo)
                 return HI_FAILURE;
             }
 
+            prtMD("HI_MPI_ISP_MemInit IspDev = %d\n", ViPipe);
             s32Ret = HI_MPI_ISP_MemInit(ViPipe);
             if (s32Ret != HI_SUCCESS)
             {
@@ -354,6 +461,7 @@ int Media_VideoIn_StartIsp(MEDIA_VI_INFO_S* pViInfo)
                 return HI_FAILURE;
             }
 
+            prtMD("HI_MPI_ISP_SetPubAttr IspDev = %d\n", ViPipe);
             s32Ret = HI_MPI_ISP_SetPubAttr(ViPipe, &stPubAttr);
             if (s32Ret != HI_SUCCESS)
             {
@@ -361,6 +469,7 @@ int Media_VideoIn_StartIsp(MEDIA_VI_INFO_S* pViInfo)
                 return HI_FAILURE;
             }
 
+            prtMD("HI_MPI_ISP_Init IspDev = %d\n", ViPipe);
             s32Ret = HI_MPI_ISP_Init(ViPipe);
             if (s32Ret != HI_SUCCESS)
             {
@@ -368,6 +477,7 @@ int Media_VideoIn_StartIsp(MEDIA_VI_INFO_S* pViInfo)
                 return HI_FAILURE;
             }
 
+            prtMD("Media_Isp_Run IspDev = %d\n", ViPipe);
             s32Ret = Media_Isp_Run(ViPipe);
             if (s32Ret != HI_SUCCESS)
             {
@@ -380,12 +490,78 @@ int Media_VideoIn_StartIsp(MEDIA_VI_INFO_S* pViInfo)
     return s32Ret;
 }
 
+void *Media_Isp_Tsk(void *arg)
+{
+    MEDIA_VI_PARAM_S *pViParam = NULL;
+    unsigned int i = 0;
+    unsigned int j = 0;
+    int viIdx = 0;
+    VI_PIPE ViPipe = -1;
+    MEDIA_VI_INFO_S *pViInfo = NULL;
+    ISP_PUB_ATTR_S stPubAttr = {0};
+    HI_S32 s32Ret = HI_SUCCESS;
+    HI_BOOL bNeedPipe = HI_FALSE;
+
+    pViParam = (MEDIA_VI_PARAM_S *)arg;
+
+    /* 每个VI通道加载默认的ISP配置参数 */
+    for (i = 0; i < pViParam->s32WorkingViNum; i++)
+    {
+        viIdx  = pViParam->s32WorkingViId[i];
+        pViInfo = &pViParam->stViInfo[viIdx];
+        for (j = 0; j < WDR_MAX_PIPE_NUM; j++)
+        {
+            if (pViInfo->stPipeInfo.aPipe[j] >= 0  && pViInfo->stPipeInfo.aPipe[j] < VI_MAX_PIPE_NUM)
+            {
+                ViPipe = pViInfo->stPipeInfo.aPipe[j];
+
+                s32Ret = Media_Isp_GetAttr(pViInfo->stSnsInfo.enSnsType, &stPubAttr);
+                if (HI_SUCCESS != s32Ret)
+                {
+                    prtMD("Media_Isp_GetAttr error! s32Ret = %#x\n", s32Ret);
+                }
+
+                stPubAttr.enWDRMode = pViInfo->stDevInfo.enWDRMode;
+
+                if (WDR_MODE_NONE == pViInfo->stDevInfo.enWDRMode)
+                {
+                    bNeedPipe = HI_TRUE;
+                }
+                else
+                {
+                    bNeedPipe = (i > 0) ? HI_FALSE : HI_TRUE;
+                }
+
+                if (HI_TRUE != bNeedPipe)
+                {
+                    continue;
+                }
+
+                /* 从ISP配置文件中加载预先设计好的ISP参数 */
+                s32Ret = Media_Isp_LoadParam(ViPipe);
+                if (HI_SUCCESS != s32Ret)
+                {
+                    prtMD("Media_Isp_LoadParam error! s32Ret = %#x\n", s32Ret);
+                }
+            }
+        }
+    }
+
+    while (1)
+    {
+        usleep(50 * 1000);
+    }
+
+    return NULL;
+}
+
 int Media_Isp_Init(MEDIA_VI_PARAM_S *pViParam)
 {
     HI_S32 i = 0;
     HI_S32 s32ViNum = 0;
     HI_S32 s32Ret = HI_SUCCESS;
     MEDIA_VI_INFO_S *pViInfo = HI_NULL;
+    pthread_t ptd;
 
     if (!pViParam)
     {
@@ -405,6 +581,9 @@ int Media_Isp_Init(MEDIA_VI_PARAM_S *pViParam)
             return HI_FAILURE;
         }
     }
+
+    /* 创建ISP处理线程，实时的检测图像质量,并进行调节 */
+    pthread_create(&ptd, NULL, Media_Isp_Tsk, (void *)pViInfo);
 
     return HI_SUCCESS;
 }

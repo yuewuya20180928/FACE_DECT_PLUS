@@ -190,6 +190,8 @@ static HI_S32 cmos_get_ae_default(VI_PIPE ViPipe, AE_SENSOR_DEFAULT_S *pstAeSnsD
             pstAeSnsDft->u32MinIntTime = 3;
             pstAeSnsDft->u32MaxIntTimeTarget = 65535;
             pstAeSnsDft->u32MinIntTimeTarget = 3;
+            printf("Func:%s, Line:%d, u32InitExposure = %d\n", __FUNCTION__, __LINE__, pstAeSnsDft->u32InitExposure);
+
             break;
         default:
             printf("cmos_get_ae_default_Sensor Mode is error!\n");
@@ -293,7 +295,6 @@ static HI_VOID cmos_inttime_update(VI_PIPE ViPipe, HI_U32 u32IntTime)
     return;
 }
 
-#if 0
 static HI_U32 regValTable[29][4] = {
     {0x00, 0x00, 0x01, 0x00}, // 0xb4 0xb3 0xb8 0xb9
     {0x00, 0x10, 0x01, 0x0c},
@@ -325,19 +326,15 @@ static HI_U32 regValTable[29][4] = {
     {0x02, 0x95, 0x3f, 0x3f},
     {0x00, 0xce, 0x3f, 0x3f},
 };
-#endif
 
-#if 0
 static HI_U32 analog_gain_table[29] = {//逻辑增益表
     1024, 1230, 1440, 1730, 2032, 2380, 2880, 3460, 4080, 4800, 5776,
     6760, 8064, 9500, 11552, 13600, 16132, 18912, 22528, 27036, 32340,
     38256, 45600, 53912, 63768, 76880, 92300, 108904, 123568,
 };
-#endif
 
 static HI_VOID cmos_again_calc_table(VI_PIPE ViPipe, HI_U32 *pu32AgainLin, HI_U32 *pu32AgainDb)
 {
-#if 0
     int again;
     int i;
     static HI_U8 againmax = 28;
@@ -346,25 +343,29 @@ static HI_VOID cmos_again_calc_table(VI_PIPE ViPipe, HI_U32 *pu32AgainLin, HI_U3
     CMOS_CHECK_POINTER_VOID(pu32AgainDb);
     again = *pu32AgainLin;
 
-    if (again >= analog_gain_table[againmax]) {
+    if (again >= analog_gain_table[againmax])
+    {
         *pu32AgainLin = analog_gain_table[28];
         *pu32AgainDb = againmax;
-    } else {
-        for (i = 1; i < 29; i++) {
-            if (again < analog_gain_table[i]) {
+    }
+    else
+    {
+        for (i = 1; i < 29; i++)
+        {
+            if (again < analog_gain_table[i])
+            {
                 *pu32AgainLin = analog_gain_table[i - 1];
                 *pu32AgainDb = i - 1;
                 break;
             }
         }
     }
-#endif
+
     return;
 }
 
 static HI_VOID cmos_gains_update(VI_PIPE ViPipe, HI_U32 u32Again, HI_U32 u32Dgain)
 {
-#if 0
     HI_U8 u8DgainHigh, u8DgainLow;
 
     ISP_SNS_STATE_S *pstSnsState = HI_NULL;
@@ -381,7 +382,7 @@ static HI_VOID cmos_gains_update(VI_PIPE ViPipe, HI_U32 u32Again, HI_U32 u32Dgai
 
     pstSnsState->astRegsInfo[0].astI2cData[7].u32Data = u8DgainLow;
     pstSnsState->astRegsInfo[0].astI2cData[6].u32Data = u8DgainHigh;
-#endif
+
     return;
 }
 
@@ -633,7 +634,7 @@ static HI_S32 cmos_set_wdr_mode(VI_PIPE ViPipe, HI_U8 u8Mode)
             return HI_FAILURE;
     }
 
-    printf("Func:%s, Line:%d, u8Mode = %d\n", __FUNCTION__, __LINE__, u8Mode);
+    printf("File:%s, Func:%s, Line:%d, u8Mode = %d\n", __FILE__, __FUNCTION__, __LINE__, u8Mode);
 
     memset(pstSnsState->au32WDRIntTime, 0, sizeof(pstSnsState->au32WDRIntTime));
 
@@ -978,6 +979,9 @@ static HI_S32 sensor_set_init(VI_PIPE ViPipe, ISP_INIT_ATTR_S *pstInitAttr)
     {
         g_au16InitCCM[ViPipe][i] = pstInitAttr->au16CCM[i];
     }
+
+    printf("File:%s, Func:%s, Line:%d, sensor_set_init\n", __FILE__, __FUNCTION__, __LINE__);
+    printf("ViPipe  = %d, u32Exposure = %d\n", ViPipe, pstInitAttr->u32Exposure);
 
     return HI_SUCCESS;
 }
