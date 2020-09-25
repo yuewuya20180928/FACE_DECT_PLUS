@@ -500,18 +500,6 @@ void gc2145_linear_UXGA_init(VI_PIPE ViPipe)
     gc2145_write_register(ViPipe, 0x17, 0xf1);
     gc2145_write_register(ViPipe, 0xfe, 0x00);
 
-	
-	//raw output
-	gc2145_write_register(ViPipe, 0xfe,0x00);
-	gc2145_write_register(ViPipe, 0xb1,0x20);
-	gc2145_write_register(ViPipe, 0xb2,0xc0);
-	gc2145_write_register(ViPipe, 0xb6,0x00);
-	gc2145_write_register(ViPipe, 0x80,0x03);
-	gc2145_write_register(ViPipe, 0x81,0x00);
-	gc2145_write_register(ViPipe, 0x82,0x00);
-	gc2145_write_register(ViPipe, 0x84,0x19);
-	gc2145_write_register(ViPipe, 0x89,0x03);
-
     printf("Func:%s, Line:%d, Date:%s, Time:%s, end!\n", __FUNCTION__, __LINE__, __DATE__, __TIME__);
 
     return;
@@ -539,7 +527,6 @@ void gc2145_linear_960p30_init(VI_PIPE ViPipe)
     gc2145_write_register(ViPipe, 0x03 , 0x06);
     gc2145_write_register(ViPipe, 0x04 , 0xb0);
     gc2145_write_register(ViPipe, 0xb1 , 0x80);
-	
     gc2145_write_register(ViPipe, 0x05 , 0x01);
     gc2145_write_register(ViPipe, 0x06 , 0x38);
 #if 1
@@ -547,15 +534,13 @@ void gc2145_linear_960p30_init(VI_PIPE ViPipe)
     gc2145_write_register(ViPipe, 0x08 , 0x22);
 #endif
     gc2145_write_register(ViPipe, 0x09 , 0x00);
-    gc2145_write_register(ViPipe, 0x0a , 0x78);
+    gc2145_write_register(ViPipe, 0x0a , 0x00);
     gc2145_write_register(ViPipe, 0x0b , 0x00);
-    gc2145_write_register(ViPipe, 0x0c , 0xa0);
-	
+    gc2145_write_register(ViPipe, 0x0c , 0x00);
     gc2145_write_register(ViPipe, 0x0d , 0x03);
     gc2145_write_register(ViPipe, 0x0e , 0xd0);
     gc2145_write_register(ViPipe, 0x0f , 0x05);
     gc2145_write_register(ViPipe, 0x10 , 0x10);
-	
     gc2145_write_register(ViPipe, 0x12 , 0x2e);
     gc2145_write_register(ViPipe, 0x17 , 0x14); //mirror
     gc2145_write_register(ViPipe, 0x18 , 0x22);
@@ -604,16 +589,15 @@ void gc2145_linear_960p30_init(VI_PIPE ViPipe)
     gc2145_write_register(ViPipe, 0xee , 0x60);
     gc2145_write_register(ViPipe, 0xef , 0x90);
     gc2145_write_register(ViPipe, 0xb6 , 0x00);
-	//crop
     gc2145_write_register(ViPipe, 0x90 , 0x01);
     gc2145_write_register(ViPipe, 0x91 , 0x00);
     gc2145_write_register(ViPipe, 0x92 , 0x00);
     gc2145_write_register(ViPipe, 0x93 , 0x00);
     gc2145_write_register(ViPipe, 0x94 , 0x00);
     gc2145_write_register(ViPipe, 0x95 , 0x03);
-    gc2145_write_register(ViPipe, 0x96 , 0xc0); //960
+    gc2145_write_register(ViPipe, 0x96 , 0xc0);
     gc2145_write_register(ViPipe, 0x97 , 0x05);
-    gc2145_write_register(ViPipe, 0x98 , 0x00); //1280
+    gc2145_write_register(ViPipe, 0x98 , 0x00);
 
     /////////////////////////////////////////
     /////////// BLK ////////////////////////
@@ -811,17 +795,6 @@ void gc2145_linear_960p30_init(VI_PIPE ViPipe)
     gc2145_write_register(ViPipe, 0x15, 0x12);
     gc2145_write_register(ViPipe, 0x17, 0xf1);
     gc2145_write_register(ViPipe, 0xfe, 0x00);
-
-	//raw output
-	gc2145_write_register(ViPipe, 0xfe,0x00);
-	gc2145_write_register(ViPipe, 0xb1,0x20);
-	gc2145_write_register(ViPipe, 0xb2,0xc0);
-	gc2145_write_register(ViPipe, 0xb6,0x00);
-	gc2145_write_register(ViPipe, 0x80,0x03);
-	gc2145_write_register(ViPipe, 0x81,0x00);
-	gc2145_write_register(ViPipe, 0x82,0x00);
-	gc2145_write_register(ViPipe, 0x84,0x19);
-	gc2145_write_register(ViPipe, 0x89,0x03);
 
     printf("Func:%s, Line:%d, Date:%s, Time:%s, end!\n", __FUNCTION__, __LINE__, __DATE__, __TIME__);
 

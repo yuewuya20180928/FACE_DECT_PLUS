@@ -52,6 +52,8 @@ int Media_MipiTx_Init(MEDIA_LCD_IDX_E lcdTypeIdx)
     int fd = -1;
     HI_S32 s32Ret = HI_SUCCESS;
 
+    prtMD("start! lcdTypeIdx = %d\n", lcdTypeIdx);
+
     fd = open(MIPI_TX_DEV, O_RDWR);
     if (fd < 0)
     {
@@ -96,6 +98,9 @@ int Media_MipiTx_Init(MEDIA_LCD_IDX_E lcdTypeIdx)
     }
 
     close(fd);
+
+    prtMD("end! lcdTypeIdx = %d\n", lcdTypeIdx);
+
     return 0;
 }
 

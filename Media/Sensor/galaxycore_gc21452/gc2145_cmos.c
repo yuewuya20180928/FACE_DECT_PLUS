@@ -95,12 +95,18 @@ extern void gc2145_mirror_flip(VI_PIPE ViPipe, ISP_SNS_MIRRORFLIP_TYPE_E eSnsMir
 #define GC2145_EXPTIME_ADDR_H                 (0x03) // Shutter-time[12:8]//快门时间      无需修改
 #define GC2145_EXPTIME_ADDR_L                 (0x04) // Shutter-time[7:0]//20200713
 
-#define GC2145_AUTO_PREGAIN_ADDR_H            (0xb0)   // auto-pregain-gain[9:6]自动前增益       无需修改
-#define GC2145_AUTO_PREGAIN_ADDR_L            (0xb1)   // auto-pregain-gain[5:0]//20200713
+#define GC2145_AGAIN_ADDR_H                   (0xb4)   // Analog-gain[9:8]//模拟增益
+#define GC2145_AGAIN_ADDR_L                   (0xb3)   // Analog-gain[7:0]//没有模拟增益啊20200713
 
-#define GC2145_VMAX_ADDR_H                    (0x07)    // Vmax[10:8]
-#define GC2145_VMAX_ADDR_L                    (0x08)    // Vmax[7:0]
+#define GC2145_DGAIN_ADDR_H                   (0xb9)   // digital-gain[11:6]//数字增益
+#define GC2145_DGAIN_ADDR_L                   (0xb8)   // digital-gain[5:0]//没有数字增益啊20200713
 
+#define GC2145_AUTO_PREGAIN_ADDR_H            (0xb1)   // auto-pregain-gain[9:6]自动前增益       无需修改
+#define GC2145_AUTO_PREGAIN_ADDR_L            (0xb2)   // auto-pregain-gain[5:0]//20200713
+
+#define GC2145_VMAX_ADDR_H                    (0x95)    // Vmax[10:8]
+#define GC2145_VMAX_ADDR_L                    (0x96)    // Vmax[7:0]
+#define GC2145_STATUS_ADDR                    (0x90)    // slow shutter via framerate or exptime//状态地址
 
 #define GC2145_INCREASE_LINES                 (0) /* make real fps less than stand fps because NVR require */
 
@@ -123,6 +129,7 @@ static HI_S32 cmos_get_ae_default(VI_PIPE ViPipe, AE_SENSOR_DEFAULT_S *pstAeSnsD
     CMOS_CHECK_POINTER(pstAeSnsDft);
     GC2145_SENSOR_GET_CTX(ViPipe, pstSnsState);
     CMOS_CHECK_POINTER(pstSnsState);
+    //AE是自动增益  这里先注释掉
 
     memset(&pstAeSnsDft->stAERouteAttr, 0, sizeof(ISP_AE_ROUTE_S));
 
@@ -138,15 +145,15 @@ static HI_S32 cmos_get_ae_default(VI_PIPE ViPipe, AE_SENSOR_DEFAULT_S *pstAeSnsD
     pstAeSnsDft->stIntTimeAccu.f32Accuracy = 1;
     pstAeSnsDft->stIntTimeAccu.f32Offset = 0;
 
-    pstAeSnsDft->stAgainAccu.enAccuType = AE_ACCURACY_LINEAR;
-    pstAeSnsDft->stAgainAccu.f32Accuracy = 0.03125;
+    pstAeSnsDft->stAgainAccu.enAccuType = AE_ACCURACY_TABLE;
+    pstAeSnsDft->stAgainAccu.f32Accuracy = 1;
 
-    pstAeSnsDft->stDgainAccu.enAccuType = AE_ACCURACY_LINEAR;
-    pstAeSnsDft->stDgainAccu.f32Accuracy = 0.03125;
+    pstAeSnsDft->stDgainAccu.enAccuType = AE_ACCURACY_TABLE;
+    pstAeSnsDft->stDgainAccu.f32Accuracy = 1;
 
     pstAeSnsDft->u32ISPDgainShift = 8;
     pstAeSnsDft->u32MinISPDgainTarget = 1 << pstAeSnsDft->u32ISPDgainShift;
-    pstAeSnsDft->u32MaxISPDgainTarget = 5 << pstAeSnsDft->u32ISPDgainShift;
+    pstAeSnsDft->u32MaxISPDgainTarget = 2 << pstAeSnsDft->u32ISPDgainShift;
 
     pstAeSnsDft->enMaxIrisFNO = ISP_IRIS_F_NO_1_0;
     pstAeSnsDft->enMinIrisFNO = ISP_IRIS_F_NO_32_0;
@@ -172,7 +179,7 @@ static HI_S32 cmos_get_ae_default(VI_PIPE ViPipe, AE_SENSOR_DEFAULT_S *pstAeSnsD
             pstAeSnsDft->au8HistThresh[2] = 0x60;
             pstAeSnsDft->au8HistThresh[3] = 0x80;
 
-            pstAeSnsDft->u32MaxAgain = 5120;
+            pstAeSnsDft->u32MaxAgain = 113168;
             pstAeSnsDft->u32MinAgain = 1024;
             pstAeSnsDft->u32MaxAgainTarget = pstAeSnsDft->u32MaxAgain;
             pstAeSnsDft->u32MinAgainTarget = pstAeSnsDft->u32MinAgain;
@@ -245,6 +252,9 @@ static HI_VOID cmos_fps_set(VI_PIPE ViPipe, HI_FLOAT f32Fps, AE_SENSOR_DEFAULT_S
     }
     u32VMAX = (u32VMAX > GC2145_FULL_LINES_MAX) ? GC2145_FULL_LINES_MAX : u32VMAX;
     pstSnsState->u32FLStd = u32VMAX;
+    pstSnsState->astRegsInfo[0].astI2cData[4].u32Data = 0x0;
+    pstSnsState->astRegsInfo[0].astI2cData[5].u32Data = (u32VMAX & 0xFF);
+    pstSnsState->astRegsInfo[0].astI2cData[6].u32Data = ((u32VMAX & 0xFF00) >> 8);
 
     pstAeSnsDft->f32Fps = f32Fps;
     //pstAeSnsDft->u32LinesPer500ms = pstSnsState->u32FLStd * f32Fps / 2;
@@ -269,6 +279,9 @@ static HI_VOID cmos_slow_framerate_set(VI_PIPE ViPipe, HI_U32 u32FullLines,
     u32FullLines = (u32FullLines > GC2145_FULL_LINES_MAX) ? GC2145_FULL_LINES_MAX : u32FullLines;
     pstSnsState->au32FL[0] = u32FullLines;
 
+    pstSnsState->astRegsInfo[0].astI2cData[4].u32Data = 0x0;
+    pstSnsState->astRegsInfo[0].astI2cData[5].u32Data = (u32FullLines & 0xFF);
+    pstSnsState->astRegsInfo[0].astI2cData[6].u32Data = ((u32FullLines & 0xFF00) >> 8);
 
     pstAeSnsDft->u32FullLines = pstSnsState->au32FL[0];
     pstAeSnsDft->u32MaxIntTime = pstSnsState->au32FL[0] - 2;
@@ -279,7 +292,7 @@ static HI_VOID cmos_slow_framerate_set(VI_PIPE ViPipe, HI_U32 u32FullLines,
 //无需修改
 static HI_VOID cmos_inttime_update(VI_PIPE ViPipe, HI_U32 u32IntTime)
 {
-    HI_U32 u32Val;
+    HI_U32 u32Val = 0;
     ISP_SNS_STATE_S *pstSnsState = HI_NULL;
     GC2145_SENSOR_GET_CTX(ViPipe, pstSnsState);
     CMOS_CHECK_POINTER_VOID(pstSnsState);
@@ -292,30 +305,94 @@ static HI_VOID cmos_inttime_update(VI_PIPE ViPipe, HI_U32 u32IntTime)
     return;
 }
 
+static HI_U32 regValTable[29][4] = {
+    {0x00, 0x00, 0x01, 0x00}, // 0xb4 0xb3 0xb8 0xb9
+    {0x00, 0x10, 0x01, 0x0c},
+    {0x00, 0x20, 0x01, 0x1b},
+    {0x00, 0x30, 0x01, 0x2c},
+    {0x00, 0x40, 0x01, 0x3f},
+    {0x00, 0x50, 0x02, 0x16},
+    {0x00, 0x60, 0x02, 0x35},
+    {0x00, 0x70, 0x03, 0x16},
+    {0x00, 0x80, 0x04, 0x02},
+    {0x00, 0x90, 0x04, 0x31},
+    {0x00, 0xa0, 0x05, 0x32},
+    {0x00, 0xb0, 0x06, 0x35},
+    {0x00, 0xc0, 0x08, 0x04},
+    {0x00, 0x5a, 0x09, 0x19},
+    {0x00, 0x83, 0x0b, 0x0f},
+    {0x00, 0x93, 0x0d, 0x12},
+    {0x00, 0x84, 0x10, 0x00},
+    {0x00, 0x94, 0x12, 0x3a},
+    {0x01, 0x2c, 0x1a, 0x02},
+    {0x01, 0x3c, 0x1b, 0x20},
+    {0x00, 0x8c, 0x20, 0x0f},
+    {0x00, 0x9c, 0x26, 0x07},
+    {0x02, 0x64, 0x36, 0x21},
+    {0x02, 0x74, 0x37, 0x3a},
+    {0x00, 0xc6, 0x3d, 0x02},
+    {0x00, 0xdc, 0x3f, 0x3f},
+    {0x02, 0x85, 0x3f, 0x3f},
+    {0x02, 0x95, 0x3f, 0x3f},
+    {0x00, 0xce, 0x3f, 0x3f},
+};
+
+static HI_U32 analog_gain_table[29] = {//逻辑增益表
+    1024, 1230, 1440, 1730, 2032, 2380, 2880, 3460, 4080, 4800, 5776,
+    6760, 8064, 9500, 11552, 13600, 16132, 18912, 22528, 27036, 32340,
+    38256, 45600, 53912, 63768, 76880, 92300, 108904, 123568,
+};
 
 static HI_VOID cmos_again_calc_table(VI_PIPE ViPipe, HI_U32 *pu32AgainLin, HI_U32 *pu32AgainDb)
 {
-    int again = 0;
+    int again;
+    int i;
+    static HI_U8 againmax = 28;
 
     CMOS_CHECK_POINTER_VOID(pu32AgainLin);
     CMOS_CHECK_POINTER_VOID(pu32AgainDb);
     again = *pu32AgainLin;
-    *pu32AgainDb =again;
+
+    if (again >= analog_gain_table[againmax])
+    {
+        *pu32AgainLin = analog_gain_table[28];
+        *pu32AgainDb = againmax;
+    }
+    else
+    {
+        for (i = 1; i < 29; i++)
+        {
+            if (again < analog_gain_table[i])
+            {
+                *pu32AgainLin = analog_gain_table[i - 1];
+                *pu32AgainDb = i - 1;
+                break;
+            }
+        }
+    }
 
     return;
 }
 
 static HI_VOID cmos_gains_update(VI_PIPE ViPipe, HI_U32 u32Again, HI_U32 u32Dgain)
 {
-    HI_U8 u8gain;
+    HI_U8 u8DgainHigh, u8DgainLow;
 
     ISP_SNS_STATE_S *pstSnsState = HI_NULL;
 
     GC2145_SENSOR_GET_CTX(ViPipe, pstSnsState);
     CMOS_CHECK_POINTER_VOID(pstSnsState);
-	u8gain=32*u32Again/1024;
+    u8DgainHigh = (u32Dgain >> 6) & 0x0f;
+    u8DgainLow = (u32Dgain & 0x3f) << 2;
 
-    pstSnsState->astRegsInfo[0].astI2cData[2].u32Data = u8gain;
+    pstSnsState->astRegsInfo[0].astI2cData[2].u32Data = regValTable[u32Again][0];
+    pstSnsState->astRegsInfo[0].astI2cData[3].u32Data = regValTable[u32Again][1];
+    pstSnsState->astRegsInfo[0].astI2cData[4].u32Data = regValTable[u32Again][2];
+    pstSnsState->astRegsInfo[0].astI2cData[5].u32Data = regValTable[u32Again][3];
+
+    pstSnsState->astRegsInfo[0].astI2cData[7].u32Data = u8DgainLow;
+    pstSnsState->astRegsInfo[0].astI2cData[6].u32Data = u8DgainHigh;
+
     return;
 }
 
@@ -528,10 +605,10 @@ static HI_S32 cmos_get_isp_black_level(VI_PIPE ViPipe, ISP_CMOS_BLACK_LEVEL_S *p
     CMOS_CHECK_POINTER(pstSnsState);
 
     pstBlackLevel->bUpdate = HI_FALSE;
-    pstBlackLevel->au16BlackLevel[0] = 0;
-    pstBlackLevel->au16BlackLevel[1] = 0;
-    pstBlackLevel->au16BlackLevel[2] = 0;
-    pstBlackLevel->au16BlackLevel[3] = 0;
+    pstBlackLevel->au16BlackLevel[0] = 256;
+    pstBlackLevel->au16BlackLevel[1] = 256;
+    pstBlackLevel->au16BlackLevel[2] = 256;
+    pstBlackLevel->au16BlackLevel[3] = 256;
     return HI_SUCCESS;
 
 }
@@ -588,7 +665,7 @@ static HI_S32 cmos_get_sns_regs_info(VI_PIPE ViPipe, ISP_SNS_REGS_INFO_S *pstSns
         pstSnsState->astRegsInfo[0].enSnsType = ISP_SNS_I2C_TYPE;
         pstSnsState->astRegsInfo[0].unComBus.s8I2cDev = g_aunGc2145BusInfo[ViPipe].s8I2cDev;
         pstSnsState->astRegsInfo[0].u8Cfg2ValidDelayMax = 2;
-        pstSnsState->astRegsInfo[0].u32RegNum = 3;
+        pstSnsState->astRegsInfo[0].u32RegNum = 7;
         for (i = 0; i < pstSnsState->astRegsInfo[0].u32RegNum; i++)
         {
             pstSnsState->astRegsInfo[0].astI2cData[i].bUpdate = HI_TRUE;
@@ -601,10 +678,28 @@ static HI_S32 cmos_get_sns_regs_info(VI_PIPE ViPipe, ISP_SNS_REGS_INFO_S *pstSns
         pstSnsState->astRegsInfo[0].astI2cData[1].u8DelayFrmNum  = 1;
         pstSnsState->astRegsInfo[0].astI2cData[1].u32RegAddr  = GC2145_EXPTIME_ADDR_H;
 
+        //pstSnsState->astRegsInfo[0].astI2cData[2].u8DelayFrmNum  = 1;
+        //pstSnsState->astRegsInfo[0].astI2cData[2].u32RegAddr  = GC2145_AGAIN_ADDR_H;
+        //pstSnsState->astRegsInfo[0].astI2cData[3].u8DelayFrmNum  = 1;
+        //pstSnsState->astRegsInfo[0].astI2cData[3].u32RegAddr  = GC2145_AGAIN_ADDR_L;
+
+        //pstSnsState->astRegsInfo[0].astI2cData[4].u8DelayFrmNum  = 1;
+        //pstSnsState->astRegsInfo[0].astI2cData[4].u32RegAddr  = GC2145_DGAIN_ADDR_L;
+        //pstSnsState->astRegsInfo[0].astI2cData[5].u8DelayFrmNum  = 1;
+        //pstSnsState->astRegsInfo[0].astI2cData[5].u32RegAddr  = GC2145_DGAIN_ADDR_H;
+
         pstSnsState->astRegsInfo[0].astI2cData[2].u8DelayFrmNum  = 1;
-        pstSnsState->astRegsInfo[0].astI2cData[2].u32RegAddr  = 0xb1;
+        pstSnsState->astRegsInfo[0].astI2cData[2].u32RegAddr  = GC2145_AUTO_PREGAIN_ADDR_L;
+        pstSnsState->astRegsInfo[0].astI2cData[3].u8DelayFrmNum  = 1;
+        pstSnsState->astRegsInfo[0].astI2cData[3].u32RegAddr  = GC2145_AUTO_PREGAIN_ADDR_H;
 
+        pstSnsState->astRegsInfo[0].astI2cData[4].u8DelayFrmNum = 0;
+        pstSnsState->astRegsInfo[0].astI2cData[4].u32RegAddr = GC2145_STATUS_ADDR;
 
+        pstSnsState->astRegsInfo[0].astI2cData[5].u8DelayFrmNum  = 0;
+        pstSnsState->astRegsInfo[0].astI2cData[5].u32RegAddr  = GC2145_VMAX_ADDR_L;
+        pstSnsState->astRegsInfo[0].astI2cData[6].u8DelayFrmNum  = 0;
+        pstSnsState->astRegsInfo[0].astI2cData[6].u32RegAddr  = GC2145_VMAX_ADDR_H;
 
         pstSnsState->bSyncInit = HI_TRUE;
     }
@@ -619,6 +714,14 @@ static HI_S32 cmos_get_sns_regs_info(VI_PIPE ViPipe, ISP_SNS_REGS_INFO_S *pstSns
                 pstSnsState->astRegsInfo[0].astI2cData[i].bUpdate = HI_TRUE;
             }
         }
+
+        if ((pstSnsState->astRegsInfo[0].astI2cData[6].bUpdate == HI_TRUE) || (pstSnsState->astRegsInfo[0].astI2cData[7].bUpdate == HI_TRUE)) {
+            pstSnsState->astRegsInfo[0].astI2cData[6].bUpdate = HI_TRUE;
+            pstSnsState->astRegsInfo[0].astI2cData[7].bUpdate = HI_TRUE;
+        }
+
+        pstSnsState->astRegsInfo[0].astI2cData[9].bUpdate = HI_TRUE;
+        pstSnsState->astRegsInfo[0].astI2cData[10].bUpdate = HI_TRUE;
     }
 
     pstSnsRegsInfo->bConfig = HI_FALSE;

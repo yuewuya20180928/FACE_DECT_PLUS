@@ -262,12 +262,14 @@ int Media_Vo_Init(MEDIA_LCD_IDX_E lcdTypeIdx)
         return s32Ret;
     }
 
+#if 0
     s32Ret = Media_Vo_InitMipiTx(lcdTypeIdx);
     if (HI_SUCCESS != s32Ret)
     {
         prtMD("Media_Vo_InitMipiTx error! s32Ret = %#x\n", s32Ret);
         return s32Ret;
     }
+#endif
 
     bInitFlag = 1;
 

@@ -242,124 +242,152 @@ static int ISPCFG_GetBypassParam(VI_PIPE viPipe, ISPCFG_BYPASS_PARAM_S *pBypassP
     /* bitBypassISPDGain */
     u32Value = ISPCFG_GetValue(viPipe, "module_state:bitBypassISPDGain");
     pBypassParam->bitBypassISPDGain = (HI_BOOL)u32Value;
+    prtMD("pBypassParam->bitBypassISPDGain = %d\n", pBypassParam->bitBypassISPDGain);
 
     /* bitBypassAntiFC */
     u32Value = ISPCFG_GetValue(viPipe, "module_state:bitBypassAntiFC");
     pBypassParam->bitBypassAntiFC = (HI_BOOL)u32Value;
+    prtMD("pBypassParam->bitBypassAntiFC = %d\n", pBypassParam->bitBypassAntiFC);
 
     /* bitBypassCrosstalkR */
     u32Value = ISPCFG_GetValue(viPipe, "module_state:bitBypassCrosstalkR");
     pBypassParam->bitBypassCrosstalkR = (HI_BOOL)u32Value;
+    prtMD("pBypassParam->bitBypassCrosstalkR = %d\n", pBypassParam->bitBypassCrosstalkR);
 
     /* bitBypassDPC */
     u32Value = ISPCFG_GetValue(viPipe, "module_state:bitBypassDPC");
     pBypassParam->bitBypassDPC = (HI_BOOL)u32Value;
+    prtMD("pBypassParam->bitBypassDPC = %d\n", pBypassParam->bitBypassDPC);
 
     /* bitBypassNR */
     u32Value = ISPCFG_GetValue(viPipe, "module_state:bitBypassNR");
     pBypassParam->bitBypassNR = (HI_BOOL)u32Value;
+    prtMD("pBypassParam->bitBypassNR = %d\n", pBypassParam->bitBypassNR);
 
     /* bitBypassDehaze */
     u32Value = ISPCFG_GetValue(viPipe, "module_state:bitBypassDehaze");
     pBypassParam->bitBypassDehaze = (HI_BOOL)u32Value;
+    prtMD("pBypassParam->bitBypassDehaze = %d\n", pBypassParam->bitBypassDehaze);
 
     /* bitBypassWBGain */
     u32Value = ISPCFG_GetValue(viPipe, "module_state:bitBypassWBGain");
     pBypassParam->bitBypassWBGain = (HI_BOOL)u32Value;
+    prtMD("pBypassParam->bitBypassWBGain = %d\n", pBypassParam->bitBypassWBGain);
 
     /* bitBypassMeshShading */
     u32Value = ISPCFG_GetValue(viPipe, "module_state:bitBypassMeshShading");
     pBypassParam->bitBypassMeshShading = (HI_BOOL)u32Value;
+    prtMD("pBypassParam->bitBypassMeshShading = %d\n", pBypassParam->bitBypassMeshShading);
 
     /* bitBypassDRC */
     u32Value = ISPCFG_GetValue(viPipe, "module_state:bitBypassDRC");
     pBypassParam->bitBypassDRC = (HI_BOOL)u32Value;
+    prtMD("pBypassParam->bitBypassDRC = %d\n", pBypassParam->bitBypassDRC);
 
     /* bitBypassDemosaic */
     u32Value = ISPCFG_GetValue(viPipe, "module_state:bitBypassDemosaic");
     pBypassParam->bitBypassDemosaic = (HI_BOOL)u32Value;
+    prtMD("pBypassParam->bitBypassDemosaic = %d\n", pBypassParam->bitBypassDemosaic);
 
     /* bitBypassColorMatrix */
     u32Value = ISPCFG_GetValue(viPipe, "module_state:bitBypassColorMatrix");
     pBypassParam->bitBypassColorMatrix = (HI_BOOL)u32Value;
+    prtMD("pBypassParam->bitBypassColorMatrix = %d\n", pBypassParam->bitBypassColorMatrix);
 
     /* bitBypassGamma */
     u32Value = ISPCFG_GetValue(viPipe, "module_state:bitBypassGamma");
     pBypassParam->bitBypassGamma = (HI_BOOL)u32Value;
+    prtMD("pBypassParam->bitBypassGamma = %d\n", pBypassParam->bitBypassGamma);
 
     /* bitBypassFSWDR */
     u32Value = ISPCFG_GetValue(viPipe, "module_state:bitBypassFSWDR");
     pBypassParam->bitBypassFSWDR = (HI_BOOL)u32Value;
+    prtMD("pBypassParam->bitBypassFSWDR = %d\n", pBypassParam->bitBypassFSWDR);
 
     /* bitBypassCA */
     u32Value = ISPCFG_GetValue(viPipe, "module_state:bitBypassCA");
     pBypassParam->bitBypassCA = (HI_BOOL)u32Value;
+    prtMD("pBypassParam->bitBypassCA = %d\n", pBypassParam->bitBypassCA);
 
     /* bitBypassCsConv */
     u32Value = ISPCFG_GetValue(viPipe, "module_state:bitBypassCsConv");
     pBypassParam->bitBypassCsConv = (HI_BOOL)u32Value;
+    prtMD("pBypassParam->bitBypassCsConv = %d\n", pBypassParam->bitBypassCsConv);
 
     /* bitBypassSharpen */
     u32Value = ISPCFG_GetValue(viPipe, "module_state:bitBypassSharpen");
     pBypassParam->bitBypassSharpen = (HI_BOOL)u32Value;
+    prtMD("pBypassParam->bitBypassSharpen = %d\n", pBypassParam->bitBypassSharpen);
 
     /* bitBypassLCAC */
     u32Value = ISPCFG_GetValue(viPipe, "module_state:bitBypassLCAC");
     pBypassParam->bitBypassLCAC = (HI_BOOL)u32Value;
+    prtMD("pBypassParam->bitBypassLCAC = %d\n", pBypassParam->bitBypassLCAC);
 
     /* bitBypassGCAC */
     u32Value = ISPCFG_GetValue(viPipe, "module_state:bitBypassGCAC");
     pBypassParam->bitBypassGCAC = (HI_BOOL)u32Value;
+    prtMD("pBypassParam->bitBypassGCAC = %d\n", pBypassParam->bitBypassGCAC);
 
     /* bit2ChnSelect */
     u32Value = ISPCFG_GetValue(viPipe, "module_state:bit2ChnSelect");
     pBypassParam->bit2ChnSelect = (HI_BOOL)u32Value;
+    prtMD("pBypassParam->bit2ChnSelect = %d\n", pBypassParam->bit2ChnSelect);
 
     /* bitBypassLdci */
     u32Value = ISPCFG_GetValue(viPipe, "module_state:bitBypassLdci");
     pBypassParam->bitBypassLdci = (HI_BOOL)u32Value;
+    prtMD("pBypassParam->bitBypassLdci = %d\n", pBypassParam->bitBypassLdci);
 
     /* bitBypassPreGamma */
     u32Value = ISPCFG_GetValue(viPipe, "module_state:bitBypassPreGamma");
     pBypassParam->bitBypassPreGamma = (HI_BOOL)u32Value;
+    prtMD("pBypassParam->bitBypassPreGamma = %d\n", pBypassParam->bitBypassPreGamma);
 
     /* bitBypassAEStatFE */
     u32Value = ISPCFG_GetValue(viPipe, "module_state:bitBypassAEStatFE");
     pBypassParam->bitBypassAEStatFE = (HI_BOOL)u32Value;
+    prtMD("pBypassParam->bitBypassAEStatFE = %d\n", pBypassParam->bitBypassAEStatFE);
 
     /* bitBypassAEStatBE */
     u32Value = ISPCFG_GetValue(viPipe, "module_state:bitBypassAEStatBE");
     pBypassParam->bitBypassAEStatBE = (HI_BOOL)u32Value;
+    prtMD("pBypassParam->bitBypassAEStatBE = %d\n", pBypassParam->bitBypassAEStatBE);
 
     /* bitBypassMGSta */
     u32Value = ISPCFG_GetValue(viPipe, "module_state:bitBypassMGSta");
     pBypassParam->bitBypassMGSta = (HI_BOOL)u32Value;
+    prtMD("pBypassParam->bitBypassMGSta = %d\n", pBypassParam->bitBypassMGSta);
 
     /* bitBypassDE */
     u32Value = ISPCFG_GetValue(viPipe, "module_state:bitBypassDE");
     pBypassParam->bitBypassDE = (HI_BOOL)u32Value;
+    prtMD("pBypassParam->bitBypassDE = %d\n", pBypassParam->bitBypassDE);
 
     /* bitBypassAFStatBE */
     u32Value = ISPCFG_GetValue(viPipe, "module_state:bitBypassAFStatBE");
     pBypassParam->bitBypassAFStatBE = (HI_BOOL)u32Value;
+    prtMD("pBypassParam->bitBypassAFStatBE = %d\n", pBypassParam->bitBypassAFStatBE);
 
     /* bitBypassAWBStat */
     u32Value = ISPCFG_GetValue(viPipe, "module_state:bitBypassAWBStat");
     pBypassParam->bitBypassAWBStat = (HI_BOOL)u32Value;
+    prtMD("pBypassParam->bitBypassAWBStat = %d\n", pBypassParam->bitBypassAWBStat);
 
     /* bitBypassCLUT */
     u32Value = ISPCFG_GetValue(viPipe, "module_state:bitBypassCLUT");
     pBypassParam->bitBypassCLUT = (HI_BOOL)u32Value;
+    prtMD("pBypassParam->bitBypassCLUT = %d\n", pBypassParam->bitBypassCLUT);
 
     /* bitBypassHLC */
     u32Value = ISPCFG_GetValue(viPipe, "module_state:bitBypassHLC");
     pBypassParam->bitBypassHLC = (HI_BOOL)u32Value;
-    prtMD("pBypassParam->bitBypassHLC = %d\n",pBypassParam->bitBypassHLC);
+    prtMD("pBypassParam->bitBypassHLC = %d\n", pBypassParam->bitBypassHLC);
 
     /* bitBypassEdgeMark */
     u32Value = ISPCFG_GetValue(viPipe, "module_state:bitBypassEdgeMark");
     pBypassParam->bitBypassEdgeMark = (HI_BOOL)u32Value;
-    prtMD("pBypassParam->bitBypassEdgeMark = %d\n",pBypassParam->bitBypassEdgeMark);
+    prtMD("pBypassParam->bitBypassEdgeMark = %d\n", pBypassParam->bitBypassEdgeMark);
 
     return 0;
 }
@@ -2183,7 +2211,7 @@ static int ISPCFG_GetStaticBNR(VI_PIPE viPipe, ISPCFG_STATIC_BNR_S *pStaticBnr)
 }
 
 //设置ISP各个模块的控制参数
-int ISPCFG_SetBypassModule(VI_PIPE ViPipe)
+int ISPCFG_SetBypass(VI_PIPE ViPipe)
 {
     HI_S32 s32Ret = -1;
     ISP_MODULE_CTRL_U stModCtrl = {0};
@@ -3782,13 +3810,19 @@ int ISPCFG_SetParam(VI_PIPE viPipe, ISPCFG_PARAM_S *pIspParam)    //增加宽动
         return -1;
     }
 
-    /* SetBypassModule_Attr 需要滞后，不能马上设置，ISP参数需要加载完之后才能设置，故放在vpss线程中加载*/
-    //////////////////////////////////////
+    /* 设置各个模块bypass参数 */
+    s32Ret = ISPCFG_SetBypass(viPipe);
+    if (0 != s32Ret)
+    {
+        prtMD("ISPCFG_SetBypass error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
+        goto ret;
+    }
+
     /* 0-设置黑电平 */
     s32Ret = ISPCFG_SetStaticBlackLevel(viPipe);
     if (0 != s32Ret)
     {
-        prtMD("ISPCFG_SetStaticBlackLevel failed\n");
+        prtMD("ISPCFG_SetStaticBlackLevel error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
         goto ret;
     }
 
@@ -3796,7 +3830,7 @@ int ISPCFG_SetParam(VI_PIPE viPipe, ISPCFG_PARAM_S *pIspParam)    //增加宽动
     s32Ret = ISPCFG_SetDynamicAE(viPipe);
     if (0 != s32Ret)
     {
-        prtMD("ISPCFG_SetDynamicAE failed\n");
+        prtMD("ISPCFG_SetDynamicAE error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
         goto ret;
     }
 
@@ -3804,7 +3838,7 @@ int ISPCFG_SetParam(VI_PIPE viPipe, ISPCFG_PARAM_S *pIspParam)    //增加宽动
     s32Ret = ISPCFG_SetStaticAWB(viPipe);
     if (0 != s32Ret)
     {
-        prtMD("ISPCFG_SetStaticAWB failed\n");
+        prtMD("ISPCFG_SetStaticAWB error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
         goto ret;
     }
 
@@ -3812,16 +3846,15 @@ int ISPCFG_SetParam(VI_PIPE viPipe, ISPCFG_PARAM_S *pIspParam)    //增加宽动
     s32Ret = ISPCFG_SetWDRExposure(viPipe);
     if (0 != s32Ret)
     {
-        prtMD("ISPCFG_SetWDRExposure failed\n");
+        prtMD("ISPCFG_SetWDRExposure error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
         goto ret;
     }
-
 
     /* 4-设置色彩色温 */
     s32Ret = ISPCFG_SetSaturation(viPipe);
     if (0 != s32Ret)
     {
-        prtMD("ISPCFG_SetSaturation failed\n");
+        prtMD("ISPCFG_SetSaturation error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
         goto ret;
     }
 
@@ -3829,7 +3862,7 @@ int ISPCFG_SetParam(VI_PIPE viPipe, ISPCFG_PARAM_S *pIspParam)    //增加宽动
     s32Ret = ISPCFG_SetDRC(viPipe);
     if (0 != s32Ret)
     {
-        prtMD("ISPCFG_SetDRC failed\n");
+        prtMD("ISPCFG_SetDRC error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
         goto ret;
     }
 
@@ -3837,7 +3870,7 @@ int ISPCFG_SetParam(VI_PIPE viPipe, ISPCFG_PARAM_S *pIspParam)    //增加宽动
     s32Ret = ISPCFG_SetCCM(viPipe);
     if (0 != s32Ret)
     {
-        prtMD("ISPCFG_SetCCM failed\n");
+        prtMD("ISPCFG_SetCCM error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
         goto ret;
     }
 
@@ -3845,7 +3878,7 @@ int ISPCFG_SetParam(VI_PIPE viPipe, ISPCFG_PARAM_S *pIspParam)    //增加宽动
     s32Ret = ISPCFG_SetDehaze(viPipe);
     if (0 != s32Ret)
     {
-        prtMD("ISPCFG_SetDehaze failed\n");
+        prtMD("ISPCFG_SetDehaze error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
         goto ret;
     }
 
@@ -3853,7 +3886,7 @@ int ISPCFG_SetParam(VI_PIPE viPipe, ISPCFG_PARAM_S *pIspParam)    //增加宽动
     s32Ret = ISPCFG_SetStatistics(viPipe);
     if (0 != s32Ret)
     {
-        prtMD("ISPCFG_SetStatistics failed\n");
+        prtMD("ISPCFG_SetStatistics error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
         goto ret;
     }
 
@@ -3861,7 +3894,7 @@ int ISPCFG_SetParam(VI_PIPE viPipe, ISPCFG_PARAM_S *pIspParam)    //增加宽动
     s32Ret = ISPCFG_SetCSC(viPipe);
     if (0 != s32Ret)
     {
-        prtMD("ISPCFG_SetCSC failed\n");
+        prtMD("ISPCFG_SetCSC error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
         goto ret;
     }
 
@@ -3869,7 +3902,7 @@ int ISPCFG_SetParam(VI_PIPE viPipe, ISPCFG_PARAM_S *pIspParam)    //增加宽动
     s32Ret = ISPCFG_SetMeshShading(viPipe);
     if (0 != s32Ret)
     {
-        prtMD("ISPCFG_SetMeshShading failed\n");
+        prtMD("ISPCFG_SetMeshShading error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
         goto ret;
     }
 
@@ -3877,7 +3910,7 @@ int ISPCFG_SetParam(VI_PIPE viPipe, ISPCFG_PARAM_S *pIspParam)    //增加宽动
     s32Ret = ISPCFG_SetSharpen(viPipe);
     if (0 != s32Ret)
     {
-        prtMD("ISPCFG_SetSharpen failed\n");
+        prtMD("ISPCFG_SetSharpen error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
         goto ret;
     }
 
@@ -3886,7 +3919,7 @@ int ISPCFG_SetParam(VI_PIPE viPipe, ISPCFG_PARAM_S *pIspParam)    //增加宽动
     s32Ret = ISPCFG_SetDemosaic(viPipe);
     if (0 != s32Ret)
     {
-        prtMD("ISPCFG_SetSharpen failed\n");
+        prtMD("ISPCFG_SetDemosaic error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
         goto ret;
     }
 #endif
@@ -3895,7 +3928,7 @@ int ISPCFG_SetParam(VI_PIPE viPipe, ISPCFG_PARAM_S *pIspParam)    //增加宽动
     s32Ret = ISPCFG_SetGamma(viPipe);
     if (0 != s32Ret)
     {
-        prtMD("ISPCFG_SetGamma failed\n");
+        prtMD("ISPCFG_SetGamma error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
         goto ret;
     }
 
@@ -3903,7 +3936,7 @@ int ISPCFG_SetParam(VI_PIPE viPipe, ISPCFG_PARAM_S *pIspParam)    //增加宽动
     s32Ret = ISPCFG_SetFSWDR(viPipe);
     if (0 != s32Ret)
     {
-        prtMD("ISPCFG_SetFSWDR failed\n");
+        prtMD("ISPCFG_SetFSWDR error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
         goto ret;
     }
 
@@ -3911,7 +3944,7 @@ int ISPCFG_SetParam(VI_PIPE viPipe, ISPCFG_PARAM_S *pIspParam)    //增加宽动
     s32Ret = ISPCFG_SetNR(viPipe);
     if (0 != s32Ret)
     {
-        prtMD("ISPCFG_SetNR failed\n");
+        prtMD("ISPCFG_SetNR error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
         goto ret;
     }
 

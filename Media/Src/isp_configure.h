@@ -465,7 +465,7 @@ int ISPCFG_GetParam(VI_PIPE ViPipe, ISPCFG_PARAM_S *pIspParam);
 int ISPCFG_SetParam(VI_PIPE ViPipe, ISPCFG_PARAM_S *pIspParam);
 int ISPCFG_SetLDCI(VI_PIPE ViPipe);
 int ISPCFG_GetStaticFSWDR(VI_PIPE viPipe, ISPCFG_STATIC_WDRFS_S *pStaticWDRFs);
-int ISPCFG_SetBypassModule(VI_PIPE ViPipe);
+int ISPCFG_SetBypass(VI_PIPE ViPipe);
 
 
 
