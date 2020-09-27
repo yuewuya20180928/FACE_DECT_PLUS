@@ -1,7 +1,7 @@
 CC=arm-himix200-linux-gcc
 CXX=arm-himix200-linux-g++
 
-INCLUDE = -I ./include/media \
+INCLUDE = -I ../output \
 
 #海思平台库
 MPI_LIB_PATH := ./Lib/hisi3516dv300/hi_mpp

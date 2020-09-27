@@ -1,4 +1,4 @@
-#include "media.h"
+#include "media_api.h"
 #include "sys_init.h"
 #include "vi.h"
 #include "isp.h"
