@@ -464,7 +464,7 @@ static int ISPCFG_GetStaticAe(VI_PIPE viPipe, ISPCFG_STATIC_AE_S *pStaticAe)
     u32Value = ISPCFG_GetValue(viPipe, "static_ae:AutoExpTimeMix");
     pStaticAe->u32AutoExpTimeMin = u32Value;
 
-    prtMD("%d %d %d %d %d\n",
+    prtMD("[AE] valid:%d, type:%d, RunInterval:%d, MaxExpTime:%d, MinExpTime:%d\n",
         pStaticAe->bAERouteExValid,
         pStaticAe->ExposureOpType,
         pStaticAe->u8AERunInterval,
@@ -1492,12 +1492,16 @@ static int ISPCFG_GetStaticDemosaic(VI_PIPE viPipe, ISPCFG_STATIC_DEMOSAIC_S *pS
     /*AutoDetailSmoothRange*/
     ISPCFG_GetString(viPipe, &pString, "static_demosaic:AutoDetailSmoothRange");
     ISPCFG_GetNumInLine(pString);
+
+    prtMD("pStaticDemosaic->u16AutoDetailSmoothStr:");
     for(u32IdxM = 0; u32IdxM < 16; u32IdxM++)
     {
         u32Value = ISPCFG_LineValue[u32IdxM];
         pStaticDemosaic->u16AutoDetailSmoothRange[u32IdxM] = ISPCFG_LineValue[u32IdxM];
-        prtMD("pStaticDemosaic->u16AutoDetailSmoothStr[%d] = %d\n",u32IdxM,pStaticDemosaic->u16AutoDetailSmoothRange[u32IdxM]);
+
+        printf(" %d", pStaticDemosaic->u16AutoDetailSmoothRange[u32IdxM]);
     }
+    printf("\n");
 
     return 0;
 }
@@ -2309,59 +2313,7 @@ static int ISPCFG_SetStaticBlackLevel(VI_PIPE ViPipe)
     return 0;
 }
 
-#if 0
-static int ISPCFG_SetStaticAE(VI_PIPE ViPipe)
-{
-    HI_S32 s32Ret = HI_SUCCESS;
-
-    ISP_EXPOSURE_ATTR_S stExposureAttr;
-
-    if (ViPipe >= VI_MAX_PIPE_NUM)
-    {
-        prtMD("invalid input ViPipe = %d\n", ViPipe);
-        return -1;
-    }
-
-    s32Ret = HI_MPI_ISP_GetExposureAttr(ViPipe, &stExposureAttr);
-    if(s32Ret != HI_SUCCESS)
-    {
-        prtMD("HI_MPI_ISP_GetExposureAttr is failed! s32Ret = %#x\n",s32Ret);
-        return -1;
-    }
-
-    stExposureAttr.bAERouteExValid = stISPCfgPipeParam[ViPipe].stStaticAe.bAERouteExValid;
-    stExposureAttr.u8AERunInterval = stISPCfgPipeParam[ViPipe].stStaticAe.u8AERunInterval;
-    stExposureAttr.stAuto.stExpTimeRange.u32Max = stISPCfgPipeParam[ViPipe].stStaticAe.u32AutoExpTimeMax;
-    stExposureAttr.stAuto.stAGainRange.u32Max = stISPCfgPipeParam[ViPipe].stStaticAe.u32AutoAGainMax;
-    stExposureAttr.stAuto.stDGainRange.u32Max = stISPCfgPipeParam[ViPipe].stStaticAe.u32AutoDGainMax;
-    stExposureAttr.stAuto.stISPDGainRange.u32Max = stISPCfgPipeParam[ViPipe].stStaticAe.u32AutoISPDGainMax;
-    stExposureAttr.stAuto.stSysGainRange.u32Max = stISPCfgPipeParam[ViPipe].stStaticAe.u32AutoSysGainMax;
-    stExposureAttr.stAuto.u32GainThreshold = stISPCfgPipeParam[ViPipe].stStaticAe.u32AutoGainThreshold;
-    stExposureAttr.stAuto.u8Speed = stISPCfgPipeParam[ViPipe].stStaticAe.u8AutoSpeed;
-    stExposureAttr.stAuto.u16BlackSpeedBias = stISPCfgPipeParam[ViPipe].stStaticAe.u16AutoBlackSpeedBias;
-    stExposureAttr.stAuto.u8Compensation = stISPCfgPipeParam[ViPipe].stStaticAe.u8AutostaticCompesation[0];
-
-    prtMD("stExposureAttr.stAuto.u8Compensation = %#x\n",stExposureAttr.stAuto.u8Compensation);
-
-    stExposureAttr.stAuto.u16EVBias = stISPCfgPipeParam[ViPipe].stStaticAe.u16AutoEVBias;
-    stExposureAttr.stAuto.enAEStrategyMode = stISPCfgPipeParam[ViPipe].stStaticAe.bAutoAEStrategMode;
-    stExposureAttr.stAuto.u16HistRatioSlope = stISPCfgPipeParam[ViPipe].stStaticAe.u16AutoHistRatioSlope;
-    stExposureAttr.stAuto.u8MaxHistOffset = stISPCfgPipeParam[ViPipe].stStaticAe.u8AutoMaxHistOffset;
-    stExposureAttr.stAuto.u8Tolerance = stISPCfgPipeParam[ViPipe].stStaticAe.u8AutoTolerance;
-    stExposureAttr.stAuto.stAEDelayAttr.u16BlackDelayFrame = stISPCfgPipeParam[ViPipe].stStaticAe.u16AutoBlackDelayFrame;
-    stExposureAttr.stAuto.stAEDelayAttr.u16WhiteDelayFrame = stISPCfgPipeParam[ViPipe].stStaticAe.u16AutoWhiteDelayFrame;
-
-    s32Ret = HI_MPI_ISP_SetExposureAttr(ViPipe, &stExposureAttr);
-    if(s32Ret != HI_SUCCESS)
-    {
-        prtMD("HI_MPI_ISP_SetExposureAttr is failed! s32Ret = %#x\n",s32Ret);
-        return -1;
-    }
-
-    return 0;
-}
-#endif
-
+/* 设置自动曝光参数值 */
 static int ISPCFG_SetDynamicAE(VI_PIPE ViPipe)
 {
     HI_S32 s32Ret = HI_SUCCESS;
@@ -2380,34 +2332,63 @@ static int ISPCFG_SetDynamicAE(VI_PIPE ViPipe)
         return -1;
     }
 
+    /* AE 扩展分配路线是否生效开关: 1-使用 AE 扩展分配路线; 0-使用普通 AE 分配路线 */
     stExposureAttr.bAERouteExValid = stISPCfgPipeParam[ViPipe].stStaticAe.bAERouteExValid;
+
+    /* 曝光类型: 0-auto;1-手动 */
+    stExposureAttr.enOpType = stISPCfgPipeParam[ViPipe].stStaticAe.ExposureOpType;
+
+    /* AE 算法运行的间隔 */
     stExposureAttr.u8AERunInterval = stISPCfgPipeParam[ViPipe].stStaticAe.u8AERunInterval;
 
+    /* 曝光时间 */
     stExposureAttr.stAuto.stExpTimeRange.u32Max = stISPCfgPipeParam[ViPipe].stStaticAe.u32AutoExpTimeMax;
     stExposureAttr.stAuto.stExpTimeRange.u32Min = stISPCfgPipeParam[ViPipe].stStaticAe.u32AutoExpTimeMin;
 
+    /* sensor模拟增益 */
     stExposureAttr.stAuto.stAGainRange.u32Max = stISPCfgPipeParam[ViPipe].stStaticAe.u32AutoAGainMax;
     stExposureAttr.stAuto.stAGainRange.u32Min = stISPCfgPipeParam[ViPipe].stStaticAe.u32AutoAGainMin;
 
+    /* sensor数字增益 */
     stExposureAttr.stAuto.stDGainRange.u32Max = stISPCfgPipeParam[ViPipe].stStaticAe.u32AutoDGainMax;
     stExposureAttr.stAuto.stDGainRange.u32Min = stISPCfgPipeParam[ViPipe].stStaticAe.u32AutoDGainMin;
 
+    /* ISP数字增益 */
     stExposureAttr.stAuto.stISPDGainRange.u32Max = stISPCfgPipeParam[ViPipe].stStaticAe.u32AutoISPDGainMax;
     stExposureAttr.stAuto.stISPDGainRange.u32Min = stISPCfgPipeParam[ViPipe].stStaticAe.u32AutoISPDGainMin;
 
+    /* 系统增益 */
     stExposureAttr.stAuto.stSysGainRange.u32Max = stISPCfgPipeParam[ViPipe].stStaticAe.u32AutoSysGainMax;
     stExposureAttr.stAuto.stSysGainRange.u32Min = stISPCfgPipeParam[ViPipe].stStaticAe.u32AutoSysGainMin;
 
+    /* 自动降帧时的系统增益门限值 */
     stExposureAttr.stAuto.u32GainThreshold = stISPCfgPipeParam[ViPipe].stStaticAe.u32AutoGainThreshold;
+
+    /* 自动曝光调整速度 */
     stExposureAttr.stAuto.u8Speed = stISPCfgPipeParam[ViPipe].stStaticAe.u8AutoSpeed;
+
+    /* 画面由暗到亮 AE 调节速度的偏差值，该值越大，画面从暗到 亮的速度越快 */
     stExposureAttr.stAuto.u16BlackSpeedBias = stISPCfgPipeParam[ViPipe].stStaticAe.u16AutoBlackSpeedBias;
+
+    /* 自动曝光调整时的目标亮度 */
     stExposureAttr.stAuto.u8Compensation = stISPCfgPipeParam[ViPipe].stStaticAe.u8AutostaticCompesation[0];
 
+    /* 自动曝光调整时的曝光量偏差值 */
     stExposureAttr.stAuto.u16EVBias = stISPCfgPipeParam[ViPipe].stStaticAe.u16AutoEVBias;
+
+    /* 自动曝光策略:高光优先或低光优先 */
     stExposureAttr.stAuto.enAEStrategyMode = stISPCfgPipeParam[ViPipe].stStaticAe.bAutoAEStrategMode;
+
+    /* 感兴趣区域的权重 */
     stExposureAttr.stAuto.u16HistRatioSlope = stISPCfgPipeParam[ViPipe].stStaticAe.u16AutoHistRatioSlope;
+
+    /* 感兴趣区域对统计平均值影响的最大程度 */
     stExposureAttr.stAuto.u8MaxHistOffset = stISPCfgPipeParam[ViPipe].stStaticAe.u8AutoMaxHistOffset;
+
+    /* 自动曝光调整时对画面亮度的容忍偏差 */
     stExposureAttr.stAuto.u8Tolerance = stISPCfgPipeParam[ViPipe].stStaticAe.u8AutoTolerance;
+
+    /* 延时属性设置 */
     stExposureAttr.stAuto.stAEDelayAttr.u16BlackDelayFrame = stISPCfgPipeParam[ViPipe].stStaticAe.u16AutoBlackDelayFrame;
     stExposureAttr.stAuto.stAEDelayAttr.u16WhiteDelayFrame = stISPCfgPipeParam[ViPipe].stStaticAe.u16AutoWhiteDelayFrame;
 
@@ -3021,13 +3002,14 @@ int ISPCFG_SetDemosaic(VI_PIPE ViPipe)
     stDemosaicAttr.enOpType = stISPCfgPipeParam[ViPipe].stStaticDemosaic.enOpType;
     if(stDemosaicAttr.enOpType == OP_TYPE_AUTO)
     {
+        prtMD("stDemosaicAttr.stAuto.au8DetailSmoothRange:");
         for(i = 0; i < 16; i++)
         {
             stDemosaicAttr.stAuto.au8NonDirStr[i] = stISPCfgPipeParam[ViPipe].stStaticDemosaic.u8AutoNonDirStr[i];
             stDemosaicAttr.stAuto.au8NonDirMFDetailEhcStr[i] = stISPCfgPipeParam[ViPipe].stStaticDemosaic.u8AutoNonDirMFDetailEhcStr[i];
             stDemosaicAttr.stAuto.au8NonDirHFDetailEhcStr[i] = stISPCfgPipeParam[ViPipe].stStaticDemosaic.u8AutoNonDirHFDetailEhcStr[i];
             stDemosaicAttr.stAuto.au8DetailSmoothRange[i] = stISPCfgPipeParam[ViPipe].stStaticDemosaic.u16AutoDetailSmoothRange[i];
-            prtMD("stDemosaicAttr.stAuto.au16DetailSmoothStr[%d] = %d\n",i,stDemosaicAttr.stAuto.au8DetailSmoothRange[i]);
+            printf(" %d", stDemosaicAttr.stAuto.au8DetailSmoothRange[i]);
             #if 0
             stDemosaicAttr.stAuto.au8ColorNoiseThdF[i] = stISPCfgPipeParam[ViPipe].stStaticDemosaic.u8AutoColorNoiseThdF;
             stDemosaicAttr.stAuto.au8ColorNoiseStrF[i] = stISPCfgPipeParam[ViPipe].stStaticDemosaic.u8AutoColorNoiseStrF;
@@ -3035,6 +3017,7 @@ int ISPCFG_SetDemosaic(VI_PIPE ViPipe)
             stDemosaicAttr.stAuto.au8ColorNoiseStrY[i] = stISPCfgPipeParam[ViPipe].stStaticDemosaic.u8AutoColorNoiseStrY;
             #endif
         }
+        printf("\n");
     }
     else
     {

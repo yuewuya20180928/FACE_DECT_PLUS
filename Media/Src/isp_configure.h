@@ -58,8 +58,8 @@ typedef struct
 typedef struct
 {
     HI_BOOL bAERouteExValid;
-    HI_U8  ExposureOpType;
-    HI_U8  u8AERunInterval;
+    HI_U8 ExposureOpType;
+    HI_U8 u8AERunInterval;
     HI_U32 u32AutoExpTimeMax;
     HI_U32 u32AutoExpTimeMin;
     HI_U32 u32AutoAGainMax;

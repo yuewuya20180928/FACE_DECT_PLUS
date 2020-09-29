@@ -28,6 +28,8 @@ int Media_Init(unsigned int sensorNumber)
     unsigned int vb_count = 12;
     MEDIA_POOL_S stPoolCfg = {0};
 
+    prtMD("Date:%s, Time:%s\n", __DATE__, __TIME__);
+
     ret = Media_VideoIn_GetConfig(&stViParam, sensorNumber);
     if (HI_SUCCESS != ret)
     {
