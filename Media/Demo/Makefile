@@ -33,7 +33,7 @@ MPI_LIBS += -L $(MPI_LIB_PATH)/ -l_hidehaze
 MPI_LIBS += -L $(MPI_LIB_PATH)/ -l_hiir_auto
 
 
-CFLAGS += -Wall -O0 $(INCLUDE) -Wmisleading-indentation
+CFLAGS += -Wall -O2 $(INCLUDE) -Wmisleading-indentation
 CLFLAGS += -lpthread -lm -ldl  -lstdc++ -fno-aggressive-loop-optimizations -ffunction-sections -fdata-sections -O0 -fstack-protector -fPIC -Wno-date-time 
 
 CXXFLAGS += $(CFLAGS)

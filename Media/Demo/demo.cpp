@@ -9,6 +9,7 @@ int main()
 {
     int s32Ret = 0;
     MEDIA_RECORD_S stRecord = {0};
+    unsigned int countTimes = 0;
     VIDEO_PARAM_S *pVideoParam = &stRecord.stVideoParam;
 
     /* 显示区域位置设置 */
@@ -65,7 +66,13 @@ int main()
     {
         usleep(100 * 1000);
 
-        printf("goto sleep!\n");
+        countTimes ++;
+
+        if (countTimes % 20 == 0)
+        {
+            printf("goto sleep!\n");
+        }
+
         /* TODO:打印只打印一次,确认原因 */
 
         continue;

@@ -250,7 +250,7 @@ int Media_Isp_LoadParam(VI_PIPE viPipe)
         return -1;
     }
 
-    /* 获取参数 */
+    /* 从配置文件中获取ISP参数 */
     s32Ret = ISPCFG_GetParam(viPipe, &stIspParam);
     if (0 != s32Ret)
     {
@@ -258,7 +258,7 @@ int Media_Isp_LoadParam(VI_PIPE viPipe)
         return -1;
     }
 
-    /* 设置参数 */
+    /* 将配置文件中的参数设置到海思驱动中去 */
     s32Ret = ISPCFG_SetParam(viPipe, &stIspParam);
     if (0 != s32Ret)
     {
@@ -289,7 +289,7 @@ void* Media_Isp_Thread(void* param)
     prctl(PR_SET_NAME, szThreadName, 0,0,0);
 
     prtMD("ISP Dev %d running !\n", IspDev);
-    s32Ret = HI_MPI_ISP_Run(IspDev);                    /* 这个函数内部有while(1),所以需要在线程中调用这个接口 */
+    s32Ret = HI_MPI_ISP_Run(IspDev);                    /* 这个函数内部有while(1),要在线程中调用,否者会卡死 */
     if (HI_SUCCESS != s32Ret)
     {
         prtMD("HI_MPI_ISP_Run failed with %#x!\n", s32Ret);
@@ -438,8 +438,6 @@ int Media_VideoIn_StartIsp(MEDIA_VI_INFO_S* pViInfo)
                 prtMD("ISP Run failed with %#x!\n", s32Ret);
                 return HI_FAILURE;
             }
-
-            /* TODO:ISP配置文件在这里加载会出现画面全黑的情况 */
         }
     }
 
@@ -485,7 +483,7 @@ void *Media_Isp_Tsk(void *arg)
                 }
                 else
                 {
-                    bNeedPipe = (i > 0) ? HI_FALSE : HI_TRUE;
+                    bNeedPipe = (j > 0) ? HI_FALSE : HI_TRUE;
                 }
 
                 if (HI_TRUE != bNeedPipe)
@@ -540,7 +538,9 @@ int Media_Isp_Init(MEDIA_VI_PARAM_S *pViParam)
     }
 
     /* 创建ISP处理线程，实时的检测图像质量,并进行调节 */
+    prtMD("Media_Isp_Init start!\n");
     pthread_create(&ptd, NULL, Media_Isp_Tsk, (void *)pViInfo);
+    prtMD("Media_Isp_Init end!\n");
 
     return HI_SUCCESS;
 }
