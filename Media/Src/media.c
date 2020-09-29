@@ -5,6 +5,7 @@
 #include "vpss.h"
 #include "module.h"
 #include "vo.h"
+#include "enc.h"
 
 MEDIA_SENSOR_E sensorIdx[MAX_SENSOR_NUMBER] =
 {
@@ -196,5 +197,135 @@ int Media_SetVideoDisp(MEDIA_SENSOR_E sensorIdx, MEDIA_VIDEO_DISP_S *pDispParam)
     }
 
     return HI_SUCCESS;
+}
+
+/* 设置录像参数 */
+int Media_SetRecord(MEDIA_SENSOR_E sensorIdx, VIDEO_STREAM_E videoStreamType, MEDIA_RECORD_S *pRecord)
+{
+    int ret = 0;
+    MEDIA_RECT_S stRect = {0};
+    VPSS_CHN vpssChan = 0;
+    VPSS_GRP vpssGrp = 0;
+    unsigned int vencChan = 0;
+    VIDEO_PARAM_S *pVideoParam = NULL;
+    MPP_CHN_S stSrcChn = {0};
+    MPP_CHN_S stDstChn = {0};
+
+    if (sensorIdx >= MAX_SENSOR_NUMBER)
+    {
+        prtMD("invalid input sensorIdx = %d\n", sensorIdx);
+        return -1;
+    }
+
+    if (videoStreamType != VIDEO_STREAM_MAIN && videoStreamType != VIDEO_STREAM_SUB)
+    {
+        prtMD("invalid input videoStreamType = %d\n", videoStreamType);
+        return -1;
+    }
+
+    if (pRecord == NULL)
+    {
+        prtMD("invalid input pRecord = %p\n", pRecord);
+        return -1;
+    }
+
+    if (sensorIdx == MEDIA_SENSOR_IR)
+    {
+        vpssGrp = 1;
+    }
+    else
+    {
+        vpssGrp = 0;
+    }
+
+    /* 视频参数设置 */
+    if (pRecord->streamType | STREAM_TYPE_VIDEO)
+    {
+        pVideoParam = &pRecord->stVideoParam;
+
+        /* 设置VPSS通道号 */
+        if (videoStreamType == VIDEO_STREAM_SUB)
+        {
+            vpssChan = VPSS_CHN_FOR_ENC_SUB;
+        }
+        else
+        {
+            vpssChan = VPSS_CHN_FOR_ENC_MAIN;
+        }
+
+        prtMD("vpssChan = %d\n", vpssChan);
+
+        if (pVideoParam->bOpen == true)
+        {
+            /* 开启VPSS通道 */
+            stRect.x = 0;
+            stRect.y = 0;
+            stRect.w = pVideoParam->w;
+            stRect.h = pVideoParam->h;
+            ret = Media_Vpss_StartChn(sensorIdx, vpssChan, &stRect);
+            if (ret != 0)
+            {
+                prtMD("Media_Vpss_StartChn error! ret = %#x\n", ret);
+            }
+
+            ret = Media_Module_GetChan(HI_ENC, &vencChan);
+            if (0 != ret)
+            {
+                prtMD("Media_Module_GetChan HI_ENC error!\n");
+                return -1;
+            }
+
+            prtMD("vencChan = %d\n", vencChan);
+
+            /* 设置编码模块 */
+            ret = Media_Enc_StartVideo(vencChan, pVideoParam);
+            if (ret != 0)
+            {
+                prtMD("Media_Enc_SetVideo error! ret = %#x\n", ret);
+            }
+
+            /* VPSS绑定VENC */
+            stSrcChn.enModId = HI_ID_VPSS;
+            stSrcChn.s32DevId = vpssGrp;
+            stSrcChn.s32ChnId = vpssChan;
+
+            stDstChn.enModId = HI_ID_VENC;
+            stDstChn.s32DevId = 0;
+            stDstChn.s32ChnId = vencChan;
+
+            ret = HI_MPI_SYS_Bind(&stSrcChn, &stDstChn);
+            if (0 != ret)
+            {
+                prtMD("HI_MPI_SYS_Bind error! ret = %#x\n", ret);
+            }
+
+            ret = Media_Enc_StartTsk(vencChan);
+            if (0 != ret)
+            {
+                prtMD("Media_Enc_StartTsk error! ret = %#x\n", ret);
+            }
+        }
+        else if (pVideoParam->bOpen == false)
+        {
+            /* 1.解绑VPSS->VENC */
+
+            /* 2.关闭VENC */
+
+            /* 3.关闭VPSS */
+
+        }
+    }
+
+    /* 音频参数设置 */
+    if (pRecord->streamType | STREAM_TYPE_AUDIO)
+    {
+        ret = Media_Enc_SetAudio(sensorIdx, videoStreamType, &pRecord->stAudioParam);
+        if (ret != 0)
+        {
+            prtMD("Media_Enc_SetAudio error! ret = %#x\n", ret);
+        }
+    }
+
+    return 0;
 }
 

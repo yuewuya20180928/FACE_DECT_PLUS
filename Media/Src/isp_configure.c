@@ -462,14 +462,14 @@ static int ISPCFG_GetStaticAe(VI_PIPE viPipe, ISPCFG_STATIC_AE_S *pStaticAe)
 
     /* AutoExpTimeMix */  //2019-08-29 add
     u32Value = ISPCFG_GetValue(viPipe, "static_ae:AutoExpTimeMix");
-    pStaticAe->u32AutoExpTimeMix = u32Value;
+    pStaticAe->u32AutoExpTimeMin = u32Value;
 
     prtMD("%d %d %d %d %d\n",
         pStaticAe->bAERouteExValid,
         pStaticAe->ExposureOpType,
         pStaticAe->u8AERunInterval,
         pStaticAe->u32AutoExpTimeMax,
-        pStaticAe->u32AutoExpTimeMix);
+        pStaticAe->u32AutoExpTimeMin);
 
     /* AutoAGainMax */
     u32Value = ISPCFG_GetValue(viPipe, "static_ae:AutoAGainMax");
@@ -477,7 +477,7 @@ static int ISPCFG_GetStaticAe(VI_PIPE viPipe, ISPCFG_STATIC_AE_S *pStaticAe)
 
     /* AutoAGainMix */
     u32Value = ISPCFG_GetValue(viPipe, "static_ae:AutoAGainMix");
-    pStaticAe->u32AutoAGainMix = u32Value;
+    pStaticAe->u32AutoAGainMin = u32Value;
 
     /* AutoDGainMax */
     u32Value = ISPCFG_GetValue(viPipe, "static_ae:AutoDGainMax");
@@ -485,7 +485,7 @@ static int ISPCFG_GetStaticAe(VI_PIPE viPipe, ISPCFG_STATIC_AE_S *pStaticAe)
 
     /* AutoDGainMix */
     u32Value = ISPCFG_GetValue(viPipe, "static_ae:AutoDGainMix");
-    pStaticAe->u32AutoDGainMix = u32Value;
+    pStaticAe->u32AutoDGainMin = u32Value;
 
     /* AutoISPDGainMax */
     u32Value = ISPCFG_GetValue(viPipe, "static_ae:AutoISPDGainMax");
@@ -493,7 +493,7 @@ static int ISPCFG_GetStaticAe(VI_PIPE viPipe, ISPCFG_STATIC_AE_S *pStaticAe)
 
     /* AutoISPDGainMix */
     u32Value = ISPCFG_GetValue(viPipe, "static_ae:AutoISPDGainMix");
-    pStaticAe->u32AutoISPDGainMix = u32Value;
+    pStaticAe->u32AutoISPDGainMin = u32Value;
 
     /* AutoSysGainMax */
     u32Value = ISPCFG_GetValue(viPipe, "static_ae:AutoSysGainMax");
@@ -501,7 +501,7 @@ static int ISPCFG_GetStaticAe(VI_PIPE viPipe, ISPCFG_STATIC_AE_S *pStaticAe)
 
     /* AutoSysGainMix */
     u32Value = ISPCFG_GetValue(viPipe, "static_ae:AutoSysGainMix");
-    pStaticAe->u32AutoSysGainMix = u32Value;
+    pStaticAe->u32AutoSysGainMin = u32Value;
 
     /* AutoGainThreshold */
     u32Value = ISPCFG_GetValue(viPipe, "static_ae:AutoGainThreshold");
@@ -2382,17 +2382,27 @@ static int ISPCFG_SetDynamicAE(VI_PIPE ViPipe)
 
     stExposureAttr.bAERouteExValid = stISPCfgPipeParam[ViPipe].stStaticAe.bAERouteExValid;
     stExposureAttr.u8AERunInterval = stISPCfgPipeParam[ViPipe].stStaticAe.u8AERunInterval;
+
     stExposureAttr.stAuto.stExpTimeRange.u32Max = stISPCfgPipeParam[ViPipe].stStaticAe.u32AutoExpTimeMax;
+    stExposureAttr.stAuto.stExpTimeRange.u32Min = stISPCfgPipeParam[ViPipe].stStaticAe.u32AutoExpTimeMin;
+
     stExposureAttr.stAuto.stAGainRange.u32Max = stISPCfgPipeParam[ViPipe].stStaticAe.u32AutoAGainMax;
+    stExposureAttr.stAuto.stAGainRange.u32Min = stISPCfgPipeParam[ViPipe].stStaticAe.u32AutoAGainMin;
+
     stExposureAttr.stAuto.stDGainRange.u32Max = stISPCfgPipeParam[ViPipe].stStaticAe.u32AutoDGainMax;
+    stExposureAttr.stAuto.stDGainRange.u32Min = stISPCfgPipeParam[ViPipe].stStaticAe.u32AutoDGainMin;
+
     stExposureAttr.stAuto.stISPDGainRange.u32Max = stISPCfgPipeParam[ViPipe].stStaticAe.u32AutoISPDGainMax;
+    stExposureAttr.stAuto.stISPDGainRange.u32Min = stISPCfgPipeParam[ViPipe].stStaticAe.u32AutoISPDGainMin;
+
     stExposureAttr.stAuto.stSysGainRange.u32Max = stISPCfgPipeParam[ViPipe].stStaticAe.u32AutoSysGainMax;
+    stExposureAttr.stAuto.stSysGainRange.u32Min = stISPCfgPipeParam[ViPipe].stStaticAe.u32AutoSysGainMin;
+
     stExposureAttr.stAuto.u32GainThreshold = stISPCfgPipeParam[ViPipe].stStaticAe.u32AutoGainThreshold;
     stExposureAttr.stAuto.u8Speed = stISPCfgPipeParam[ViPipe].stStaticAe.u8AutoSpeed;
     stExposureAttr.stAuto.u16BlackSpeedBias = stISPCfgPipeParam[ViPipe].stStaticAe.u16AutoBlackSpeedBias;
     stExposureAttr.stAuto.u8Compensation = stISPCfgPipeParam[ViPipe].stStaticAe.u8AutostaticCompesation[0];
-    //g_u8Compensation = stExposureAttr.stAuto.u8Compensation;  //获取默认的加载的目标亮度值
-    //prtMD("ae-------stExposureAttr.stAuto.u8Compensation = %#x\n",stExposureAttr.stAuto.u8Compensation);
+
     stExposureAttr.stAuto.u16EVBias = stISPCfgPipeParam[ViPipe].stStaticAe.u16AutoEVBias;
     stExposureAttr.stAuto.enAEStrategyMode = stISPCfgPipeParam[ViPipe].stStaticAe.bAutoAEStrategMode;
     stExposureAttr.stAuto.u16HistRatioSlope = stISPCfgPipeParam[ViPipe].stStaticAe.u16AutoHistRatioSlope;

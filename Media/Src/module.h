@@ -54,7 +54,7 @@ typedef struct
     unsigned int chnNo;
 }MEDIA_BIND_INFO_S;
 
-int Media_Module_GetChan(MEDIA_MODULE_E module, int *pChnValue);
+int Media_Module_GetChan(MEDIA_MODULE_E module, unsigned int *pChnValue);
 
 int Media_Module_ReleaseChan(MEDIA_MODULE_E module, int modChan);
 

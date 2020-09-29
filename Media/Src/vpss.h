@@ -9,9 +9,10 @@
 extern "C" {
 #endif
 
-#define VPSS_CHN_FOR_ENC 0
 #define VPSS_CHN_FOR_VO 1
 #define VPSS_CHN_FOR_ALG 2
+#define VPSS_CHN_FOR_ENC_MAIN 2//(1+3)
+#define VPSS_CHN_FOR_ENC_SUB (2+3)
 
 typedef struct
 {
@@ -20,7 +21,7 @@ typedef struct
     unsigned int gtoupHeight;
 }VPSS_GRP_HDL_S;
 
-typedef struct 
+typedef struct
 {
     void *pHandle;
 }VPSS_PARAM_S;

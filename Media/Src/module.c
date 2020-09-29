@@ -4,7 +4,7 @@
 
 MEDIA_MODULE_POOL_S modulePool;         /* 全局变量用于统计各个硬件模块的使用状况 */
 
-int Media_Module_GetChan(MEDIA_MODULE_E module, int *pChnValue)
+int Media_Module_GetChan(MEDIA_MODULE_E module, unsigned int *pChnValue)
 {
     static unsigned char bFirstInit = 0;
     unsigned int i = 0;
@@ -124,15 +124,15 @@ MOD_ID_E Media_Module_GetType(MEDIA_MODULE_E enModule)
         case HI_VO:
             enMode = HI_ID_VO;
             break;
-        
+
         case HI_VI:
             enMode = HI_ID_VI;
             break;
-        
+
         case HI_RGN:
             enMode = HI_ID_RGN;
             break;
-        
+
         case HI_VGS:
             enMode = HI_ID_VGS;
             break;
@@ -171,7 +171,7 @@ int Media_Module_Bind(MEDIA_BIND_INFO_S *pSrc, MEDIA_BIND_INFO_S *pDst)
     {
         prtMD("HI_MPI_SYS_Bind error! s32Ret = %#x\n", s32Ret);
     }
-    
+
     return HI_SUCCESS;
 }
 

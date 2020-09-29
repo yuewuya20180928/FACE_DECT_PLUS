@@ -14,7 +14,7 @@ int Media_Vpss_InitModule(void)
 int Media_Vpss_InitGroup(MEDIA_SENSOR_E enSensorIdx, unsigned int w, unsigned int h)
 {
     VPSS_PARAM_S *pVpssParam = NULL;
-    VPSS_GRP vpssGrp = -1;
+    unsigned int vpssGrp = -1;
     int ret = 0;
     VPSS_GRP_ATTR_S stVpssGrpAttr;
     VPSS_GRP_HDL_S *pHandle = NULL;
@@ -90,6 +90,7 @@ int Media_Vpss_StartChn(MEDIA_SENSOR_E sensorIdx, VPSS_CHN VpssChn, MEDIA_RECT_S
     VPSS_GRP_HDL_S *pVpssGrpHdl = NULL;
     VPSS_GRP VpssGrp = -1;
     VPSS_CHN_ATTR_S stVpssChnAttr = {0};
+    VPSS_EXT_CHN_ATTR_S stVpssExtChnAttr = {0};
     unsigned int width = 0;
     unsigned int height = 0;
     HI_S32 s32Ret = HI_SUCCESS;
@@ -109,25 +110,47 @@ int Media_Vpss_StartChn(MEDIA_SENSOR_E sensorIdx, VPSS_CHN VpssChn, MEDIA_RECT_S
     width = ALIGN_DOWN(pRect->w, 2);
     height = ALIGN_DOWN(pRect->h, 2);
 
-    stVpssChnAttr.u32Width                    = width;
-    stVpssChnAttr.u32Height                   = height;
-    stVpssChnAttr.enChnMode                   = VPSS_CHN_MODE_USER;
-    stVpssChnAttr.enCompressMode              = COMPRESS_MODE_NONE;
-    stVpssChnAttr.enDynamicRange              = DYNAMIC_RANGE_SDR8;
-    stVpssChnAttr.enVideoFormat               = VIDEO_FORMAT_LINEAR;
-    stVpssChnAttr.enPixelFormat               = PIXEL_FORMAT_YVU_SEMIPLANAR_420;
-    stVpssChnAttr.stFrameRate.s32SrcFrameRate = 30;
-    stVpssChnAttr.stFrameRate.s32DstFrameRate = 30;
-    stVpssChnAttr.u32Depth                    = 0;
-    stVpssChnAttr.bMirror                     = HI_FALSE;
-    stVpssChnAttr.bFlip                       = HI_TRUE;
-    stVpssChnAttr.stAspectRatio.enMode        = ASPECT_RATIO_NONE;
-
-    s32Ret = HI_MPI_VPSS_SetChnAttr(VpssGrp, VpssChn, &stVpssChnAttr);
-    if (s32Ret != HI_SUCCESS)
+    if (VpssChn <= 2)
     {
-        prtMD("HI_MPI_VPSS_SetChnAttr failed with %#x\n", s32Ret);
-        return HI_FAILURE;
+        stVpssChnAttr.u32Width                    = width;
+        stVpssChnAttr.u32Height                   = height;
+        stVpssChnAttr.enChnMode                   = VPSS_CHN_MODE_USER;
+        stVpssChnAttr.enCompressMode              = COMPRESS_MODE_NONE;
+        stVpssChnAttr.enDynamicRange              = DYNAMIC_RANGE_SDR8;
+        stVpssChnAttr.enVideoFormat               = VIDEO_FORMAT_LINEAR;
+        stVpssChnAttr.enPixelFormat               = PIXEL_FORMAT_YVU_SEMIPLANAR_420;
+        stVpssChnAttr.stFrameRate.s32SrcFrameRate = -1;
+        stVpssChnAttr.stFrameRate.s32DstFrameRate = -1;
+        stVpssChnAttr.u32Depth                    = 0;
+        stVpssChnAttr.bMirror                     = HI_FALSE;
+        stVpssChnAttr.bFlip                       = HI_TRUE;
+        stVpssChnAttr.stAspectRatio.enMode        = ASPECT_RATIO_NONE;
+
+        s32Ret = HI_MPI_VPSS_SetChnAttr(VpssGrp, VpssChn, &stVpssChnAttr);
+        if (s32Ret != HI_SUCCESS)
+        {
+            prtMD("HI_MPI_VPSS_SetChnAttr error! s32Ret = %#x\n", s32Ret);
+            return HI_FAILURE;
+        }
+    }
+    else
+    {
+        stVpssExtChnAttr.u32Width = width;
+        stVpssExtChnAttr.u32Height = height;
+        stVpssExtChnAttr.s32BindChn = 1;
+        stVpssExtChnAttr.u32Depth = 0;
+        stVpssExtChnAttr.stFrameRate.s32SrcFrameRate = 30;
+        stVpssExtChnAttr.stFrameRate.s32DstFrameRate = 30;
+        stVpssExtChnAttr.enCompressMode = COMPRESS_MODE_NONE;
+        stVpssExtChnAttr.enDynamicRange = DYNAMIC_RANGE_SDR8;
+        stVpssExtChnAttr.enVideoFormat = VIDEO_FORMAT_LINEAR;
+        stVpssExtChnAttr.enPixelFormat = PIXEL_FORMAT_YVU_SEMIPLANAR_420;
+        s32Ret = HI_MPI_VPSS_SetExtChnAttr(VpssGrp, VpssChn, &stVpssExtChnAttr);
+        if (s32Ret != HI_SUCCESS)
+        {
+            prtMD("HI_MPI_VPSS_SetExtChnAttr error! s32Ret = %#x\n", s32Ret);
+            return HI_FAILURE;
+        }
     }
 
     s32Ret = HI_MPI_VPSS_EnableChn(VpssGrp, VpssChn);
@@ -168,7 +191,7 @@ int Media_Vpss_BindVo(MEDIA_SENSOR_E sensorIdx, MEDIA_BIND_INFO_S *pDst)
     s32Ret = Media_Module_Bind(&stSrc, pDst);
     if (HI_SUCCESS != s32Ret)
     {
-        prtMD("Media_Module_Bind error! s32REet = %#x\n", s32Ret);        
+        prtMD("Media_Module_Bind error! s32REet = %#x\n", s32Ret);
     }
 
     return s32Ret;
@@ -201,7 +224,7 @@ int Media_Vpss_BindVi(MEDIA_SENSOR_E sensorIdx, MEDIA_BIND_INFO_S *pSrc)
     s32Ret = Media_Module_Bind(pSrc, &stDst);
     if (HI_SUCCESS != s32Ret)
     {
-        prtMD("Media_Module_Bind error! s32REet = %#x\n", s32Ret);        
+        prtMD("Media_Module_Bind error! s32REet = %#x\n", s32Ret);
     }
 
     return s32Ret;
