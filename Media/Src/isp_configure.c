@@ -687,6 +687,7 @@ static int ISPCFG_GetStaticSaturation(VI_PIPE viPipe, ISPCFG_STATIC_SATURATION_S
 {
     unsigned int u32Value = 0;
     unsigned int u32IdxM = 0;
+    int s32Ret = 0;
     char *pString = NULL;
 
     if ((viPipe >= VI_MAX_PIPE_NUM) || (pStaticSaturation == NULL))
@@ -704,14 +705,24 @@ static int ISPCFG_GetStaticSaturation(VI_PIPE viPipe, ISPCFG_STATIC_SATURATION_S
     pStaticSaturation->u8ManualSat = (HI_U8)u32Value;
 
     /* AutoSat */
-    ISPCFG_GetString(viPipe, &pString, "static_saturation:AutoSat");
-    ISPCFG_GetNumInLine(pString);
+    s32Ret = ISPCFG_GetString(viPipe, &pString, "static_saturation:AutoSat");
+    if (0 != s32Ret)
+    {
+        prtMD("ISPCFG_GetString error! s32Ret = %#x\n", s32Ret);
+        return -1;
+    }
 
-    for(u32IdxM = 0; u32IdxM < 16; u32IdxM++)
+    s32Ret = ISPCFG_GetNumInLine(pString);
+
+    prtMD("Manual.Saturation[%d]:", s32Ret);
+
+    for (u32IdxM = 0; u32IdxM < 16; u32IdxM++)
     {
         u32Value = ISPCFG_LineValue[u32IdxM];
         pStaticSaturation->au8AutoSat[u32IdxM] = (HI_U8)u32Value;
+        printf(" %d", u32Value);
     }
+    printf("\n");
 
     return 0;
 }
