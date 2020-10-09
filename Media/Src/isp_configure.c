@@ -434,7 +434,9 @@ static int ISPCFG_GetBlackValue(VI_PIPE viPipe, ISPCFG_BLACK_PARAM_S *pBlackPara
 static int ISPCFG_GetStaticAe(VI_PIPE viPipe, ISPCFG_STATIC_AE_S *pStaticAe)
 {
     unsigned int u32Value = 0;
-    int u32IdxM = 0;
+    int valueNum = 0;
+    int s32Ret = 0;
+    int u32Idx = 0;
     char *pString = NULL;
 
     if ((viPipe >= VI_MAX_PIPE_NUM) || (pStaticAe == NULL))
@@ -520,14 +522,20 @@ static int ISPCFG_GetStaticAe(VI_PIPE viPipe, ISPCFG_STATIC_AE_S *pStaticAe)
     pStaticAe->u8AutoTolerance = (HI_U8)u32Value;
 
     /* AutostaticCompesation */
-    ISPCFG_GetString(viPipe, &pString,"static_ae:AutostaticCompesation");
-    ISPCFG_GetNumInLine(pString);
-
-    for(u32IdxM = 0; u32IdxM < 16; u32IdxM++)
+    s32Ret = ISPCFG_GetString(viPipe, &pString, "static_ae:AutostaticCompesation");
+    if (0 != s32Ret)
     {
-        u32Value = ISPCFG_LineValue[u32IdxM];
-        pStaticAe->u8AutostaticCompesation[u32IdxM] = (HI_U16)u32Value;
-        //prtMD("pStaticAe->u8AutostaticCompesation[u32IdxM] = %d\n",pStaticAe->u8AutostaticCompesation[u32IdxM]);
+        prtMD("ISPCFG_GetString error! s32Ret = %#x\n", s32Ret);
+        return -1;
+    }
+
+    valueNum = ISPCFG_GetNumInLine(pString);
+
+    for(u32Idx = 0; u32Idx < valueNum; u32Idx++)
+    {
+        u32Value = ISPCFG_LineValue[u32Idx];
+        pStaticAe->u8AutostaticCompesation[u32Idx] = (HI_U16)u32Value;
+        prtMD("pStaticAe->u8AutostaticCompesation[%d] = %d\n", u32Idx, pStaticAe->u8AutostaticCompesation[u32Idx]);
     }
 
     /* AutoEVBias */
@@ -2405,10 +2413,11 @@ static int ISPCFG_SetDynamicAE(VI_PIPE ViPipe)
 
     //stExposureAttr.stAuto.enFSWDRMode = stISPCfgPipeParam[ViPipe].stStaticAe.enFSWDRMode;
 
-    prtMD("bAERouteExValid = %d, u8AERunInterval = %d, u32Max = %d\n",
+    prtMD("bAERouteExValid = %d, u8AERunInterval = %d, u32Max = %d, u8Compensation = %d\n",
         stExposureAttr.bAERouteExValid,
         stExposureAttr.u8AERunInterval,
-        stExposureAttr.stAuto.stExpTimeRange.u32Max);
+        stExposureAttr.stAuto.stExpTimeRange.u32Max,
+        stExposureAttr.stAuto.u8Compensation);
 
     s32Ret = HI_MPI_ISP_SetExposureAttr(ViPipe, &stExposureAttr);
     if(s32Ret != HI_SUCCESS)
@@ -3510,104 +3519,6 @@ static int ISPCFG_SetNR(VI_PIPE ViPipe)
     if(s32Ret != HI_SUCCESS)
     {
         prtMD("HI_MPI_ISP_SetNRAttr is failed! s32Ret = %#x\n",s32Ret);
-        return -1;
-    }
-
-    return 0;
-}
-
-int ISPCFG_SetExposure(VI_PIPE ViPipe)
-{
-    HI_S32 s32Ret = HI_SUCCESS;
-    ISP_EXPOSURE_ATTR_S stExposureAttr = {0};
-
-    if (ViPipe >= VI_MAX_PIPE_NUM)
-    {
-        prtMD("invalid input ViPipe = %d\n", ViPipe);
-        return -1;
-    }
-
-    s32Ret = HI_MPI_ISP_GetExposureAttr(ViPipe, &stExposureAttr);
-    if(s32Ret != HI_SUCCESS)
-    {
-        prtMD("HI_MPI_ISP_GetExposureAttr is failed! s32Ret = %#x\n",s32Ret);
-        return -1;
-    }
-
-    if (ISPCFG_IsoValue[ViPipe] >= 100 && ISPCFG_IsoValue[ViPipe] < 200)
-    {
-        stExposureAttr.stAuto.u8Compensation = stISPCfgPipeParam[ViPipe].stStaticAe.u8AutostaticCompesation[0];
-    }
-    else if (ISPCFG_IsoValue[ViPipe] >= 200 && ISPCFG_IsoValue[ViPipe] < 400)
-    {
-        stExposureAttr.stAuto.u8Compensation = stISPCfgPipeParam[ViPipe].stStaticAe.u8AutostaticCompesation[1];
-    }
-    else if (ISPCFG_IsoValue[ViPipe] >= 400 && ISPCFG_IsoValue[ViPipe] < 800)
-    {
-        stExposureAttr.stAuto.u8Compensation = stISPCfgPipeParam[ViPipe].stStaticAe.u8AutostaticCompesation[2];
-    }
-    else if (ISPCFG_IsoValue[ViPipe] >= 800 && ISPCFG_IsoValue[ViPipe] < 1600)
-    {
-        stExposureAttr.stAuto.u8Compensation = stISPCfgPipeParam[ViPipe].stStaticAe.u8AutostaticCompesation[3];
-    }
-    else if (ISPCFG_IsoValue[ViPipe] >= 1600 && ISPCFG_IsoValue[ViPipe] < 3200)
-    {
-        stExposureAttr.stAuto.u8Compensation = stISPCfgPipeParam[ViPipe].stStaticAe.u8AutostaticCompesation[4];
-    }
-    else if (ISPCFG_IsoValue[ViPipe] >= 3200 && ISPCFG_IsoValue[ViPipe] < 6400)
-    {
-        stExposureAttr.stAuto.u8Compensation = stISPCfgPipeParam[ViPipe].stStaticAe.u8AutostaticCompesation[5];
-    }
-    else if (ISPCFG_IsoValue[ViPipe] >= 6400 && ISPCFG_IsoValue[ViPipe] < 12800)
-    {
-        stExposureAttr.stAuto.u8Compensation = stISPCfgPipeParam[ViPipe].stStaticAe.u8AutostaticCompesation[6];
-    }
-    else if (ISPCFG_IsoValue[ViPipe] >= 12800 && ISPCFG_IsoValue[ViPipe] < 25600)
-    {
-        stExposureAttr.stAuto.u8Compensation = stISPCfgPipeParam[ViPipe].stStaticAe.u8AutostaticCompesation[7];
-    }
-    else if (ISPCFG_IsoValue[ViPipe] >= 25600 && ISPCFG_IsoValue[ViPipe] < 51200)
-    {
-        stExposureAttr.stAuto.u8Compensation = stISPCfgPipeParam[ViPipe].stStaticAe.u8AutostaticCompesation[8];
-    }
-    else if (ISPCFG_IsoValue[ViPipe] >= 51200 && ISPCFG_IsoValue[ViPipe] < 102400)
-    {
-        stExposureAttr.stAuto.u8Compensation = stISPCfgPipeParam[ViPipe].stStaticAe.u8AutostaticCompesation[9];
-    }
-    else if (ISPCFG_IsoValue[ViPipe] >= 102400 && ISPCFG_IsoValue[ViPipe] < 204800)
-    {
-        stExposureAttr.stAuto.u8Compensation = stISPCfgPipeParam[ViPipe].stStaticAe.u8AutostaticCompesation[10];
-    }
-    else if (ISPCFG_IsoValue[ViPipe] >= 204800 && ISPCFG_IsoValue[ViPipe] < 409600)
-    {
-        stExposureAttr.stAuto.u8Compensation = stISPCfgPipeParam[ViPipe].stStaticAe.u8AutostaticCompesation[11];
-    }
-    else if (ISPCFG_IsoValue[ViPipe] >= 409600 && ISPCFG_IsoValue[ViPipe] < 819200)
-    {
-        stExposureAttr.stAuto.u8Compensation = stISPCfgPipeParam[ViPipe].stStaticAe.u8AutostaticCompesation[12];
-    }
-    else if (ISPCFG_IsoValue[ViPipe] >= 819200 && ISPCFG_IsoValue[ViPipe] < 1638400)
-    {
-        stExposureAttr.stAuto.u8Compensation = stISPCfgPipeParam[ViPipe].stStaticAe.u8AutostaticCompesation[13];
-    }
-    else if (ISPCFG_IsoValue[ViPipe] >= 1638400 && ISPCFG_IsoValue[ViPipe] < 1638400)
-    {
-        stExposureAttr.stAuto.u8Compensation = stISPCfgPipeParam[ViPipe].stStaticAe.u8AutostaticCompesation[14];
-    }
-    else if (ISPCFG_IsoValue[ViPipe] >= 1638400 && ISPCFG_IsoValue[ViPipe] < 3276800)
-    {
-        stExposureAttr.stAuto.u8Compensation = stISPCfgPipeParam[ViPipe].stStaticAe.u8AutostaticCompesation[15];
-    }
-    else
-    {
-        stExposureAttr.stAuto.u8Compensation = 40;
-    }
-
-    //prtMD("--ViPipe = %d-stExposureAttr.stAuto.u8Compensation = %d，g_u32IsoValue[ViPipe] = %d\n",ViPipe,stExposureAttr.stAuto.u8Compensation,ISPCFG_IsoValue[ViPipe]);
-    s32Ret = HI_MPI_ISP_SetExposureAttr(ViPipe, &stExposureAttr);
-    if(s32Ret != HI_SUCCESS)
-    {
-        prtMD("HI_MPI_ISP_GetExposureAttr is failed! s32Ret = %#x\n",s32Ret);
         return -1;
     }
 

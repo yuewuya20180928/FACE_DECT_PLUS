@@ -460,7 +460,6 @@ int ISPCFG_SetStatistics(VI_PIPE ViPipe);
 int ISPCFG_SetDemosaic(VI_PIPE ViPipe);
 int ISPCFG_SetPipeParam(VI_PIPE ViPipe, VPSS_GRP VpssGrp);
 int ISPCFG_SetNormalStatictics(VI_PIPE ViPipe);
-int ISPCFG_SetExposure(VI_PIPE ViPipe);
 int ISPCFG_GetParam(VI_PIPE ViPipe, ISPCFG_PARAM_S *pIspParam);
 int ISPCFG_SetParam(VI_PIPE ViPipe, ISPCFG_PARAM_S *pIspParam);
 int ISPCFG_SetLDCI(VI_PIPE ViPipe);

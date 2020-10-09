@@ -8,9 +8,7 @@ unsigned int sensorNumber = 1;
 int main()
 {
     int s32Ret = 0;
-    MEDIA_RECORD_S stRecord = {0};
     unsigned int countTimes = 0;
-    VIDEO_PARAM_S *pVideoParam = &stRecord.stVideoParam;
 
     /* 显示区域位置设置 */
     unsigned int dispX = 0;
@@ -27,12 +25,7 @@ int main()
         return -1;
     }
 
-    #if 1
     stVideoDisp.bOpen = 1;
-    #else
-    stVideoDisp.bOpen = 0;
-    #endif
-
     stVideoDisp.stRect.x = dispX;
     stVideoDisp.stRect.y = dispY;
     stVideoDisp.stRect.w = dispW;
@@ -45,6 +38,10 @@ int main()
         return -1;
     }
 
+#if 0
+    MEDIA_RECORD_S stRecord = {0};
+    VIDEO_PARAM_S *pVideoParam = &stRecord.stVideoParam;
+
     /* 视频流 */
     stRecord.streamType = STREAM_TYPE_VIDEO;
     pVideoParam->enType = ENCODE_TYPE_H265;
@@ -56,11 +53,12 @@ int main()
     pVideoParam->bitRate = 4096;
 
     /* 开启RGB sensor的录像功能 */
-    //s32Ret = Media_SetRecord(MEDIA_SENSOR_RGB, VIDEO_STREAM_MAIN, &stRecord);
+    s32Ret = Media_SetRecord(MEDIA_SENSOR_RGB, VIDEO_STREAM_MAIN, &stRecord);
     if (0 != s32Ret)
     {
         printf("Media_SetRecord error! s32Ret = %#x\n", s32Ret);
     }
+#endif
 
     while (1)
     {
@@ -68,14 +66,10 @@ int main()
 
         countTimes ++;
 
-        if (countTimes % 20 == 0)
+        if (countTimes % 200 == 0)
         {
-            printf("goto sleep!\n");
+            //printf("goto sleep!\n");
         }
-
-        /* TODO:打印只打印一次,确认原因 */
-
-        continue;
     }
 
     return 0;

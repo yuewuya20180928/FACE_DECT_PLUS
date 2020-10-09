@@ -101,7 +101,6 @@ extern void gc2145_mirror_flip(VI_PIPE ViPipe, ISP_SNS_MIRRORFLIP_TYPE_E eSnsMir
 #define GC2145_VMAX_ADDR_H                    (0x07)    // Vmax[10:8]
 #define GC2145_VMAX_ADDR_L                    (0x08)    // Vmax[7:0]
 
-
 #define GC2145_INCREASE_LINES                 (0) /* make real fps less than stand fps because NVR require */
 
 #define GC2145_VMAX_UXGA_30_LINEAR            (1232 + GC2145_INCREASE_LINES)
@@ -111,10 +110,6 @@ extern void gc2145_mirror_flip(VI_PIPE ViPipe, ISP_SNS_MIRRORFLIP_TYPE_E eSnsMir
 #define GC2145_SENSOR_UXGA_30FPS_LINEAR_MODE  (0)
 
 #define GC2145_SENSOR_960P_30FPS_LINEAR_MODE  (1)
-
-
-/* sensor fps mode */
-#define GC2145_SENSOR_1080P_30FPS_LINEAR_MODE (0)
 
 static HI_S32 cmos_get_ae_default(VI_PIPE ViPipe, AE_SENSOR_DEFAULT_S *pstAeSnsDft)
 {
@@ -269,7 +264,6 @@ static HI_VOID cmos_slow_framerate_set(VI_PIPE ViPipe, HI_U32 u32FullLines,
     u32FullLines = (u32FullLines > GC2145_FULL_LINES_MAX) ? GC2145_FULL_LINES_MAX : u32FullLines;
     pstSnsState->au32FL[0] = u32FullLines;
 
-
     pstAeSnsDft->u32FullLines = pstSnsState->au32FL[0];
     pstAeSnsDft->u32MaxIntTime = pstSnsState->au32FL[0] - 2;
     return;
@@ -292,7 +286,6 @@ static HI_VOID cmos_inttime_update(VI_PIPE ViPipe, HI_U32 u32IntTime)
     return;
 }
 
-
 static HI_VOID cmos_again_calc_table(VI_PIPE ViPipe, HI_U32 *pu32AgainLin, HI_U32 *pu32AgainDb)
 {
     int again = 0;
@@ -313,7 +306,7 @@ static HI_VOID cmos_gains_update(VI_PIPE ViPipe, HI_U32 u32Again, HI_U32 u32Dgai
 
     GC2145_SENSOR_GET_CTX(ViPipe, pstSnsState);
     CMOS_CHECK_POINTER_VOID(pstSnsState);
-	u8gain=32*u32Again/1024;
+    u8gain = 32 * u32Again / 1024;
 
     pstSnsState->astRegsInfo[0].astI2cData[2].u32Data = u8gain;
     return;
@@ -334,7 +327,7 @@ static HI_VOID cmos_ae_fswdr_attr_set(VI_PIPE ViPipe, AE_FSWDR_ATTR_S *pstAeFSWD
 
     return;
 }
-//ae经验函数  不需要修改
+
 static HI_S32 cmos_init_ae_exp_function(AE_SENSOR_EXP_FUNC_S *pstExpFuncs)
 {
     CMOS_CHECK_POINTER(pstExpFuncs);
@@ -351,7 +344,6 @@ static HI_S32 cmos_init_ae_exp_function(AE_SENSOR_EXP_FUNC_S *pstExpFuncs)
 
     return HI_SUCCESS;
 }
-
 
 /* Rgain and Bgain of the golden sample */
 #define GOLDEN_RGAIN                          0
@@ -383,13 +375,17 @@ static HI_S32 cmos_get_awb_default(VI_PIPE ViPipe, AWB_SENSOR_DEFAULT_S *pstAwbS
     pstAwbSnsDft->as32WbPara[5] = -147924;
     pstAwbSnsDft->u16GoldenRgain = GOLDEN_RGAIN;
     pstAwbSnsDft->u16GoldenBgain = GOLDEN_BGAIN;
-    switch (pstSnsState->enWDRMode) {
+
+    switch (pstSnsState->enWDRMode)
+    {
         default:
+
         case WDR_MODE_NONE:
             memcpy(&pstAwbSnsDft->stCcm, &g_stAwbCcm, sizeof(AWB_CCM_S));
             memcpy(&pstAwbSnsDft->stAgcTbl, &g_stAwbAgcTable, sizeof(AWB_AGC_TABLE_S));
             break;
     }
+
     pstAwbSnsDft->u16SampleRgain = g_au16SampleRgain[ViPipe];
     pstAwbSnsDft->u16SampleBgain = g_au16SampleBgain[ViPipe];
     pstAwbSnsDft->u16InitRgain = g_au16InitWBGain[ViPipe][0];
@@ -397,12 +393,14 @@ static HI_S32 cmos_get_awb_default(VI_PIPE ViPipe, AWB_SENSOR_DEFAULT_S *pstAwbS
     pstAwbSnsDft->u16InitBgain = g_au16InitWBGain[ViPipe][2];
     pstAwbSnsDft->u8AWBRunInterval = 4;
 
-    for (i = 0; i < CCM_MATRIX_SIZE; i++) {
+    for (i = 0; i < CCM_MATRIX_SIZE; i++)
+    {
         pstAwbSnsDft->au16InitCCM[i] = g_au16InitCCM[ViPipe][i];
     }
 
     return HI_SUCCESS;
 }
+
 //awb经验公式
 static HI_S32 cmos_init_awb_exp_function(AWB_SENSOR_EXP_FUNC_S *pstExpFuncs)
 {
@@ -453,7 +451,9 @@ static HI_S32 cmos_get_isp_default(VI_PIPE ViPipe, ISP_CMOS_DEFAULT_S *pstDef)
     pstDef->unKey.bit1PreGamma = 0;
     pstDef->pstPreGamma        = &g_stPreGamma;
 #endif
-    switch (pstSnsState->enWDRMode) {
+
+    switch (pstSnsState->enWDRMode)
+    {
         default:
         case WDR_MODE_NONE:
             pstDef->unKey.bit1Demosaic       = 1;
@@ -489,7 +489,8 @@ static HI_S32 cmos_get_isp_default(VI_PIPE ViPipe, ISP_CMOS_DEFAULT_S *pstDef)
 
     memcpy(&pstDef->stDngColorParam, &g_stDngColorParam, sizeof(ISP_CMOS_DNG_COLORPARAM_S));
 
-    switch (pstSnsState->u8ImgMode) {
+    switch (pstSnsState->u8ImgMode)
+    {
         default:
         case GC2145_SENSOR_UXGA_30FPS_LINEAR_MODE:
             pstDef->stSensorMode.stDngRawFormat.u8BitsPerSample = 10;
@@ -532,8 +533,8 @@ static HI_S32 cmos_get_isp_black_level(VI_PIPE ViPipe, ISP_CMOS_BLACK_LEVEL_S *p
     pstBlackLevel->au16BlackLevel[1] = 0;
     pstBlackLevel->au16BlackLevel[2] = 0;
     pstBlackLevel->au16BlackLevel[3] = 0;
-    return HI_SUCCESS;
 
+    return HI_SUCCESS;
 }
 
 //无需修改
@@ -604,18 +605,18 @@ static HI_S32 cmos_get_sns_regs_info(VI_PIPE ViPipe, ISP_SNS_REGS_INFO_S *pstSns
         pstSnsState->astRegsInfo[0].astI2cData[2].u8DelayFrmNum  = 1;
         pstSnsState->astRegsInfo[0].astI2cData[2].u32RegAddr  = 0xb1;
 
-
-
         pstSnsState->bSyncInit = HI_TRUE;
     }
     else
     {
         for (i = 0; i < pstSnsState->astRegsInfo[0].u32RegNum - 2; i++)
         {    // AEC/AGC_Update
-            if (pstSnsState->astRegsInfo[0].astI2cData[i].u32Data == pstSnsState->astRegsInfo[1].astI2cData[i].u32Data) {
+            if (pstSnsState->astRegsInfo[0].astI2cData[i].u32Data == pstSnsState->astRegsInfo[1].astI2cData[i].u32Data)
+            {
                 pstSnsState->astRegsInfo[0].astI2cData[i].bUpdate = HI_FALSE;
-            } else {
-
+            }
+            else
+            {
                 pstSnsState->astRegsInfo[0].astI2cData[i].bUpdate = HI_TRUE;
             }
         }
@@ -720,6 +721,13 @@ static HI_VOID sensor_global_init(VI_PIPE ViPipe)
     memset(&pstSnsState->astRegsInfo[0], 0, sizeof(ISP_SNS_REGS_INFO_S));
     memset(&pstSnsState->astRegsInfo[1], 0, sizeof(ISP_SNS_REGS_INFO_S));
 
+    printf("Func:%s, Line:%d, u8ImgMode = %d, enWDRMode = %d, u32FLStd = %d\n",
+        __FUNCTION__,
+        __LINE__,
+        pstSnsState->u8ImgMode,
+        pstSnsState->enWDRMode,
+        pstSnsState->u32FLStd);
+
     return;
 }
 
@@ -727,12 +735,12 @@ static HI_S32 cmos_init_sensor_exp_function(ISP_SENSOR_EXP_FUNC_S *pstSensorExpF
 {
     CMOS_CHECK_POINTER(pstSensorExpFunc);
     memset(pstSensorExpFunc, 0, sizeof(ISP_SENSOR_EXP_FUNC_S));
+
     pstSensorExpFunc->pfn_cmos_sensor_init = gc2145_init;
     pstSensorExpFunc->pfn_cmos_sensor_exit = gc2145_exit;
     pstSensorExpFunc->pfn_cmos_sensor_global_init = sensor_global_init;
     pstSensorExpFunc->pfn_cmos_set_image_mode = cmos_set_image_mode;
     pstSensorExpFunc->pfn_cmos_set_wdr_mode = cmos_set_wdr_mode;
-
     pstSensorExpFunc->pfn_cmos_get_isp_default = cmos_get_isp_default;
     pstSensorExpFunc->pfn_cmos_get_isp_black_level = cmos_get_isp_black_level;
     pstSensorExpFunc->pfn_cmos_set_pixel_detect = cmos_set_pixel_detect;

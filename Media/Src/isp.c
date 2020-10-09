@@ -4,6 +4,8 @@
 #include "vi.h"
 #include "isp_configure.h"
 
+MEDIA_VI_PARAM_S stIspViParam = {0};
+
 pthread_t g_IspPid[MAX_ISP_NUM];
 
 ISP_PUB_ATTR_S ISP_PUB_ATTR_IMX327_2M_30FPS =
@@ -456,7 +458,7 @@ void *Media_Isp_Tsk(void *arg)
     HI_S32 s32Ret = HI_SUCCESS;
     HI_BOOL bNeedPipe = HI_FALSE;
 
-    pViParam = (MEDIA_VI_PARAM_S *)arg;
+    pViParam = &stIspViParam;
 
     /* 每个VI通道加载默认的ISP配置参数 */
     for (i = 0; i < pViParam->s32WorkingViNum; i++)
@@ -501,6 +503,7 @@ void *Media_Isp_Tsk(void *arg)
         }
     }
 
+
     while (1)
     {
         usleep(50 * 1000);
@@ -524,6 +527,8 @@ int Media_Isp_Init(MEDIA_VI_PARAM_S *pViParam)
         return HI_FAILURE;
     }
 
+    memcpy(&stIspViParam, pViParam, sizeof(MEDIA_VI_PARAM_S));
+
     for (i = 0; i < pViParam->s32WorkingViNum; i++)
     {
         s32ViNum  = pViParam->s32WorkingViId[i];
@@ -539,7 +544,7 @@ int Media_Isp_Init(MEDIA_VI_PARAM_S *pViParam)
 
     /* 创建ISP处理线程，实时的检测图像质量,并进行调节 */
     prtMD("Media_Isp_Init start!\n");
-    pthread_create(&ptd, NULL, Media_Isp_Tsk, (void *)pViInfo);
+    pthread_create(&ptd, NULL, Media_Isp_Tsk, (void *)NULL);
     prtMD("Media_Isp_Init end!\n");
 
     return HI_SUCCESS;
