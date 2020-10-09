@@ -17,7 +17,7 @@ ifeq ($(releaeType), debug)
 CFLAGS += -g
 endif
 
-LIBDIR = ./Lib/$(platform)
+LIBDIR = ./output/
 BINDIR = ./Bin/$(platform)
 
 # 目标依赖关系 
