@@ -7,7 +7,8 @@ cd Sensor
 #编译媒体库
 cd ../
 make clean; make
-cp output/libmedia.so /nfs/ -f
+
+cp output/*.so /nfs/ -f
 cp Demo/test /nfs/ -f
 
 rm -rf ./Bin
