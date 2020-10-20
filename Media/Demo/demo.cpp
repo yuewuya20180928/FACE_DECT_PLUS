@@ -38,7 +38,6 @@ int main()
         return -1;
     }
 
-#if 0
     MEDIA_RECORD_S stRecord = {0};
     VIDEO_PARAM_S *pVideoParam = &stRecord.stVideoParam;
 
@@ -58,7 +57,6 @@ int main()
     {
         printf("Media_SetRecord error! s32Ret = %#x\n", s32Ret);
     }
-#endif
 
     while (1)
     {

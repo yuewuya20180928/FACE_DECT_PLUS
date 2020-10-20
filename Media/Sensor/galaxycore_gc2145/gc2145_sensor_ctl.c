@@ -282,7 +282,7 @@ void gc2145_linear_UXGA_init(VI_PIPE ViPipe)
     gc2145_write_register(ViPipe, 0x85 , 0x30);
     gc2145_write_register(ViPipe, 0x8a , 0x00);
     gc2145_write_register(ViPipe, 0x8b , 0x00);
-    gc2145_write_register(ViPipe, 0xb0 , 0x55);
+    gc2145_write_register(ViPipe, 0xb0 , 0x40);
     gc2145_write_register(ViPipe, 0xc3 , 0x00);
     gc2145_write_register(ViPipe, 0xc4 , 0x80);
     gc2145_write_register(ViPipe, 0xc5 , 0x90);
@@ -292,7 +292,7 @@ void gc2145_linear_UXGA_init(VI_PIPE ViPipe)
     gc2145_write_register(ViPipe, 0xed , 0x04);
     gc2145_write_register(ViPipe, 0xee , 0x60);
     gc2145_write_register(ViPipe, 0xef , 0x90);
-    gc2145_write_register(ViPipe, 0xb6 , 0x00);
+    gc2145_write_register(ViPipe, 0xb6 , 0x01);
     gc2145_write_register(ViPipe, 0x90 , 0x01);
     gc2145_write_register(ViPipe, 0x91 , 0x00);
     gc2145_write_register(ViPipe, 0x92 , 0x00);
@@ -358,7 +358,7 @@ void gc2145_linear_UXGA_init(VI_PIPE ViPipe)
     gc2145_write_register(ViPipe, 0x0a , 0xc2);
     gc2145_write_register(ViPipe, 0x0b , 0x11);
     gc2145_write_register(ViPipe, 0x0c , 0x10);
-    gc2145_write_register(ViPipe, 0x13 , 0x40);
+    gc2145_write_register(ViPipe, 0x13 , 0x20);
     gc2145_write_register(ViPipe, 0x17 , 0x00);
     gc2145_write_register(ViPipe, 0x1c , 0x11);
     gc2145_write_register(ViPipe, 0x1e , 0x61);
@@ -505,7 +505,7 @@ void gc2145_linear_UXGA_init(VI_PIPE ViPipe)
     gc2145_write_register(ViPipe, 0xfe,0x00);
     gc2145_write_register(ViPipe, 0xb1,0x20);
     gc2145_write_register(ViPipe, 0xb2,0xc0);
-    gc2145_write_register(ViPipe, 0xb6,0x00);
+    gc2145_write_register(ViPipe, 0xb6,0x01);
     gc2145_write_register(ViPipe, 0x80,0x03);
     gc2145_write_register(ViPipe, 0x81,0x00);
     gc2145_write_register(ViPipe, 0x82,0x00);
@@ -593,7 +593,7 @@ void gc2145_linear_960p30_init(VI_PIPE ViPipe)
     gc2145_write_register(ViPipe, 0x85 , 0x30);
     gc2145_write_register(ViPipe, 0x8a , 0x00);
     gc2145_write_register(ViPipe, 0x8b , 0x00);
-    gc2145_write_register(ViPipe, 0xb0 , 0x55);
+    gc2145_write_register(ViPipe, 0xb0 , 0x40);
     gc2145_write_register(ViPipe, 0xc3 , 0x00);
     gc2145_write_register(ViPipe, 0xc4 , 0x80);
     gc2145_write_register(ViPipe, 0xc5 , 0x90);
@@ -603,7 +603,7 @@ void gc2145_linear_960p30_init(VI_PIPE ViPipe)
     gc2145_write_register(ViPipe, 0xed , 0x04);
     gc2145_write_register(ViPipe, 0xee , 0x60);
     gc2145_write_register(ViPipe, 0xef , 0x90);
-    gc2145_write_register(ViPipe, 0xb6 , 0x00);
+    gc2145_write_register(ViPipe, 0xb6 , 0x01);
     //crop
     gc2145_write_register(ViPipe, 0x90 , 0x01);
     gc2145_write_register(ViPipe, 0x91 , 0x00);
@@ -670,7 +670,7 @@ void gc2145_linear_960p30_init(VI_PIPE ViPipe)
     gc2145_write_register(ViPipe, 0x0a , 0xc2);
     gc2145_write_register(ViPipe, 0x0b , 0x11);
     gc2145_write_register(ViPipe, 0x0c , 0x10);
-    gc2145_write_register(ViPipe, 0x13 , 0x40);
+    gc2145_write_register(ViPipe, 0x13 , 0x20);
     gc2145_write_register(ViPipe, 0x17 , 0x00);
     gc2145_write_register(ViPipe, 0x1c , 0x11);
     gc2145_write_register(ViPipe, 0x1e , 0x61);
@@ -816,7 +816,7 @@ void gc2145_linear_960p30_init(VI_PIPE ViPipe)
     gc2145_write_register(ViPipe, 0xfe,0x00);
     gc2145_write_register(ViPipe, 0xb1,0x20);
     gc2145_write_register(ViPipe, 0xb2,0xc0);
-    gc2145_write_register(ViPipe, 0xb6,0x00);
+    gc2145_write_register(ViPipe, 0xb6,0x01);
     gc2145_write_register(ViPipe, 0x80,0x03);
     gc2145_write_register(ViPipe, 0x81,0x00);
     gc2145_write_register(ViPipe, 0x82,0x00);
