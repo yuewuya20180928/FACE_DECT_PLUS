@@ -241,7 +241,8 @@ int Media_Isp_LoadParam(VI_PIPE viPipe)
         return -1;
     }
 
-    snprintf(fileNames, 512, "%s%d", ISP_CFG_FILE_PREFIX, viPipe);
+    //snprintf(fileNames, 512, "%s%d", ISP_CFG_FILE_PREFIX, viPipe);
+    snprintf(fileNames, 512, "%s%d", ISP_CFG_FILE_PREFIX, 1);
     prtMD("fileNames[%d]: %s\n", viPipe, fileNames);
 
     /* 加载配置文件 */

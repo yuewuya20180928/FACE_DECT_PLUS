@@ -33,8 +33,6 @@
 #include "isp_configure.h"
 #include "media_com.h"
 
-int ISPCFG_SceneMode = 0;            //0:正常模式, 1:暗态模式
-
 static dictionary *ISPCFG_Fd[VI_MAX_PIPE_NUM];
 static unsigned long long ISPCFG_LineValue[MAX_NUM_IN_LINE];
 
@@ -79,9 +77,9 @@ int ISPCFG_UnloadFile(VI_PIPE viPipe)
 /**函数：
 ***说明：获取pString对应key字符串项的值
 ***/
-unsigned int ISPCFG_GetValue(const VI_PIPE viPipe, const char *pString)
+int ISPCFG_GetValue(const VI_PIPE viPipe, const char *pString)
 {
-    unsigned int keyvalue = 0;
+    int keyvalue = 0;
 
     if ((viPipe >= VI_MAX_PIPE_NUM) || (pString == NULL))
     {
@@ -206,10 +204,7 @@ static int ISPCFG_GetNumInLine(char *pInLine)
     return i;
 }
 
-////////
-////////加载isp参数
-////////
-static  HI_U32 ISPCFG_GetThreshValue(HI_U32 u32Value, HI_U32 u32Count, HI_U32* pThresh)
+HI_U32 ISPCFG_GetThreshValue(HI_U32 u32Value, HI_U32 u32Count, HI_U32* pThresh)
 {
     HI_U32 u32Level = 0;
 
@@ -229,7 +224,7 @@ static  HI_U32 ISPCFG_GetThreshValue(HI_U32 u32Value, HI_U32 u32Count, HI_U32* p
     return u32Level;
 }
 
-static int ISPCFG_GetBypassParam(VI_PIPE viPipe, ISPCFG_BYPASS_PARAM_S *pBypassParam)
+static int ISPCFG_GetBypass(VI_PIPE viPipe, ISPCFG_BYPASS_PARAM_S *pBypassParam)
 {
     unsigned int u32Value = 0;
 
@@ -240,152 +235,152 @@ static int ISPCFG_GetBypassParam(VI_PIPE viPipe, ISPCFG_BYPASS_PARAM_S *pBypassP
     }
 
     /* bitBypassISPDGain */
-    u32Value = ISPCFG_GetValue(viPipe, "module_state:bitBypassISPDGain");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_MODULE_CTRL_U:bitBypassISPDGain");
     pBypassParam->bitBypassISPDGain = (HI_BOOL)u32Value;
     prtMD("pBypassParam->bitBypassISPDGain = %d\n", pBypassParam->bitBypassISPDGain);
 
     /* bitBypassAntiFC */
-    u32Value = ISPCFG_GetValue(viPipe, "module_state:bitBypassAntiFC");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_MODULE_CTRL_U:bitBypassAntiFC");
     pBypassParam->bitBypassAntiFC = (HI_BOOL)u32Value;
     prtMD("pBypassParam->bitBypassAntiFC = %d\n", pBypassParam->bitBypassAntiFC);
 
     /* bitBypassCrosstalkR */
-    u32Value = ISPCFG_GetValue(viPipe, "module_state:bitBypassCrosstalkR");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_MODULE_CTRL_U:bitBypassCrosstalkR");
     pBypassParam->bitBypassCrosstalkR = (HI_BOOL)u32Value;
     prtMD("pBypassParam->bitBypassCrosstalkR = %d\n", pBypassParam->bitBypassCrosstalkR);
 
     /* bitBypassDPC */
-    u32Value = ISPCFG_GetValue(viPipe, "module_state:bitBypassDPC");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_MODULE_CTRL_U:bitBypassDPC");
     pBypassParam->bitBypassDPC = (HI_BOOL)u32Value;
     prtMD("pBypassParam->bitBypassDPC = %d\n", pBypassParam->bitBypassDPC);
 
     /* bitBypassNR */
-    u32Value = ISPCFG_GetValue(viPipe, "module_state:bitBypassNR");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_MODULE_CTRL_U:bitBypassNR");
     pBypassParam->bitBypassNR = (HI_BOOL)u32Value;
     prtMD("pBypassParam->bitBypassNR = %d\n", pBypassParam->bitBypassNR);
 
     /* bitBypassDehaze */
-    u32Value = ISPCFG_GetValue(viPipe, "module_state:bitBypassDehaze");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_MODULE_CTRL_U:bitBypassDehaze");
     pBypassParam->bitBypassDehaze = (HI_BOOL)u32Value;
     prtMD("pBypassParam->bitBypassDehaze = %d\n", pBypassParam->bitBypassDehaze);
 
     /* bitBypassWBGain */
-    u32Value = ISPCFG_GetValue(viPipe, "module_state:bitBypassWBGain");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_MODULE_CTRL_U:bitBypassWBGain");
     pBypassParam->bitBypassWBGain = (HI_BOOL)u32Value;
     prtMD("pBypassParam->bitBypassWBGain = %d\n", pBypassParam->bitBypassWBGain);
 
     /* bitBypassMeshShading */
-    u32Value = ISPCFG_GetValue(viPipe, "module_state:bitBypassMeshShading");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_MODULE_CTRL_U:bitBypassMeshShading");
     pBypassParam->bitBypassMeshShading = (HI_BOOL)u32Value;
     prtMD("pBypassParam->bitBypassMeshShading = %d\n", pBypassParam->bitBypassMeshShading);
 
     /* bitBypassDRC */
-    u32Value = ISPCFG_GetValue(viPipe, "module_state:bitBypassDRC");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_MODULE_CTRL_U:bitBypassDRC");
     pBypassParam->bitBypassDRC = (HI_BOOL)u32Value;
     prtMD("pBypassParam->bitBypassDRC = %d\n", pBypassParam->bitBypassDRC);
 
     /* bitBypassDemosaic */
-    u32Value = ISPCFG_GetValue(viPipe, "module_state:bitBypassDemosaic");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_MODULE_CTRL_U:bitBypassDemosaic");
     pBypassParam->bitBypassDemosaic = (HI_BOOL)u32Value;
     prtMD("pBypassParam->bitBypassDemosaic = %d\n", pBypassParam->bitBypassDemosaic);
 
     /* bitBypassColorMatrix */
-    u32Value = ISPCFG_GetValue(viPipe, "module_state:bitBypassColorMatrix");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_MODULE_CTRL_U:bitBypassColorMatrix");
     pBypassParam->bitBypassColorMatrix = (HI_BOOL)u32Value;
     prtMD("pBypassParam->bitBypassColorMatrix = %d\n", pBypassParam->bitBypassColorMatrix);
 
     /* bitBypassGamma */
-    u32Value = ISPCFG_GetValue(viPipe, "module_state:bitBypassGamma");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_MODULE_CTRL_U:bitBypassGamma");
     pBypassParam->bitBypassGamma = (HI_BOOL)u32Value;
     prtMD("pBypassParam->bitBypassGamma = %d\n", pBypassParam->bitBypassGamma);
 
     /* bitBypassFSWDR */
-    u32Value = ISPCFG_GetValue(viPipe, "module_state:bitBypassFSWDR");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_MODULE_CTRL_U:bitBypassFSWDR");
     pBypassParam->bitBypassFSWDR = (HI_BOOL)u32Value;
     prtMD("pBypassParam->bitBypassFSWDR = %d\n", pBypassParam->bitBypassFSWDR);
 
     /* bitBypassCA */
-    u32Value = ISPCFG_GetValue(viPipe, "module_state:bitBypassCA");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_MODULE_CTRL_U:bitBypassCA");
     pBypassParam->bitBypassCA = (HI_BOOL)u32Value;
     prtMD("pBypassParam->bitBypassCA = %d\n", pBypassParam->bitBypassCA);
 
     /* bitBypassCsConv */
-    u32Value = ISPCFG_GetValue(viPipe, "module_state:bitBypassCsConv");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_MODULE_CTRL_U:bitBypassCsConv");
     pBypassParam->bitBypassCsConv = (HI_BOOL)u32Value;
     prtMD("pBypassParam->bitBypassCsConv = %d\n", pBypassParam->bitBypassCsConv);
 
     /* bitBypassSharpen */
-    u32Value = ISPCFG_GetValue(viPipe, "module_state:bitBypassSharpen");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_MODULE_CTRL_U:bitBypassSharpen");
     pBypassParam->bitBypassSharpen = (HI_BOOL)u32Value;
     prtMD("pBypassParam->bitBypassSharpen = %d\n", pBypassParam->bitBypassSharpen);
 
     /* bitBypassLCAC */
-    u32Value = ISPCFG_GetValue(viPipe, "module_state:bitBypassLCAC");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_MODULE_CTRL_U:bitBypassLCAC");
     pBypassParam->bitBypassLCAC = (HI_BOOL)u32Value;
     prtMD("pBypassParam->bitBypassLCAC = %d\n", pBypassParam->bitBypassLCAC);
 
     /* bitBypassGCAC */
-    u32Value = ISPCFG_GetValue(viPipe, "module_state:bitBypassGCAC");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_MODULE_CTRL_U:bitBypassGCAC");
     pBypassParam->bitBypassGCAC = (HI_BOOL)u32Value;
     prtMD("pBypassParam->bitBypassGCAC = %d\n", pBypassParam->bitBypassGCAC);
 
     /* bit2ChnSelect */
-    u32Value = ISPCFG_GetValue(viPipe, "module_state:bit2ChnSelect");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_MODULE_CTRL_U:bit2ChnSelect");
     pBypassParam->bit2ChnSelect = (HI_BOOL)u32Value;
     prtMD("pBypassParam->bit2ChnSelect = %d\n", pBypassParam->bit2ChnSelect);
 
     /* bitBypassLdci */
-    u32Value = ISPCFG_GetValue(viPipe, "module_state:bitBypassLdci");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_MODULE_CTRL_U:bitBypassLdci");
     pBypassParam->bitBypassLdci = (HI_BOOL)u32Value;
     prtMD("pBypassParam->bitBypassLdci = %d\n", pBypassParam->bitBypassLdci);
 
     /* bitBypassPreGamma */
-    u32Value = ISPCFG_GetValue(viPipe, "module_state:bitBypassPreGamma");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_MODULE_CTRL_U:bitBypassPreGamma");
     pBypassParam->bitBypassPreGamma = (HI_BOOL)u32Value;
     prtMD("pBypassParam->bitBypassPreGamma = %d\n", pBypassParam->bitBypassPreGamma);
 
     /* bitBypassAEStatFE */
-    u32Value = ISPCFG_GetValue(viPipe, "module_state:bitBypassAEStatFE");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_MODULE_CTRL_U:bitBypassAEStatFE");
     pBypassParam->bitBypassAEStatFE = (HI_BOOL)u32Value;
     prtMD("pBypassParam->bitBypassAEStatFE = %d\n", pBypassParam->bitBypassAEStatFE);
 
     /* bitBypassAEStatBE */
-    u32Value = ISPCFG_GetValue(viPipe, "module_state:bitBypassAEStatBE");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_MODULE_CTRL_U:bitBypassAEStatBE");
     pBypassParam->bitBypassAEStatBE = (HI_BOOL)u32Value;
     prtMD("pBypassParam->bitBypassAEStatBE = %d\n", pBypassParam->bitBypassAEStatBE);
 
     /* bitBypassMGSta */
-    u32Value = ISPCFG_GetValue(viPipe, "module_state:bitBypassMGSta");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_MODULE_CTRL_U:bitBypassMGSta");
     pBypassParam->bitBypassMGSta = (HI_BOOL)u32Value;
     prtMD("pBypassParam->bitBypassMGSta = %d\n", pBypassParam->bitBypassMGSta);
 
     /* bitBypassDE */
-    u32Value = ISPCFG_GetValue(viPipe, "module_state:bitBypassDE");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_MODULE_CTRL_U:bitBypassDE");
     pBypassParam->bitBypassDE = (HI_BOOL)u32Value;
     prtMD("pBypassParam->bitBypassDE = %d\n", pBypassParam->bitBypassDE);
 
     /* bitBypassAFStatBE */
-    u32Value = ISPCFG_GetValue(viPipe, "module_state:bitBypassAFStatBE");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_MODULE_CTRL_U:bitBypassAFStatBE");
     pBypassParam->bitBypassAFStatBE = (HI_BOOL)u32Value;
     prtMD("pBypassParam->bitBypassAFStatBE = %d\n", pBypassParam->bitBypassAFStatBE);
 
     /* bitBypassAWBStat */
-    u32Value = ISPCFG_GetValue(viPipe, "module_state:bitBypassAWBStat");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_MODULE_CTRL_U:bitBypassAWBStat");
     pBypassParam->bitBypassAWBStat = (HI_BOOL)u32Value;
     prtMD("pBypassParam->bitBypassAWBStat = %d\n", pBypassParam->bitBypassAWBStat);
 
     /* bitBypassCLUT */
-    u32Value = ISPCFG_GetValue(viPipe, "module_state:bitBypassCLUT");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_MODULE_CTRL_U:bitBypassCLUT");
     pBypassParam->bitBypassCLUT = (HI_BOOL)u32Value;
     prtMD("pBypassParam->bitBypassCLUT = %d\n", pBypassParam->bitBypassCLUT);
 
     /* bitBypassHLC */
-    u32Value = ISPCFG_GetValue(viPipe, "module_state:bitBypassHLC");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_MODULE_CTRL_U:bitBypassHLC");
     pBypassParam->bitBypassHLC = (HI_BOOL)u32Value;
     prtMD("pBypassParam->bitBypassHLC = %d\n", pBypassParam->bitBypassHLC);
 
     /* bitBypassEdgeMark */
-    u32Value = ISPCFG_GetValue(viPipe, "module_state:bitBypassEdgeMark");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_MODULE_CTRL_U:bitBypassEdgeMark");
     pBypassParam->bitBypassEdgeMark = (HI_BOOL)u32Value;
     prtMD("pBypassParam->bitBypassEdgeMark = %d\n", pBypassParam->bitBypassEdgeMark);
 
@@ -408,11 +403,11 @@ static int ISPCFG_GetBlackValue(VI_PIPE viPipe, ISPCFG_BLACK_PARAM_S *pBlackPara
     }
 
     /* enOptype */
-    u32Value = ISPCFG_GetValue(viPipe, "static_blacklevel:enOptype");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_BLACK_LEVEL_S:enOptype");
     pBlackParam->enOpType = (HI_S32)u32Value;
 
     /* AutoStaticWb 包含了4个参数 */
-    ret = ISPCFG_GetString(viPipe, &pString,"static_blacklevel:au16BlackLevel");
+    ret = ISPCFG_GetString(viPipe, &pString,"hiISP_BLACK_LEVEL_S:au16BlackLevel");
     if (0 != ret)
     {
         prtMD("ISPCFG_GetString error! viPipe = %d, ret = %#x\n", viPipe, ret);
@@ -431,12 +426,9 @@ static int ISPCFG_GetBlackValue(VI_PIPE viPipe, ISPCFG_BLACK_PARAM_S *pBlackPara
 }
 
 //TODO 函数名待优化
-static int ISPCFG_GetStaticAe(VI_PIPE viPipe, ISPCFG_STATIC_AE_S *pStaticAe)
+static int ISPCFG_GetAE(VI_PIPE viPipe, ISPCFG_AE_PARAM_S *pStaticAe)
 {
     unsigned int u32Value = 0;
-    int valueNum = 0;
-    int s32Ret = 0;
-    int u32Idx = 0;
     char *pString = NULL;
 
     if ((viPipe >= VI_MAX_PIPE_NUM) || (pStaticAe == NULL))
@@ -446,24 +438,24 @@ static int ISPCFG_GetStaticAe(VI_PIPE viPipe, ISPCFG_STATIC_AE_S *pStaticAe)
     }
 
     /* AERouteExValid */
-    u32Value = ISPCFG_GetValue(viPipe, "static_ae:AERouteExValid");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_EXPOSURE_ATTR_S:bAERouteExValid");
     pStaticAe->bAERouteExValid = (HI_BOOL)u32Value;
 
     /* ExposureOpType */  //2019-08-29 add
-    u32Value = ISPCFG_GetValue(viPipe, "static_ae:ExposureOpType");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_EXPOSURE_ATTR_S:enOpType");
     pStaticAe->ExposureOpType = (HI_BOOL)u32Value;
 
     /* AERunInterval */
-    u32Value = ISPCFG_GetValue(viPipe, "static_ae:AERunInterval");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_EXPOSURE_ATTR_S:u8AERunInterval");
     pStaticAe->u8AERunInterval = (HI_U8)u32Value;
     //prtMD("1-------u32Value = %d\n",pStaticAe->u8AERunInterval);
 
     /* AutoExpTimeMax */
-    u32Value = ISPCFG_GetValue(viPipe, "static_ae:AutoExpTimeMax");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_AE_ATTR_S:stExpTimeRange.u32Max");
     pStaticAe->u32AutoExpTimeMax = u32Value;
 
     /* AutoExpTimeMix */  //2019-08-29 add
-    u32Value = ISPCFG_GetValue(viPipe, "static_ae:AutoExpTimeMix");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_AE_ATTR_S:stExpTimeRange.u32Min");
     pStaticAe->u32AutoExpTimeMin = u32Value;
 
     prtMD("[AE] valid:%d, type:%d, RunInterval:%d, MaxExpTime:%d, MinExpTime:%d\n",
@@ -474,104 +466,85 @@ static int ISPCFG_GetStaticAe(VI_PIPE viPipe, ISPCFG_STATIC_AE_S *pStaticAe)
         pStaticAe->u32AutoExpTimeMin);
 
     /* AutoAGainMax */
-    u32Value = ISPCFG_GetValue(viPipe, "static_ae:AutoAGainMax");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_AE_ATTR_S:stAGainRange.u32Max");
     pStaticAe->u32AutoAGainMax = u32Value;
 
     /* AutoAGainMix */
-    u32Value = ISPCFG_GetValue(viPipe, "static_ae:AutoAGainMix");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_AE_ATTR_S:stAGainRange.u32Min");
     pStaticAe->u32AutoAGainMin = u32Value;
 
     /* AutoDGainMax */
-    u32Value = ISPCFG_GetValue(viPipe, "static_ae:AutoDGainMax");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_AE_ATTR_S:stDGainRange.u32Max");
     pStaticAe->u32AutoDGainMax = u32Value;
 
     /* AutoDGainMix */
-    u32Value = ISPCFG_GetValue(viPipe, "static_ae:AutoDGainMix");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_AE_ATTR_S:stDGainRange.u32Min");
     pStaticAe->u32AutoDGainMin = u32Value;
 
     /* AutoISPDGainMax */
-    u32Value = ISPCFG_GetValue(viPipe, "static_ae:AutoISPDGainMax");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_AE_ATTR_S:stISPDGainRange.u32Max");
     pStaticAe->u32AutoISPDGainMax = u32Value;
 
     /* AutoISPDGainMix */
-    u32Value = ISPCFG_GetValue(viPipe, "static_ae:AutoISPDGainMix");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_AE_ATTR_S:stISPDGainRange.u32Min");
     pStaticAe->u32AutoISPDGainMin = u32Value;
 
     /* AutoSysGainMax */
-    u32Value = ISPCFG_GetValue(viPipe, "static_ae:AutoSysGainMax");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_AE_ATTR_S:stSysGainRange.u32Max");
     pStaticAe->u32AutoSysGainMax = u32Value;
 
     /* AutoSysGainMix */
-    u32Value = ISPCFG_GetValue(viPipe, "static_ae:AutoSysGainMix");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_AE_ATTR_S:stSysGainRange.u32Min");
     pStaticAe->u32AutoSysGainMin = u32Value;
 
     /* AutoGainThreshold */
-    u32Value = ISPCFG_GetValue(viPipe, "static_ae:AutoGainThreshold");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_AE_ATTR_S:u32GainThreshold");
     pStaticAe->u32AutoGainThreshold = u32Value;
 
     /* AutoSpeed */
-    u32Value = ISPCFG_GetValue(viPipe, "static_ae:AutoSpeed");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_AE_ATTR_S:u8Speed");
     pStaticAe->u8AutoSpeed = (HI_U8)u32Value;
 
     /* AutoBlackSpeedBias */
-    u32Value = ISPCFG_GetValue(viPipe, "static_ae:AutoBlackSpeedBias");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_AE_ATTR_S:u16BlackSpeedBias");
     pStaticAe->u16AutoBlackSpeedBias = (HI_U16)u32Value;
 
     /* AutoTolerance */
-    u32Value = ISPCFG_GetValue(viPipe, "static_ae:AutoTolerance");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_AE_ATTR_S:u8Tolerance");
     pStaticAe->u8AutoTolerance = (HI_U8)u32Value;
 
     /* AutostaticCompesation */
-    s32Ret = ISPCFG_GetString(viPipe, &pString, "static_ae:AutostaticCompesation");
-    if (0 != s32Ret)
-    {
-        prtMD("ISPCFG_GetString error! s32Ret = %#x\n", s32Ret);
-        return -1;
-    }
-
-    valueNum = ISPCFG_GetNumInLine(pString);
-
-    for(u32Idx = 0; u32Idx < valueNum; u32Idx++)
-    {
-        u32Value = ISPCFG_LineValue[u32Idx];
-        pStaticAe->u8AutostaticCompesation[u32Idx] = (HI_U16)u32Value;
-        prtMD("pStaticAe->u8AutostaticCompesation[%d] = %d\n", u32Idx, pStaticAe->u8AutostaticCompesation[u32Idx]);
-    }
+    u32Value = ISPCFG_GetString(viPipe, &pString, "hiISP_AE_ATTR_S:u8Compensation");
+    pStaticAe->u8AutostaticCompesation = (HI_U8)u32Value;
 
     /* AutoEVBias */
-    u32Value = ISPCFG_GetValue(viPipe, "static_ae:AutoEVBias");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_AE_ATTR_S:u16EVBias");
     pStaticAe->u16AutoEVBias = (HI_U16)u32Value;
 
     /* AutoAEStrategMode */
-    u32Value = ISPCFG_GetValue(viPipe, "static_ae:AutoAEStrategMode");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_AE_ATTR_S:enAEStrategyMode");
     pStaticAe->bAutoAEStrategMode = (HI_BOOL)u32Value;
 
     /* AutoHistRatioSlope */
-    u32Value = ISPCFG_GetValue(viPipe, "static_ae:AutoHistRatioSlope");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_AE_ATTR_S:u16HistRatioSlope");
     pStaticAe->u16AutoHistRatioSlope = (HI_U16)u32Value;
 
     /* AutoMaxHistOffset */
-    u32Value = ISPCFG_GetValue(viPipe, "static_ae:AutoMaxHistOffset");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_AE_ATTR_S:u8MaxHistOffset");
     pStaticAe->u8AutoMaxHistOffset = (HI_U8)u32Value;
 
     /* AutoBlackDelayFrame */
-    u32Value = ISPCFG_GetValue(viPipe, "static_ae:AutoBlackDelayFrame");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_AE_ATTR_S:stAEDelayAttr.u16BlackDelayFrame");
     pStaticAe->u16AutoBlackDelayFrame = (HI_U16)u32Value;
 
     /* AutoWhiteDelayFrame */
-    u32Value = ISPCFG_GetValue(viPipe, "static_ae:AutoWhiteDelayFrame");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_AE_ATTR_S:stAEDelayAttr.u16WhiteDelayFrame");
     pStaticAe->u16AutoWhiteDelayFrame = (HI_U16)u32Value;
-
-#if 0
-    /* AutoFswdrmode */
-    u32Value = ISPCFG_GetValue(viPipe, "static_ae:AutoFswdrmode");
-    pStaticAe->enFSWDRMode = (HI_U16)u32Value;
-#endif
 
     return 0;
 }
 
-static int ISPCFG_GetStaticAwb(VI_PIPE viPipe, ISPCFG_STATIC_AWB_S *pStaticAwb)
+static int ISPCFG_GetAWB(VI_PIPE viPipe, ISPCFG_AWB_PARAM_S *pStaticAwb)
 {
     unsigned int u32Value = 0;
     unsigned int u32IdxM = 0;
@@ -583,20 +556,12 @@ static int ISPCFG_GetStaticAwb(VI_PIPE viPipe, ISPCFG_STATIC_AWB_S *pStaticAwb)
         return -1;
     }
 
-    /* AWBOpType */
-    u32Value = ISPCFG_GetValue(viPipe, "static_awb:AWBOpType");
-    pStaticAwb->AWBOpType = (HI_U8)u32Value;
-
-    /* AWBEnable */
-    u32Value = ISPCFG_GetValue(viPipe, "static_awb:AWBEnable");
-    pStaticAwb->AWBEnable = (HI_BOOL)u32Value;
-
     /* AutoWhiteDelayFrame */
-    u32Value = ISPCFG_GetValue(viPipe, "static_awb:AutoRefColorTemp");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_AWB_ATTR_S:u16RefColorTemp");
     pStaticAwb->u16AutoRefColorTemp = (HI_U16)u32Value;
 
     /* AutoStaticWb 包含了4个参数 */
-    ISPCFG_GetString(viPipe, &pString,"static_awb:AutoStaticWb");
+    ISPCFG_GetString(viPipe, &pString,"hiISP_AWB_ATTR_S:au16StaticWB");
     ISPCFG_GetNumInLine(pString);
 
     for(u32IdxM = 0; u32IdxM < 4; u32IdxM++)
@@ -606,7 +571,7 @@ static int ISPCFG_GetStaticAwb(VI_PIPE viPipe, ISPCFG_STATIC_AWB_S *pStaticAwb)
     }
 
     /* AutoCurvePara */
-    ISPCFG_GetString(viPipe, &pString,"static_awb:AutoCurvePara");
+    ISPCFG_GetString(viPipe, &pString,"hiISP_AWB_ATTR_S:as32CurvePara");
     ISPCFG_GetNumInLine(pString);
 
     for(u32IdxM = 0; u32IdxM < 6; u32IdxM++)
@@ -616,33 +581,33 @@ static int ISPCFG_GetStaticAwb(VI_PIPE viPipe, ISPCFG_STATIC_AWB_S *pStaticAwb)
     }
 
     /* AutoRGStrength */
-    u32Value = ISPCFG_GetValue(viPipe, "static_awb:AutoRGStrength");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_AWB_ATTR_S:u8RGStrength");
     pStaticAwb->u8AutoRGStrength = (HI_U8)u32Value;
 
     /* AutoBGStrength */
-    u32Value = ISPCFG_GetValue(viPipe, "static_awb:AutoBGStrength");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_AWB_ATTR_S:u8BGStrength");
     pStaticAwb->u8AutoBGStrength = (HI_U8)u32Value;
 
     /* AutoAWBSpeed */
-    u32Value = ISPCFG_GetValue(viPipe, "static_awb:AutoAWBSpeed");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_AWB_ATTR_S:u16Speed");
     pStaticAwb->u16AutoSpeed = (HI_U16)u32Value;
 
     /* AutoZoneSel */
-    u32Value = ISPCFG_GetValue(viPipe, "static_awb:AutoZoneSel");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_AWB_ATTR_S:u16ZoneSel");
     pStaticAwb->u16AutoZoneSel = (HI_U16)u32Value;
 
-    /* AutoLowColorTemp */
-    u32Value = ISPCFG_GetValue(viPipe, "static_awb:AutoLowColorTemp");
-    pStaticAwb->u16AutoLowColorTemp = (HI_U16)u32Value;
-
     /* AutoHightColorTemp */
-    u32Value = ISPCFG_GetValue(viPipe, "static_awb:AutoHighColorTemp");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_AWB_ATTR_S:u16HighColorTemp");
     pStaticAwb->u16AutoHighColorTemp = (HI_U16)u32Value;
 
+
+    /* AutoLowColorTemp */
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_AWB_ATTR_S:u16LowColorTemp");
+    pStaticAwb->u16AutoLowColorTemp = (HI_U16)u32Value;
     return 0;
 }
 
-static int ISPCFG_GetWdrExposure(VI_PIPE viPipe, ISPCFG_STATIC_WDR_AE_S *pStaticWdrExposure)
+static int ISPCFG_GetWdrExposure(VI_PIPE viPipe, ISPCFG_WDR_AE_PARAM_S *pStaticWdrExposure)
 {
     unsigned int u32Value = 0;
     unsigned int u32IdxM = 0;
@@ -655,31 +620,31 @@ static int ISPCFG_GetWdrExposure(VI_PIPE viPipe, ISPCFG_STATIC_WDR_AE_S *pStatic
     }
 
     /* ExpRatioType */
-    u32Value = ISPCFG_GetValue(viPipe, "static_wdrexposure:ExpRatioType");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_WDR_EXPOSURE_ATTR_S:enExpRatioType");
     pStaticWdrExposure->u8ExpRatioType = (HI_U8)u32Value;
 
     /* ExpRatioMax */
-    u32Value = ISPCFG_GetValue(viPipe, "static_wdrexposure:ExpRatioMax");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_WDR_EXPOSURE_ATTR_S:u32ExpRatioMax");
     pStaticWdrExposure->u32ExpRatioMax = (HI_U32)u32Value;
 
     /* ExpRatioMin */
-    u32Value = ISPCFG_GetValue(viPipe, "static_wdrexposure:ExpRatioMin");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_WDR_EXPOSURE_ATTR_S:u32ExpRatioMin");
     pStaticWdrExposure->u32ExpRatioMin = (HI_U32)u32Value;
 
     /* Tolerance */
-    u32Value = ISPCFG_GetValue(viPipe, "static_wdrexposure:Tolerance");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_WDR_EXPOSURE_ATTR_S:u16Tolerance");
     pStaticWdrExposure->u16Tolerance = (HI_U16)u32Value;
 
     /* WDRSpeed */
-    u32Value = ISPCFG_GetValue(viPipe, "static_wdrexposure:WDRSpeed");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_WDR_EXPOSURE_ATTR_S:u16Speed");
     pStaticWdrExposure->u16Speed = (HI_U16)u32Value;
 
     /* RatioBias */
-    u32Value = ISPCFG_GetValue(viPipe, "static_wdrexposure:RatioBias");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_WDR_EXPOSURE_ATTR_S:u16RatioBias");
     pStaticWdrExposure->u16RatioBias = (HI_U16)u32Value;
 
     /* ExpRatio */
-    ISPCFG_GetString(viPipe, &pString, "static_wdrexposure:ExpRatio");
+    ISPCFG_GetString(viPipe, &pString, "hiISP_WDR_EXPOSURE_ATTR_S:au32ExpRatio");
     ISPCFG_GetNumInLine(pString);
 
     for(u32IdxM = 0; u32IdxM < 3; u32IdxM++)
@@ -691,7 +656,7 @@ static int ISPCFG_GetWdrExposure(VI_PIPE viPipe, ISPCFG_STATIC_WDR_AE_S *pStatic
     return 0;
 }
 
-static int ISPCFG_GetStaticSaturation(VI_PIPE viPipe, ISPCFG_STATIC_SATURATION_S *pStaticSaturation)
+static int ISPCFG_GetSaturation(VI_PIPE viPipe, ISPCFG_SATURATION_PARAM_S *pStaticSaturation)
 {
     unsigned int u32Value = 0;
     unsigned int u32IdxM = 0;
@@ -705,15 +670,15 @@ static int ISPCFG_GetStaticSaturation(VI_PIPE viPipe, ISPCFG_STATIC_SATURATION_S
     }
 
     /* OpType */
-    u32Value = ISPCFG_GetValue(viPipe, "static_saturation:OpType");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_SATURATION_ATTR_S:enOpType");
     pStaticSaturation->bOpType = (HI_BOOL)u32Value;
 
     /* ManualSat */
-    u32Value = ISPCFG_GetValue(viPipe, "static_saturation:ManualSat");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_SATURATION_ATTR_S:stManual.u8Saturation");
     pStaticSaturation->u8ManualSat = (HI_U8)u32Value;
 
     /* AutoSat */
-    s32Ret = ISPCFG_GetString(viPipe, &pString, "static_saturation:AutoSat");
+    s32Ret = ISPCFG_GetString(viPipe, &pString, "hiISP_SATURATION_ATTR_S:stAuto.au8Sat");
     if (0 != s32Ret)
     {
         prtMD("ISPCFG_GetString error! s32Ret = %#x\n", s32Ret);
@@ -735,7 +700,7 @@ static int ISPCFG_GetStaticSaturation(VI_PIPE viPipe, ISPCFG_STATIC_SATURATION_S
     return 0;
 }
 
-static int ISPCFG_GetStaticDRC(VI_PIPE viPipe, ISPCFG_STATIC_DRC_S *pStaticDrc)
+static int ISPCFG_GetDRC(VI_PIPE viPipe, ISPCFG_DRC_PARAM_S *pStaticDrc)
 {
     unsigned int u32Value = 0;
 
@@ -746,127 +711,127 @@ static int ISPCFG_GetStaticDRC(VI_PIPE viPipe, ISPCFG_STATIC_DRC_S *pStaticDrc)
     }
 
     /* bEnable */
-    u32Value = ISPCFG_GetValue(viPipe, "static_drc:bEnable");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_DRC_ATTR_S:bEnable");
     pStaticDrc->bEnable = (HI_BOOL)u32Value;
 
     /* CurveSelect */
-    u32Value = ISPCFG_GetValue(viPipe, "static_drc:CurveSelect");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_DRC_ATTR_S:enCurveSelect");
     pStaticDrc->u8CurveSelect = (HI_U8)u32Value;
 
     /* PDStrength */
-    u32Value = ISPCFG_GetValue(viPipe, "static_drc:PDStrength");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_DRC_ATTR_S:u8PDStrength");
     pStaticDrc->u8PDStrength = (HI_U8)u32Value;
 
     /* LocalMixingBrightMax */
-    u32Value = ISPCFG_GetValue(viPipe, "static_drc:LocalMixingBrightMax");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_DRC_ATTR_S:u8LocalMixingBrightMax");
     pStaticDrc->u8LocalMixingBrightMax = (HI_U8)u32Value;
 
     /* LocalMixingBrightMin */
-    u32Value = ISPCFG_GetValue(viPipe, "static_drc:LocalMixingBrightMin");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_DRC_ATTR_S:u8LocalMixingBrightMin");
     pStaticDrc->u8LocalMixingBrightMin = (HI_U8)u32Value;
 
     /* LocalMixingBrightThr */
-    u32Value = ISPCFG_GetValue(viPipe, "static_drc:LocalMixingBrightThr");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_DRC_ATTR_S:u8LocalMixingBrightThr");
     pStaticDrc->u8LocalMixingBrightThr = (HI_U8)u32Value;
 
     /* LocalMixingBrightSlo */
-    u32Value = ISPCFG_GetValue(viPipe, "static_drc:LocalMixingBrightSlo");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_DRC_ATTR_S:s8LocalMixingBrightSlo");
     pStaticDrc->s8LocalMixingBrightSlo = (HI_S8)u32Value;
 
     /* LocalMixingDarkMax */
-    u32Value = ISPCFG_GetValue(viPipe, "static_drc:LocalMixingDarkMax");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_DRC_ATTR_S:u8LocalMixingDarkMax");
     pStaticDrc->u8LocalMixingDarkMax = (HI_U8)u32Value;
 
     /* LocalMixingDarkMin */
-    u32Value = ISPCFG_GetValue(viPipe, "static_drc:LocalMixingDarkMin");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_DRC_ATTR_S:u8LocalMixingDarkMin");
     pStaticDrc->u8LocalMixingDarkMin = (HI_U8)u32Value;
 
     /* LocalMixingDarkThr */
-    u32Value = ISPCFG_GetValue(viPipe, "static_drc:LocalMixingDarkThr");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_DRC_ATTR_S:u8LocalMixingDarkThr");
     pStaticDrc->u8LocalMixingDarkThr = (HI_U8)u32Value;
 
     /* LocalMixingDarkSlo */
-    u32Value = ISPCFG_GetValue(viPipe, "static_drc:LocalMixingDarkSlo");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_DRC_ATTR_S:s8LocalMixingDarkSlo");
     pStaticDrc->s8LocalMixingDarkSlo = (HI_S8)u32Value;
 
     /* BrightGainLmt */
-    u32Value = ISPCFG_GetValue(viPipe, "static_drc:BrightGainLmt");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_DRC_ATTR_S:u8BrightGainLmt");
     pStaticDrc->u8BrightGainLmt = (HI_U8)u32Value;
 
     /* BrightGainLmtStep */
-    u32Value = ISPCFG_GetValue(viPipe, "static_drc:BrightGainLmtStep");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_DRC_ATTR_S:u8BrightGainLmtStep");
     pStaticDrc->u8BrightGainLmtStep = (HI_BOOL)u32Value;
 
     /* DarkGainLmtY */
-    u32Value = ISPCFG_GetValue(viPipe, "static_drc:DarkGainLmtY");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_DRC_ATTR_S:u8DarkGainLmtY");
     pStaticDrc->u8DarkGainLmtY = (HI_U8)u32Value;
 
     /* DarkGainLmtC */
-    u32Value = ISPCFG_GetValue(viPipe, "static_drc:DarkGainLmtC");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_DRC_ATTR_S:u8DarkGainLmtC");
     pStaticDrc->u8DarkGainLmtC = (HI_U8)u32Value;
 
     /* ContrastControl */
-    u32Value = ISPCFG_GetValue(viPipe, "static_drc:ContrastControl");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_DRC_ATTR_S:u8ContrastControl");
     pStaticDrc->u8ContrastControl = (HI_U8)u32Value;
 
     /* DetailAdjustFactor */
-    u32Value = ISPCFG_GetValue(viPipe, "static_drc:DetailAdjustFactor");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_DRC_ATTR_S:s8DetailAdjustFactor");
     pStaticDrc->s8DetailAdjustFactor = (HI_S8)u32Value;
 
     /* SpatialFltCoef */
-    u32Value = ISPCFG_GetValue(viPipe, "static_drc:SpatialFltCoef");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_DRC_ATTR_S:u8SpatialFltCoef");
     pStaticDrc->u8SpatialFltCoef = (HI_U8)u32Value;
 
     /* RangeFltCoef */
-    u32Value = ISPCFG_GetValue(viPipe, "static_drc:RangeFltCoef");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_DRC_ATTR_S:u8RangeFltCoef");
     pStaticDrc->u8RangeFltCoef = (HI_U8)u32Value;
 
     /* RangeAdaMax */
-    u32Value = ISPCFG_GetValue(viPipe, "static_drc:RangeAdaMax");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_DRC_ATTR_S:u8RangeAdaMax");
     pStaticDrc->u8RangeAdaMax = (HI_U8)u32Value;
 
     /* GradRevMax */
-    u32Value = ISPCFG_GetValue(viPipe, "static_drc:GradRevMax");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_DRC_ATTR_S:u8GradRevMax");
     pStaticDrc->u8GradRevMax = (HI_U8)u32Value;
 
     /* GradRevThr */
-    u32Value = ISPCFG_GetValue(viPipe, "static_drc:GradRevThr");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_DRC_ATTR_S:u8GradRevThr");
     pStaticDrc->u8GradRevThr = (HI_U8)u32Value;
 
     /* DRCOpType */
-    u32Value = ISPCFG_GetValue(viPipe, "static_drc:DRCOpType");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_DRC_ATTR_S:enOpType");
     pStaticDrc->u8DRCOpType = (HI_U8)u32Value;
 
     /* ManualStrength */
-    u32Value = ISPCFG_GetValue(viPipe, "static_drc:ManualStrength");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_DRC_ATTR_S:stManual.u16Strength");
     pStaticDrc->u16ManualStrength = (HI_U16)u32Value;
 
     /* AutoStrength */
-    u32Value = ISPCFG_GetValue(viPipe, "static_drc:AutoStrength");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_DRC_ATTR_S:stAuto.u16Strength");
     pStaticDrc->u16AutoStrength = (HI_U16)u32Value;
 
     /* AutoStrengthMax */
-    u32Value = ISPCFG_GetValue(viPipe, "static_drc:AutoStrengthMax");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_DRC_ATTR_S:stAuto.u16StrengthMax");
     pStaticDrc->u16AutoStrengthMax = (HI_U16)u32Value;
 
     /* AutoStrengthMin */
-    u32Value = ISPCFG_GetValue(viPipe, "static_drc:AutoStrengthMin");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_DRC_ATTR_S:stAuto.u16StrengthMin");
     pStaticDrc->u16AutoStrengthMin = (HI_U16)u32Value;
 
     /* Asy_u8Asymmetry */
-    u32Value = ISPCFG_GetValue(viPipe, "static_drc:Asy_u8Asymmetry");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_DRC_ATTR_S:stAsymmetryCurve.u8Asymmetry");
     pStaticDrc->u8Asymmetry = (HI_U16)u32Value;
 
     /* Asy_u8SecondPole */
-    u32Value = ISPCFG_GetValue(viPipe, "static_drc:Asy_u8SecondPole");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_DRC_ATTR_S:stAsymmetryCurve.u8SecondPole");
     pStaticDrc->u8SecondPole = (HI_U16)u32Value;
 
     /* Asy_u8Stretch */
-    u32Value = ISPCFG_GetValue(viPipe, "static_drc:Asy_u8Stretch");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_DRC_ATTR_S:stAsymmetryCurve.u8Stretch");
     pStaticDrc->u8Stretch = (HI_U16)u32Value;
 
     /* Asy_u8Compress */
-    u32Value = ISPCFG_GetValue(viPipe, "static_drc:Asy_u8Compress");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_DRC_ATTR_S:stAsymmetryCurve.u8Compress");
     pStaticDrc->u8Compress = (HI_U16)u32Value;
 
 #if 0
@@ -913,7 +878,7 @@ static int ISPCFG_GetStaticDRC(VI_PIPE viPipe, ISPCFG_STATIC_DRC_S *pStaticDrc)
     return 0;
 }
 
-static int ISPCFG_GetStaticCCM(VI_PIPE viPipe, ISPCFG_STATIC_CCM_S *pStaticCCM)
+static int ISPCFG_GetCCM(VI_PIPE viPipe, ISPCFG_CCM_PARAM_S *pStaticCCM)
 {
     int i = 0;
     unsigned int u32Value = 0;
@@ -928,31 +893,31 @@ static int ISPCFG_GetStaticCCM(VI_PIPE viPipe, ISPCFG_STATIC_CCM_S *pStaticCCM)
     }
 
     /* CcmopType */
-    u32Value = ISPCFG_GetValue(viPipe, "static_ccm:CcmopType");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_COLORMATRIX_ATTR_S:enOpType");
     pStaticCCM->CcmOpType = (HI_U8)u32Value;
 
     /* AutoISOActEn */
-    u32Value = ISPCFG_GetValue(viPipe, "static_ccm:AutoISOActEn");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_COLORMATRIX_ATTR_S:stAuto.bISOActEn");
     pStaticCCM->bISOActEn = (HI_BOOL)u32Value;
 
     /* AutoTempActEn */
-    u32Value = ISPCFG_GetValue(viPipe, "static_ccm:AutoTempActEn");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_COLORMATRIX_ATTR_S:stAuto.bTempActEn");
     pStaticCCM->bTempActEn = (HI_BOOL)u32Value;
 
     /* AutoCCMTabNum */
-    u32Value = ISPCFG_GetValue(viPipe, "static_ccm:AutoCCMTabNum");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_COLORMATRIX_ATTR_S:stAuto.u16CCMTabNum");
     pStaticCCM->u16CCMTabNum = (HI_U16)u32Value;
 
     //加载不同色温下的色温值
     for(i = 0;i < pStaticCCM->u16CCMTabNum;i++)
     {
         /* AutoCCMTabNum */
-        snprintf(astloadpara, 128, "static_ccm:CCMTabTemp%d", i);
+        snprintf(astloadpara, 128, "hiISP_COLORMATRIX_ATTR_S:stAuto.astCCMTab[%d].u16ColorTemp", i);
         u32Value = ISPCFG_GetValue(viPipe, astloadpara);
         pStaticCCM->astCCMTab[i].u16ColorTemp = (HI_U16)u32Value;
 
         /*AutoBlcCtrl*/
-        snprintf(astloadpara, 128, "static_ccm:CCMTab%d", i);
+        snprintf(astloadpara, 128, "hiISP_COLORMATRIX_ATTR_S:stAuto.astCCMTab[%d].au16CCM", i);
         ISPCFG_GetString(viPipe, &pString, astloadpara);
         ISPCFG_GetNumInLine(pString);
 
@@ -966,10 +931,10 @@ static int ISPCFG_GetStaticCCM(VI_PIPE viPipe, ISPCFG_STATIC_CCM_S *pStaticCCM)
     return 0;
 }
 
-static int ISPCFG_GetStaticDehaze(VI_PIPE viPipe, ISPCFG_STATIC_DEHAZE_S *pStaticDeHaze)
+static int ISPCFG_GetDehaze(VI_PIPE viPipe, ISPCFG_DEHAZE_PARAM_S *pStaticDeHaze)
 {
     unsigned int u32Value;
-    unsigned int u32IdxM = 0,i = 0;
+    unsigned int u32IdxM = 0;
     char *pString = NULL;
     char astloadpara[128] = {0};
 
@@ -980,57 +945,54 @@ static int ISPCFG_GetStaticDehaze(VI_PIPE viPipe, ISPCFG_STATIC_DEHAZE_S *pStati
     }
 
     /* bEnable */
-    u32Value = ISPCFG_GetValue(viPipe, "static_dehaze:bEnable");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_DEHAZE_ATTR_S:bEnable");
     pStaticDeHaze->bEnable = (HI_BOOL)u32Value;
 
     /* bDehazeUserLutEnable */
-    u32Value = ISPCFG_GetValue(viPipe, "static_dehaze:bDehazeUserLutEnable");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_DEHAZE_ATTR_S:bUserLutEnable");
     pStaticDeHaze->bUserLutEnable = (HI_BOOL)u32Value;
 
     /* DehazeOpType */
-    u32Value = ISPCFG_GetValue(viPipe, "static_dehaze:DehazeOpType");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_DEHAZE_ATTR_S:enOpType");
     pStaticDeHaze->u8DehazeOpType = (HI_U8)u32Value;
 
     /* Manualstrength */
-    u32Value = ISPCFG_GetValue(viPipe, "static_dehaze:Manualstrength");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_DEHAZE_ATTR_S:stManual.u8strength");
     pStaticDeHaze->u8ManualStrength = (HI_U8)u32Value;
 
     /* Autostrength */
-    u32Value = ISPCFG_GetValue(viPipe, "static_dehaze:Autostrength");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_DEHAZE_ATTR_S:stAuto.u8strength");
     pStaticDeHaze->u8Autostrength = (HI_U8)u32Value;
 
     /* TmprfltIncrCoef */
-    u32Value = ISPCFG_GetValue(viPipe, "static_dehaze:TmprfltIncrCoef");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_DEHAZE_ATTR_S:u16TmprfltIncrCoef");
     pStaticDeHaze->u16prfltIncrCoef = (HI_U16)u32Value;
 
     /* TmprfltDecrCoef */
-    u32Value = ISPCFG_GetValue(viPipe, "static_dehaze:TmprfltDecrCoef");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_DEHAZE_ATTR_S:u16TmprfltDecrCoef");
     pStaticDeHaze->u16prfltDecrCoef = (HI_U16)u32Value;
 
-    /* DehazeLut0 */
-    for(i = 0;i < 16;i++)
-    {
-        snprintf(astloadpara, 128, "static_dehaze:DehazeLut%d", i);
-        ISPCFG_GetString(viPipe, &pString, astloadpara);
-        ISPCFG_GetNumInLine(pString);
+    /* DehazeLut */
+    snprintf(astloadpara, 128, "hiISP_DEHAZE_ATTR_S:au8DehazeLut");
+    ISPCFG_GetString(viPipe, &pString, astloadpara);
+    ISPCFG_GetNumInLine(pString);
 
-        for(u32IdxM = 0; u32IdxM < 16; u32IdxM++)
-        {
-            u32Value = ISPCFG_LineValue[u32IdxM];
-            pStaticDeHaze->au8DehazeLut[i * 16 + u32IdxM] = ISPCFG_LineValue[u32IdxM];
-        }
+    for(u32IdxM = 0; u32IdxM < 256; u32IdxM++)
+    {
+        u32Value = ISPCFG_LineValue[u32IdxM];
+        pStaticDeHaze->au8DehazeLut[u32IdxM] = ISPCFG_LineValue[u32IdxM];
     }
 
     return 0;
 }
 
-//曝光权重
-static int ISPCFG_GetStaticStatistics(VI_PIPE viPipe, ISPCFG_STATIC_STATISTICSCFG_S *pStaticStatistics)
+//曝光权重设置
+static int ISPCFG_GetStatistics(VI_PIPE viPipe, ISPCFG_STATISTICS_PARAM_S *pStaticStatistics)
 {
-    unsigned int u32IdxM = 0;
-    unsigned int u32IdxN = 0;
+    unsigned int i = 0;
+    unsigned int j = 0;
+    unsigned int idx = 0;
     char *pString = NULL;
-    char aszIniNodeName[128] = {0};
 
     if ((viPipe >= VI_MAX_PIPE_NUM) || (pStaticStatistics == NULL))
     {
@@ -1039,22 +1001,26 @@ static int ISPCFG_GetStaticStatistics(VI_PIPE viPipe, ISPCFG_STATIC_STATISTICSCF
     }
 
     /*AEWeight*/
-    for(u32IdxM = 0; u32IdxM < 15; u32IdxM++)
-    {
-        snprintf(aszIniNodeName, 128, "static_statistics:ExpWeight_%d", u32IdxM);
-        ISPCFG_GetString(viPipe, &pString, aszIniNodeName);
-        ISPCFG_GetNumInLine(pString);
+    ISPCFG_GetString(viPipe, &pString, "hiISP_AE_STATISTICS_CFG_S:au8Weight");
+    ISPCFG_GetNumInLine(pString);
 
-        for (u32IdxN = 0; u32IdxN < 17; u32IdxN++)
+    /* 设置曝光权重占比,默认场景下中间区域权要大,可根据实际业务场景需要来动态设置某一个区域的权重 */
+
+    prtMD("au8Weight:\n");
+    for (i = 0; i < AE_ZONE_ROW; i++)
+    {
+        for (j = 0; j < AE_ZONE_COLUMN; j++)
         {
-            pStaticStatistics->au8AEWeight[u32IdxM][u32IdxN] = (HI_U8)ISPCFG_LineValue[u32IdxN];
+            pStaticStatistics->au8AEWeight[i][j] = (HI_U8)ISPCFG_LineValue[idx++];
+            printf("%d ", pStaticStatistics->au8AEWeight[i][j]);
         }
+        printf("\n");
     }
 
     return 0;
 }
 
-static int ISPCFG_GetStaticCSC(VI_PIPE viPipe, ISPCFG_STATIC_CSC_S *pStaticCSC)
+static int ISPCFG_GetCSC(VI_PIPE viPipe, ISPCFG_CSC_PARAM_S *pStaticCSC)
 {
     unsigned int u32Value = 0;
 
@@ -1065,33 +1031,33 @@ static int ISPCFG_GetStaticCSC(VI_PIPE viPipe, ISPCFG_STATIC_CSC_S *pStaticCSC)
     }
 
     /* bEnable */
-    u32Value = ISPCFG_GetValue(viPipe, "static_csc:CscbEnable");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_CSC_ATTR_S:bEnable");
     pStaticCSC->bEnable = (HI_BOOL)u32Value;
 
     /*Hue 色调 */
-    u32Value = ISPCFG_GetValue(viPipe, "static_csc:CscHue");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_CSC_ATTR_S:u8Hue");
     pStaticCSC->u8Hue = (HI_U8)u32Value;
 
     /*Luma 亮度 */
-    u32Value = ISPCFG_GetValue(viPipe, "static_csc:CscLuma");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_CSC_ATTR_S:u8Luma");
     pStaticCSC->u8Luma = (HI_U8)u32Value;
 
     /*Contrast 对比度 */
-    u32Value = ISPCFG_GetValue(viPipe, "static_csc:CscContrast");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_CSC_ATTR_S:u8Contr");
     pStaticCSC->u8Contr = (HI_U8)u32Value;
 
     /*Saturation 饱和度 */
-    u32Value = ISPCFG_GetValue(viPipe, "static_csc:CscSaturation");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_CSC_ATTR_S:u8Satu");
     pStaticCSC->u8Satu = (HI_U8)u32Value;
 
     /*ColorGamut 色域属性 */
-    u32Value = ISPCFG_GetValue(viPipe, "static_csc:CscColorGamut");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_CSC_ATTR_S:enColorGamut");
     pStaticCSC->enColorGamut = (HI_U8)u32Value;
 
     return 0;
 }
 
-static int ISPCFG_GetStaticLDCI(VI_PIPE viPipe, ISPCFG_STATIC_LDCI_S *pStaticLdci)
+static int ISPCFG_GetLDCI(VI_PIPE viPipe, ISPCFG_LDCI_PARAM_S *pStaticLdci)
 {
     unsigned int u32Value = 0;
     unsigned int u32IdxM = 0;
@@ -1104,19 +1070,19 @@ static int ISPCFG_GetStaticLDCI(VI_PIPE viPipe, ISPCFG_STATIC_LDCI_S *pStaticLdc
     }
 
     /*bEnable*/
-    u32Value = ISPCFG_GetValue(viPipe, "static_ldci:bEnable");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_LDCI_ATTR_S:bEnable");
     pStaticLdci->bEnable = (HI_BOOL)u32Value;
 
     /*LDCIOpType*/
-    u32Value = ISPCFG_GetValue(viPipe, "static_ldci:LDCIOpType");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_LDCI_ATTR_S:enOpType");
     pStaticLdci->u8LDCIOpType = (HI_U8)u32Value;
 
     /*ManualBlcCtrl*/
-    u32Value = ISPCFG_GetValue(viPipe, "static_ldci:ManualBlcCtrl");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_LDCI_ATTR_S:stManual.u16BlcCtrl");
     pStaticLdci->u16ManualBlcCtrl = (HI_U8)u32Value;
 
     /*AutoBlcCtrl*/
-    ISPCFG_GetString(viPipe, &pString, "static_ldci:AutoBlcCtrl");
+    ISPCFG_GetString(viPipe, &pString, "hiISP_LDCI_ATTR_S:stAuto.au16BlcCtrl");
     ISPCFG_GetNumInLine(pString);
 
     for(u32IdxM = 0; u32IdxM < 16; u32IdxM++)
@@ -1129,7 +1095,7 @@ static int ISPCFG_GetStaticLDCI(VI_PIPE viPipe, ISPCFG_STATIC_LDCI_S *pStaticLdc
 }
 
 //13 -shading
-static int ISPCFG_GetStaticShading(VI_PIPE viPipe, ISPCFG_STATIC_SHADING_S *pStaticShading)
+static int ISPCFG_GetShading(VI_PIPE viPipe, ISPCFG_SHADING_PARAM_S *pStaticShading)
 {
     unsigned int u32Value = 0;
 
@@ -1140,19 +1106,19 @@ static int ISPCFG_GetStaticShading(VI_PIPE viPipe, ISPCFG_STATIC_SHADING_S *pSta
     }
 
     /*bEnable*/
-    u32Value = ISPCFG_GetValue(viPipe, "static_shading:bEnable");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_SHADING_ATTR_S:bEnable");
     pStaticShading->bEnable = (HI_BOOL)u32Value;
 
     return 0;
 }
 
-static int ISPCFG_GetStaticSharpen(VI_PIPE viPipe, ISPCFG_STATIC_SHARPEN_S *pStaticSharpen)
+static int ISPCFG_GetSharpen(VI_PIPE viPipe, ISPCFG_SHARPEN_PARAM_S *pStaticSharpen)
 {
-    unsigned int u32Value = 0;
-    unsigned int u32IdxM = 0;
-    unsigned int u32IdxN = 0;
+    int u32Value = 0;
+    unsigned int i = 0;
+    unsigned int j = 0;
+    unsigned int idx = 0;
     char * pString = NULL;
-    char aszIniNodeName[128] = {0};
 
     if ((viPipe >= VI_MAX_PIPE_NUM) || (NULL == pStaticSharpen))
     {
@@ -1161,253 +1127,233 @@ static int ISPCFG_GetStaticSharpen(VI_PIPE viPipe, ISPCFG_STATIC_SHARPEN_S *pSta
     }
 
     /*bEnable*/
-    u32Value = ISPCFG_GetValue(viPipe, "static_sharpen:bEnable");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_SHARPEN_ATTR_S:bEnable");
     pStaticSharpen->bEnable = (HI_BOOL)u32Value;
 
     /* enOpType */
-    u32Value = ISPCFG_GetValue(viPipe, "static_sharpen:enOpType");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_SHARPEN_ATTR_S:enOpType");
     pStaticSharpen->enOpType = (int)u32Value;
 
     //////////////////////////////////////////////////////Manual
     /* ManualTextureFreq */
-    u32Value = ISPCFG_GetValue(viPipe, "static_sharpen:ManualTextureFreq");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_SHARPEN_ATTR_S:stManual.u16TextureFreq");
     pStaticSharpen->ManualTextureFreq = (int)u32Value;
 
     /* ManualEdgeFreq */
-    u32Value = ISPCFG_GetValue(viPipe, "static_sharpen:ManualEdgeFreq");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_SHARPEN_ATTR_S:stManual.u16EdgeFreq");
     pStaticSharpen->ManualEdgeFreq = (int)u32Value;
 
     /* ManualOvershoot */
-    u32Value = ISPCFG_GetValue(viPipe, "static_sharpen:ManualOvershoot");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_SHARPEN_ATTR_S:stManual.u8OverShoot");
     pStaticSharpen->ManualOvershoot = (int)u32Value;
 
     /* ManualUnderShoot */
-    u32Value = ISPCFG_GetValue(viPipe, "static_sharpen:ManualUnderShoot");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_SHARPEN_ATTR_S:stManual.u8UnderShoot");
     pStaticSharpen->ManualUnderShoot = (int)u32Value;
 
     /* ManualSupStr */
-    u32Value = ISPCFG_GetValue(viPipe, "static_sharpen:ManualSupStr");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_SHARPEN_ATTR_S:stManual.u8ShootSupStr");
     pStaticSharpen->ManualSupStr = (int)u32Value;
 
     /* ManualSupAdj */
-    u32Value = ISPCFG_GetValue(viPipe, "static_sharpen:ManualSupAdj");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_SHARPEN_ATTR_S:stManual.u8ShootSupAdj");
     pStaticSharpen->ManualSupAdj = (int)u32Value;
 
     /* ManualDetailCtrl */
-    u32Value = ISPCFG_GetValue(viPipe, "static_sharpen:ManualDetailCtrl");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_SHARPEN_ATTR_S:stManual.u8DetailCtrl");
     pStaticSharpen->ManualDetailCtrl = (int)u32Value;
 
     /* ManualDetailCtrlThr */
-    u32Value = ISPCFG_GetValue(viPipe, "static_sharpen:ManualDetailCtrlThr");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_SHARPEN_ATTR_S:stManual.u8DetailCtrlThr");
     pStaticSharpen->ManualDetailCtrlThr = (int)u32Value;
 
     /* ManualEdgeFiltStr */
-    u32Value = ISPCFG_GetValue(viPipe, "static_sharpen:ManualEdgeFiltStr");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_SHARPEN_ATTR_S:stManual.u8EdgeFiltStr");
     pStaticSharpen->ManualEdgeFiltStr = (int)u32Value;
 
-    //////////////////////////////////////////////////////auto
-
     /* AutoLumaWgt */
-    for(u32IdxM = 0; u32IdxM < 16; u32IdxM++)
-    {
-        snprintf(aszIniNodeName, 128, "static_sharpen:AutoLumaWgt_%d", u32IdxM);
-        ISPCFG_GetString(viPipe, &pString, aszIniNodeName);
-        ISPCFG_GetNumInLine(pString);
+    ISPCFG_GetString(viPipe, &pString, "hiISP_SHARPEN_ATTR_S:stAuto.au8LumaWgt");
+    ISPCFG_GetNumInLine(pString);
 
-        for (u32IdxN = 0; u32IdxN < 32; u32IdxN++)
+    idx = 0;
+    for(i = 0; i < ISP_SHARPEN_LUMA_NUM; i++)
+    {
+        for(j = 0; j < ISP_AUTO_ISO_STRENGTH_NUM; j++)
         {
-            pStaticSharpen->AutoLumaWgt[u32IdxM][u32IdxN] = (HI_U16)ISPCFG_LineValue[u32IdxN];
-            //prtMD("pStaticSharpen->au16TextureStr[%d][%d] = %d\n",u32IdxM,u32IdxN,pStaticSharpen->au16TextureStr[u32IdxM][u32IdxN]);
+            pStaticSharpen->AutoLumaWgt[i][j] = (HI_U16)ISPCFG_LineValue[idx++];
         }
     }
 
     /* AutoTextureFreq */
-    ISPCFG_GetString(viPipe, &pString, "static_sharpen:AutoTextureFreq");
+    ISPCFG_GetString(viPipe, &pString, "hiISP_SHARPEN_ATTR_S:stAuto.au16TextureFreq");
     ISPCFG_GetNumInLine(pString);
-
-    for(u32IdxM = 0; u32IdxM < 16; u32IdxM++)
+    for(i = 0; i < ISP_AUTO_ISO_STRENGTH_NUM; i++)
     {
-        u32Value = ISPCFG_LineValue[u32IdxM];
-        pStaticSharpen->AutoTextureFreq[u32IdxM] = ISPCFG_LineValue[u32IdxM];
-        //prtMD("pStaticSharpen->AutoTextureFreq[%d] = %d\n",u32IdxM,pStaticSharpen->AutoTextureFreq[u32IdxM]);
+        u32Value = ISPCFG_LineValue[i];
+        pStaticSharpen->AutoTextureFreq[i] = ISPCFG_LineValue[i];
     }
 
     /* AutoEdgeFreq */
-    ISPCFG_GetString(viPipe, &pString, "static_sharpen:AutoEdgeFreq");
+    ISPCFG_GetString(viPipe, &pString, "hiISP_SHARPEN_ATTR_S:stAuto.au16EdgeFreq");
     ISPCFG_GetNumInLine(pString);
-
-    for(u32IdxM = 0; u32IdxM < 16; u32IdxM++)
+    for(i = 0; i < ISP_AUTO_ISO_STRENGTH_NUM; i++)
     {
-        u32Value = ISPCFG_LineValue[u32IdxM];
-        pStaticSharpen->AutoEdgeFreq[u32IdxM] = ISPCFG_LineValue[u32IdxM];
+        u32Value = ISPCFG_LineValue[i];
+        pStaticSharpen->AutoEdgeFreq[i] = ISPCFG_LineValue[i];
     }
 
     /* AutoOvershoot */
-    ISPCFG_GetString(viPipe, &pString, "static_sharpen:AutoOvershoot");
+    ISPCFG_GetString(viPipe, &pString, "hiISP_SHARPEN_ATTR_S:stAuto.au8OverShoot");
     ISPCFG_GetNumInLine(pString);
-
-    for(u32IdxM = 0; u32IdxM < 16; u32IdxM++)
+    for(i = 0; i < ISP_AUTO_ISO_STRENGTH_NUM; i++)
     {
-        u32Value = ISPCFG_LineValue[u32IdxM];
-        pStaticSharpen->au8OverShoot[u32IdxM] = ISPCFG_LineValue[u32IdxM];
+        u32Value = ISPCFG_LineValue[i];
+        pStaticSharpen->au8OverShoot[i] = ISPCFG_LineValue[i];
     }
 
     /* AutoUnderShoot */
-    ISPCFG_GetString(viPipe, &pString, "static_sharpen:AutoUnderShoot");
+    ISPCFG_GetString(viPipe, &pString, "hiISP_SHARPEN_ATTR_S:stAuto.au8UnderShoot");
     ISPCFG_GetNumInLine(pString);
-
-    for(u32IdxM = 0; u32IdxM < 16; u32IdxM++)
+    for(i = 0; i < ISP_AUTO_ISO_STRENGTH_NUM; i++)
     {
-        u32Value = ISPCFG_LineValue[u32IdxM];
-        pStaticSharpen->au8UnderShoot[u32IdxM] = ISPCFG_LineValue[u32IdxM];
+        u32Value = ISPCFG_LineValue[i];
+        pStaticSharpen->au8UnderShoot[i] = ISPCFG_LineValue[i];
     }
 
     /* AutoSupStr */
-    ISPCFG_GetString(viPipe, &pString, "static_sharpen:AutoSupStr");
+    ISPCFG_GetString(viPipe, &pString, "hiISP_SHARPEN_ATTR_S:stAuto.au8ShootSupStr");
     ISPCFG_GetNumInLine(pString);
 
-    for(u32IdxM = 0; u32IdxM < 16; u32IdxM++)
+    for (i = 0; i < ISP_AUTO_ISO_STRENGTH_NUM; i++)
     {
-        u32Value = ISPCFG_LineValue[u32IdxM];
-        pStaticSharpen->AutoSupStr[u32IdxM] = ISPCFG_LineValue[u32IdxM];
+        u32Value = ISPCFG_LineValue[i];
+        pStaticSharpen->AutoSupStr[i] = ISPCFG_LineValue[i];
     }
 
     /* AutoSupAdj */
-    ISPCFG_GetString(viPipe, &pString, "static_sharpen:AutoSupAdj");
+    ISPCFG_GetString(viPipe, &pString, "hiISP_SHARPEN_ATTR_S:stAuto.au8ShootSupAdj");
     ISPCFG_GetNumInLine(pString);
 
-    for(u32IdxM = 0; u32IdxM < 16; u32IdxM++)
+    for (i = 0; i < ISP_AUTO_ISO_STRENGTH_NUM; i ++)
     {
-        u32Value = ISPCFG_LineValue[u32IdxM];
-        pStaticSharpen->AutoSupAdj[u32IdxM] = ISPCFG_LineValue[u32IdxM];
+        u32Value = ISPCFG_LineValue[i];
+        pStaticSharpen->AutoSupAdj[i] = ISPCFG_LineValue[i];
     }
 
     /* AutoDetailCtrl */
-    ISPCFG_GetString(viPipe, &pString, "static_sharpen:AutoDetailCtrl");
+    ISPCFG_GetString(viPipe, &pString, "hiISP_SHARPEN_ATTR_S:stAuto.au8DetailCtrl");
     ISPCFG_GetNumInLine(pString);
 
-    for(u32IdxM = 0; u32IdxM < 16; u32IdxM++)
+    for (i = 0; i < ISP_AUTO_ISO_STRENGTH_NUM; i ++)
     {
-        u32Value = ISPCFG_LineValue[u32IdxM];
-        pStaticSharpen->AutoDetailCtrl[u32IdxM] = ISPCFG_LineValue[u32IdxM];
+        u32Value = ISPCFG_LineValue[i];
+        pStaticSharpen->AutoDetailCtrl[i] = ISPCFG_LineValue[i];
     }
 
     /* AutoDetailCtrlThr */
-    ISPCFG_GetString(viPipe, &pString, "static_sharpen:AutoDetailCtrlThr");
+    ISPCFG_GetString(viPipe, &pString, "hiISP_SHARPEN_ATTR_S:stAuto.au8DetailCtrlThr");
     ISPCFG_GetNumInLine(pString);
 
-    for(u32IdxM = 0; u32IdxM < 16; u32IdxM++)
+    for (i = 0; i < 16; i ++)
     {
-        u32Value = ISPCFG_LineValue[u32IdxM];
-        pStaticSharpen->AutoDetailCtrlThr[u32IdxM] = ISPCFG_LineValue[u32IdxM];
+        u32Value = ISPCFG_LineValue[i];
+        pStaticSharpen->AutoDetailCtrlThr[i] = ISPCFG_LineValue[i];
     }
 
     /* AutoEdgeFiltStr */
-    ISPCFG_GetString(viPipe, &pString, "static_sharpen:AutoEdgeFiltStr");
+    ISPCFG_GetString(viPipe, &pString, "hiISP_SHARPEN_ATTR_S:stAuto.au8EdgeFiltStr");
     ISPCFG_GetNumInLine(pString);
 
-    for(u32IdxM = 0; u32IdxM < 16; u32IdxM++)
+    for (i = 0; i < ISP_AUTO_ISO_STRENGTH_NUM; i ++)
     {
-        u32Value = ISPCFG_LineValue[u32IdxM];
-        pStaticSharpen->AutoEdgeFiltStr[u32IdxM] = ISPCFG_LineValue[u32IdxM];
+        u32Value = ISPCFG_LineValue[i];
+        pStaticSharpen->AutoEdgeFiltStr[i] = ISPCFG_LineValue[i];
     }
 
     /* AutoEdgeFiltMaxCap */
-    ISPCFG_GetString(viPipe, &pString, "static_sharpen:AutoEdgeFiltMaxCap");
+    ISPCFG_GetString(viPipe, &pString, "hiISP_SHARPEN_ATTR_S:stAuto.au8EdgeFiltMaxCap");
     ISPCFG_GetNumInLine(pString);
 
-    for(u32IdxM = 0; u32IdxM < 16; u32IdxM++)
+    for (i = 0; i < ISP_AUTO_ISO_STRENGTH_NUM; i ++)
     {
-        u32Value = ISPCFG_LineValue[u32IdxM];
-        pStaticSharpen->AutoEdgeFiltMaxCap[u32IdxM] = ISPCFG_LineValue[u32IdxM];
+        u32Value = ISPCFG_LineValue[i];
+        pStaticSharpen->AutoEdgeFiltMaxCap[i] = ISPCFG_LineValue[i];
     }
 
     /* AutoRGain */
-    ISPCFG_GetString(viPipe, &pString, "static_sharpen:AutoRGain");
+    ISPCFG_GetString(viPipe, &pString, "hiISP_SHARPEN_ATTR_S:stAuto.au8RGain");
     ISPCFG_GetNumInLine(pString);
 
-    for(u32IdxM = 0; u32IdxM < 16; u32IdxM++)
+    for (i = 0; i < ISP_AUTO_ISO_STRENGTH_NUM; i++)
     {
-        u32Value = ISPCFG_LineValue[u32IdxM];
-        pStaticSharpen->AutoRGain[u32IdxM] = ISPCFG_LineValue[u32IdxM];
+        u32Value = ISPCFG_LineValue[i];
+        pStaticSharpen->AutoRGain[i] = ISPCFG_LineValue[i];
     }
 
     /* AutoGGain */
-    ISPCFG_GetString(viPipe, &pString, "static_sharpen:AutoGGain");
+    ISPCFG_GetString(viPipe, &pString, "hiISP_SHARPEN_ATTR_S:stAuto.au8GGain");
     ISPCFG_GetNumInLine(pString);
 
-    for(u32IdxM = 0; u32IdxM < 16; u32IdxM++)
+    for (i = 0; i < ISP_AUTO_ISO_STRENGTH_NUM; i ++)
     {
-        u32Value = ISPCFG_LineValue[u32IdxM];
-        pStaticSharpen->AutoGGain[u32IdxM] = ISPCFG_LineValue[u32IdxM];
+        u32Value = ISPCFG_LineValue[i];
+        pStaticSharpen->AutoGGain[i] = ISPCFG_LineValue[i];
     }
 
     /* AutoBGain */
-    ISPCFG_GetString(viPipe, &pString, "static_sharpen:AutoBGain");
+    ISPCFG_GetString(viPipe, &pString, "hiISP_SHARPEN_ATTR_S:stAuto.au8BGain");
     ISPCFG_GetNumInLine(pString);
 
-    for(u32IdxM = 0; u32IdxM < 16; u32IdxM++)
+    for (i = 0; i < ISP_AUTO_ISO_STRENGTH_NUM; i++)
     {
-        u32Value = ISPCFG_LineValue[u32IdxM];
-        pStaticSharpen->AutoBGain[u32IdxM] = ISPCFG_LineValue[u32IdxM];
+        u32Value = ISPCFG_LineValue[i];
+        pStaticSharpen->AutoBGain[i] = ISPCFG_LineValue[i];
     }
 
     /* AutoSkinGain */
-    ISPCFG_GetString(viPipe, &pString, "static_sharpen:AutoSkinGain");
+    ISPCFG_GetString(viPipe, &pString, "hiISP_SHARPEN_ATTR_S:stAuto.au8SkinGain");
     ISPCFG_GetNumInLine(pString);
-
-    for(u32IdxM = 0; u32IdxM < 16; u32IdxM++)
+    for (i = 0; i < ISP_AUTO_ISO_STRENGTH_NUM; i++)
     {
-        u32Value = ISPCFG_LineValue[u32IdxM];
-        pStaticSharpen->AutoSkinGain[u32IdxM] = ISPCFG_LineValue[u32IdxM];
+        u32Value = ISPCFG_LineValue[i];
+        pStaticSharpen->AutoSkinGain[i] = ISPCFG_LineValue[i];
     }
 
     /* AutoMaxSharpGain */
-    ISPCFG_GetString(viPipe, &pString, "static_sharpen:AutoMaxSharpGain");
+    ISPCFG_GetString(viPipe, &pString, "hiISP_SHARPEN_ATTR_S:stAuto.au16MaxSharpGain");
     ISPCFG_GetNumInLine(pString);
-
-    for(u32IdxM = 0; u32IdxM < 16; u32IdxM++)
+    for (i = 0; i < ISP_AUTO_ISO_STRENGTH_NUM; i++)
     {
-        u32Value = ISPCFG_LineValue[u32IdxM];
-        pStaticSharpen->AutoMaxSharpGain[u32IdxM] = ISPCFG_LineValue[u32IdxM];
+        u32Value = ISPCFG_LineValue[i];
+        pStaticSharpen->AutoMaxSharpGain[i] = ISPCFG_LineValue[i];
     }
 
-#if 1
-
-    /* TextureStrTable0 */
-    for(u32IdxM = 0; u32IdxM < 16; u32IdxM++)
+    ISPCFG_GetString(viPipe, &pString, "hiISP_SHARPEN_ATTR_S:stAuto.au16TextureStr");
+    ISPCFG_GetNumInLine(pString);
+    idx = 0;
+    for (i = 0; i < ISP_SHARPEN_GAIN_NUM; i++)
     {
-        snprintf(aszIniNodeName, 128, "static_sharpen:TextureStrTable%d", u32IdxM);
-        ISPCFG_GetString(viPipe, &pString, aszIniNodeName);
-        ISPCFG_GetNumInLine(pString);
-
-        for (u32IdxN = 0; u32IdxN < 32; u32IdxN++)
+        for (j = 0; j < ISP_AUTO_ISO_STRENGTH_NUM; j++)
         {
-            pStaticSharpen->au16TextureStr[u32IdxM][u32IdxN] = (HI_U16)ISPCFG_LineValue[u32IdxN];
-            //prtMD("pStaticSharpen->au16TextureStr[%d][%d] = %d\n",u32IdxM,u32IdxN,pStaticSharpen->au16TextureStr[u32IdxM][u32IdxN]);
+            pStaticSharpen->au16TextureStr[i][j] = (HI_U16)ISPCFG_LineValue[idx++];
         }
     }
 
-    /* EdgeStrTable0 */
-    for(u32IdxM = 0; u32IdxM < 16; u32IdxM++)
+    ISPCFG_GetString(viPipe, &pString, "hiISP_SHARPEN_ATTR_S:stAuto.au16EdgeStr");
+    ISPCFG_GetNumInLine(pString);
+     idx = 0;
+    for (i = 0; i < ISP_SHARPEN_GAIN_NUM; i++)
     {
-        snprintf(aszIniNodeName, 128, "static_sharpen:EdgeStrTable%d", u32IdxM);
-        ISPCFG_GetString(viPipe, &pString, aszIniNodeName);
-        ISPCFG_GetNumInLine(pString);
-
-        for (u32IdxN = 0; u32IdxN < 32; u32IdxN++)
+        for (j = 0; j < ISP_AUTO_ISO_STRENGTH_NUM; j++)
         {
-            pStaticSharpen->au16EdgeStr[u32IdxM][u32IdxN] = (HI_U16)ISPCFG_LineValue[u32IdxN];
-            //prtMD("pStaticSharpen->au16EdgeStr[%d][%d] = %d\n",u32IdxM,u32IdxN,pStaticSharpen->au16EdgeStr[u32IdxM][u32IdxN]);
+            pStaticSharpen->au16EdgeStr[i][j] = (HI_U16)ISPCFG_LineValue[idx++];
         }
     }
-
-#endif
 
     return 0;
 }
 
-static int ISPCFG_GetStaticDemosaic(VI_PIPE viPipe, ISPCFG_STATIC_DEMOSAIC_S *pStaticDemosaic)
+static int ISPCFG_GetDemosaic(VI_PIPE viPipe, ISPCFG_DEMOSAIC_PARAM_S *pStaticDemosaic)
 {
     unsigned int u32Value = 0;
     unsigned int u32IdxM = 0;
@@ -1420,33 +1366,33 @@ static int ISPCFG_GetStaticDemosaic(VI_PIPE viPipe, ISPCFG_STATIC_DEMOSAIC_S *pS
     }
 
     /*bEnable*/
-    u32Value = ISPCFG_GetValue(viPipe, "static_demosaic:bEnable");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_DEMOSAIC_ATTR_S:bEnable");
     pStaticDemosaic->bEnable = (HI_BOOL)u32Value;
 
     /*OpType*/
-    u32Value = ISPCFG_GetValue(viPipe, "static_demosaic:OpType");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_DEMOSAIC_ATTR_S:enOpType");
     pStaticDemosaic->enOpType = (HI_S32)u32Value;
 
     /* 手动模式 */
     /*ManualNonDirStr*/
-    u32Value = ISPCFG_GetValue(viPipe, "static_demosaic:ManualNonDirStr");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_DEMOSAIC_ATTR_S:stManual.u8NonDirStr");
     pStaticDemosaic->u8ManualNonDirStr = (HI_U8)u32Value;
 
     /*ManualNonDirMFDetailEhcStr*/
-    u32Value = ISPCFG_GetValue(viPipe, "static_demosaic:ManualNonDirMFDetailEhcStr");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_DEMOSAIC_ATTR_S:stManual.u8NonDirMFDetailEhcStr");
     pStaticDemosaic->u8ManualNonDirMFDetailEhcStr = (HI_U8)u32Value;
 
     /*ManualNonDirHFDetailEhcStr*/
-    u32Value = ISPCFG_GetValue(viPipe, "static_demosaic:ManualNonDirHFDetailEhcStr");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_DEMOSAIC_ATTR_S:stManual.u8NonDirHFDetailEhcStr");
     pStaticDemosaic->u8ManualNonDirHFDetailEhcStr = (HI_U8)u32Value;
 
     /*ManualDetailSmoothRange*/
-    u32Value = ISPCFG_GetValue(viPipe, "static_demosaic:ManualDetailSmoothRange");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_DEMOSAIC_ATTR_S:stManual.u8DetailSmoothRange");
     pStaticDemosaic->u16ManualDetailSmoothStr = (HI_U16)u32Value;
 
     /* 自动模式 */
     /*AutoColorNoiseThdF*/
-    ISPCFG_GetString(viPipe, &pString, "static_demosaic:AutoColorNoiseThdF");
+    ISPCFG_GetString(viPipe, &pString, "hiISP_DEMOSAIC_ATTR_S:stAuto.au8ColorNoiseThdF");
     ISPCFG_GetNumInLine(pString);
     for(u32IdxM = 0; u32IdxM < 16; u32IdxM++)
     {
@@ -1455,7 +1401,7 @@ static int ISPCFG_GetStaticDemosaic(VI_PIPE viPipe, ISPCFG_STATIC_DEMOSAIC_S *pS
     }
 
     /*AutoColorNoiseStrF*/
-    ISPCFG_GetString(viPipe, &pString, "static_demosaic:AutoColorNoiseStrF");
+    ISPCFG_GetString(viPipe, &pString, "hiISP_DEMOSAIC_ATTR_S:stAuto.au8ColorNoiseStrF");
     ISPCFG_GetNumInLine(pString);
     for(u32IdxM = 0; u32IdxM < 16; u32IdxM++)
     {
@@ -1464,7 +1410,7 @@ static int ISPCFG_GetStaticDemosaic(VI_PIPE viPipe, ISPCFG_STATIC_DEMOSAIC_S *pS
     }
 
     /*AutoColorNoiseThdY*/
-    ISPCFG_GetString(viPipe, &pString, "static_demosaic:AutoColorNoiseThdY");
+    ISPCFG_GetString(viPipe, &pString, "hiISP_DEMOSAIC_ATTR_S:stAuto.au8ColorNoiseThdY");
     ISPCFG_GetNumInLine(pString);
     for(u32IdxM = 0; u32IdxM < 16; u32IdxM++)
     {
@@ -1473,7 +1419,7 @@ static int ISPCFG_GetStaticDemosaic(VI_PIPE viPipe, ISPCFG_STATIC_DEMOSAIC_S *pS
     }
 
     /*AutoColorNoiseStrY*/
-    ISPCFG_GetString(viPipe, &pString, "static_demosaic:AutoColorNoiseStrY");
+    ISPCFG_GetString(viPipe, &pString, "hiISP_DEMOSAIC_ATTR_S:stAuto.au8ColorNoiseStrY");
     ISPCFG_GetNumInLine(pString);
     for(u32IdxM = 0; u32IdxM < 16; u32IdxM++)
     {
@@ -1482,7 +1428,7 @@ static int ISPCFG_GetStaticDemosaic(VI_PIPE viPipe, ISPCFG_STATIC_DEMOSAIC_S *pS
     }
 
     /*AutoNonDirStr*/
-    ISPCFG_GetString(viPipe, &pString, "static_demosaic:AutoNonDirStr");
+    ISPCFG_GetString(viPipe, &pString, "hiISP_DEMOSAIC_ATTR_S:stAuto.au8NonDirStr");
     ISPCFG_GetNumInLine(pString);
     for(u32IdxM = 0; u32IdxM < 16; u32IdxM++)
     {
@@ -1491,7 +1437,7 @@ static int ISPCFG_GetStaticDemosaic(VI_PIPE viPipe, ISPCFG_STATIC_DEMOSAIC_S *pS
     }
 
     /*AutoNonDirMFDetailEhcStr*/
-    ISPCFG_GetString(viPipe, &pString, "static_demosaic:AutoNonDirMFDetailEhcStr");
+    ISPCFG_GetString(viPipe, &pString, "hiISP_DEMOSAIC_ATTR_S:stAuto.au8NonDirMFDetailEhcStr");
     ISPCFG_GetNumInLine(pString);
     for(u32IdxM = 0; u32IdxM < 16; u32IdxM++)
     {
@@ -1500,7 +1446,7 @@ static int ISPCFG_GetStaticDemosaic(VI_PIPE viPipe, ISPCFG_STATIC_DEMOSAIC_S *pS
     }
 
     /*AutoNonDirHFDetailEhcStr*/
-    ISPCFG_GetString(viPipe, &pString, "static_demosaic:AutoNonDirHFDetailEhcStr");
+    ISPCFG_GetString(viPipe, &pString, "hiISP_DEMOSAIC_ATTR_S:stAuto.au8NonDirHFDetailEhcStr");
     ISPCFG_GetNumInLine(pString);
     for(u32IdxM = 0; u32IdxM < 16; u32IdxM++)
     {
@@ -1509,7 +1455,7 @@ static int ISPCFG_GetStaticDemosaic(VI_PIPE viPipe, ISPCFG_STATIC_DEMOSAIC_S *pS
     }
 
     /*AutoDetailSmoothRange*/
-    ISPCFG_GetString(viPipe, &pString, "static_demosaic:AutoDetailSmoothRange");
+    ISPCFG_GetString(viPipe, &pString, "hiISP_DEMOSAIC_ATTR_S:stAuto.au8DetailSmoothRange");
     ISPCFG_GetNumInLine(pString);
 
     prtMD("pStaticDemosaic->u16AutoDetailSmoothStr:");
@@ -1525,478 +1471,725 @@ static int ISPCFG_GetStaticDemosaic(VI_PIPE viPipe, ISPCFG_STATIC_DEMOSAIC_S *pS
     return 0;
 }
 
-static int ISPCFG_GetDynamic3DNR(VI_PIPE viPipe, ISPCFG_DYNAMIC_THREEDNR_S *pDynamic3Dnr)
+static int ISPCFG_GetViNR(VI_PIPE viPipe, ISPCFG_VI_NR_PARAM_S *pNrxParam)
 {
-    unsigned int u32Value = 0;
-    unsigned int u32IdxM = 0;
-    char * pString = NULL;
-    char aszIniNodeName[128] = {0};
+    int value = 0;
+    char *pString = NULL;
+    unsigned int i = 0;
+    VI_PIPE_NRX_PARAM_V2_S *pNrnManuParamV2 = NULL;
 
-    if ((viPipe >= VI_MAX_PIPE_NUM) || (NULL == pDynamic3Dnr))
+    if ((viPipe >= VI_MAX_PIPE_NUM) || (NULL == pNrxParam))
     {
-        prtMD("invalid input viPipe = %d, pDynamic3DNR = %p\n", viPipe, pDynamic3Dnr);
+        prtMD("invalid input viPipe = %d, pNrxParam = %p\n", viPipe, pNrxParam);
         return -1;
     }
 
-    /*ThreeDNRCount*/
-    u32Value = ISPCFG_GetValue(viPipe, "dynamic_threednr:ThreeDNRCount");
-    pDynamic3Dnr->u32ThreeDNRCount = (HI_U32)u32Value;
+    /* 使能标志 */
+    value = ISPCFG_GetValue(viPipe, "hiISP_3DNRX_ATTR_S:bNrEn");
+    pNrxParam->bOpen = (HI_U8)value;
 
-    /*VI_3DNRStartPoint*/
-    u32Value = ISPCFG_GetValue(viPipe, "dynamic_threednr:VI_3DNRStartPoint");
-    pDynamic3Dnr->u16VI_3DNRStartPoint = (HI_U32)u32Value;
+    /* 版本信息确认 */
+    value = ISPCFG_GetValue(viPipe, "hiISP_3DNRX_ATTR_S:enNRVersion");
+    pNrxParam->stNrParam.enNRVersion = value;
+    if (pNrxParam->stNrParam.enNRVersion != VI_NR_V2)
+    {
+        prtMD("not supported! value = %d\n", value);
+        return -1;
+    }
 
+    /* 手动 or 自动 */
+    value = ISPCFG_GetValue(viPipe, "hiISP_3DNRX_ATTR_S:enOptMode");
+    pNrxParam->stNrParam.stNRXParamV2.enOptMode = value;
+    if (pNrxParam->stNrParam.stNRXParamV2.enOptMode != OPERATION_MODE_MANUAL)
+    {
+        prtMD("not supported! value = %d\n", value);
+        return -1;
+    }
 
-    /* IsoThresh */
-    ISPCFG_GetString(viPipe, &pString, "dynamic_threednr:IsoThresh");
+    pNrnManuParamV2 = &pNrxParam->stNrParam.stNRXParamV2.stNRXManualV2.stNRXParamV2;
+
+    /* 手动参数获取 */
+    value = ISPCFG_GetValue(viPipe, "hiNRX_PARAM_MANUAL_V2_S:stNRXParamV2.SFy.SPN6");
+    pNrnManuParamV2->SFy.SPN6 = value;
+
+    value = ISPCFG_GetValue(viPipe, "hiNRX_PARAM_MANUAL_V2_S:stNRXParamV2.SFy.SFR");
+    pNrnManuParamV2->SFy.SFR = value;
+
+    value = ISPCFG_GetValue(viPipe, "hiNRX_PARAM_MANUAL_V2_S:stNRXParamV2.SFy.SBN6");
+    pNrnManuParamV2->SFy.SBN6 = value;
+
+    value = ISPCFG_GetValue(viPipe, "hiNRX_PARAM_MANUAL_V2_S:stNRXParamV2.SFy.PBR6");
+    pNrnManuParamV2->SFy.PBR6 = value;
+
+    value = ISPCFG_GetValue(viPipe, "hiNRX_PARAM_MANUAL_V2_S:stNRXParamV2.SFy.SRT0");
+    pNrnManuParamV2->SFy.SRT0 = value;
+
+    value = ISPCFG_GetValue(viPipe, "hiNRX_PARAM_MANUAL_V2_S:stNRXParamV2.SFy.SRT1");
+    pNrnManuParamV2->SFy.SRT1 = value;
+
+    value = ISPCFG_GetValue(viPipe, "hiNRX_PARAM_MANUAL_V2_S:stNRXParamV2.SFy.JMODE");
+    pNrnManuParamV2->SFy.JMODE = value;
+
+    value = ISPCFG_GetValue(viPipe, "hiNRX_PARAM_MANUAL_V2_S:stNRXParamV2.SFy.DeIdx");
+    pNrnManuParamV2->SFy.DeIdx = value;
+
+    value = ISPCFG_GetValue(viPipe, "hiNRX_PARAM_MANUAL_V2_S:stNRXParamV2.SFy.DeRate");
+    pNrnManuParamV2->SFy.DeRate = value;
+
+    value = ISPCFG_GetString(viPipe, &pString, "hiNRX_PARAM_MANUAL_V2_S:stNRXParamV2.SFy.SFR6");
     ISPCFG_GetNumInLine(pString);
-
-    for (u32IdxM = 0; u32IdxM < pDynamic3Dnr->u32ThreeDNRCount; u32IdxM++)
+    for (i = 0; i < 3; i++)
     {
-        u32Value = ISPCFG_LineValue[u32IdxM];
-        pDynamic3Dnr->au32ThreeDNRIso[u32IdxM] = ISPCFG_LineValue[u32IdxM];
+        pNrnManuParamV2->SFy.SFR6[i] = ISPCFG_LineValue[i];
     }
 
-    /* ISO value */
-    for (u32IdxM = 0; u32IdxM < pDynamic3Dnr->u32ThreeDNRCount; u32IdxM++)
-    {
-        //初始化数据结构体
-        ISPCFG_VI_3DNR_S *pVIX      = &(pDynamic3Dnr->astThreeDNRVIValue[u32IdxM]);
-        ISPCFG_VPSS_3DNR_S *pVPX    = &(pDynamic3Dnr->astThreeDNRVPSSValue[u32IdxM]);
+    value = ISPCFG_GetValue(viPipe, "hiNRX_PARAM_MANUAL_V2_S:stNRXParamV2.SFy.SFS1");
+    pNrnManuParamV2->SFy.SFS1 = value;
 
-        ISPCFG_VI_3DNR_IE_S *pViI    = &(pVIX->IEy);
-        ISPCFG_VI_3DNR_SF_S *pViS    = &(pVIX->SFy);
-        ISPCFG_VPSS_3DNR_IE_S  *pVpI = pVPX->IEy;
-        ISPCFG_VPSS_3DNR_SF_S  *pVpS = pVPX->SFy;
-        ISPCFG_VPSS_3DNR_MD_S  *pVpM = pVPX->MDy;
-        ISPCFG_VPSS_3DNR_TF_S  *pVpT = pVPX->TFy;
-        ISPCFG_VPSS_3DNR_RF_S  *pVpR = &pVPX->RFs;
-        ISPCFG_VPSS_3DNR_NRC_S  *pVpNRc = &pVPX->NRc;
-        ISPCFG_3DNR_VPSS_PNRC_S *pVpPNRc = &pVPX->pNRc;
+    value = ISPCFG_GetValue(viPipe, "hiNRX_PARAM_MANUAL_V2_S:stNRXParamV2.SFy.SFT1");
+    pNrnManuParamV2->SFy.SFT1 = value;
 
-        //第1行数据
-        snprintf(aszIniNodeName, 128, "iso_%d:-en", ((HI_U32)pow(2.0,(float)u32IdxM)) * 100);
-        ISPCFG_GetString(viPipe, &pString, aszIniNodeName);
-        if (pString != NULL)
-        {
-            sscanf(pString,"          |             %3d |             %3d |             %3d",
-                &pVpS[0].NRyEn, &pVpS[1].NRyEn, &pVpS[2].NRyEn);
-            prtMD("[en]:  %d,  %d,  %d\n", pVpS[0].NRyEn, pVpS[1].NRyEn, pVpS[2].NRyEn);
-        }
+    value = ISPCFG_GetValue(viPipe, "hiNRX_PARAM_MANUAL_V2_S:stNRXParamV2.SFy.SBR1");
+    pNrnManuParamV2->SFy.SBR1 = value;
 
-        //第2行数据
-        snprintf(aszIniNodeName, 128, "iso_%d:-nXsf1", ((HI_U32)pow(2.0,(float)u32IdxM)) * 100);
-        ISPCFG_GetString(viPipe, &pString, aszIniNodeName);
-        if (pString != NULL)
-        {
-            sscanf(pString,"%3d:%3d:%3d |    %3d:%3d:%3d |     %3d:%3d:%3d |     %3d:%3d:%3d |    %3d:%3d:%3d ",
-                             &pViS->SFS1, &pViS->SFT1, &pViS->SBR1,
-                             &pVpS[0].SFS1, &pVpS[0].SFT1, &pVpS[0].SBR1,
-                             &pVpS[1].SFS1, &pVpS[1].SFT1, &pVpS[1].SBR1,
-                             &pVpS[2].SFS1, &pVpS[2].SFT1, &pVpS[2].SBR1,
-                             &pVpNRc->SFy.SFS1,&pVpNRc->SFy.SFT1,&pVpNRc->SFy.SBR1);
-            prtMD("[nXsf1]:  %d,  %d,  %d,  %d,  %d,  %d,  %d,  %d,  %d,  %d,  %d,  %d\n",
-                pViS->SFS1, pViS->SFT1, pViS->SBR1,
-                pVpS[0].SFS1, pVpS[0].SFT1, pVpS[0].SBR1,
-                pVpS[1].SFS1, pVpS[1].SFT1, pVpS[1].SBR1,
-                pVpS[2].SFS1, pVpS[2].SFT1, pVpS[2].SBR1);
-        }
+    value = ISPCFG_GetValue(viPipe, "hiNRX_PARAM_MANUAL_V2_S:stNRXParamV2.SFy.SFS2");
+    pNrnManuParamV2->SFy.SFS2 = value;
 
-        //第3行数据
-        snprintf(aszIniNodeName, 128, "iso_%d:-nXsf2", ((HI_U32)pow(2.0,(float)u32IdxM)) * 100);
-        ISPCFG_GetString(viPipe, &pString, aszIniNodeName);
-        if (pString != NULL)
-        {
-            sscanf(pString,"%3d:%3d:%3d |    %3d:%3d:%3d |     %3d:%3d:%3d |     %3d:%3d:%3d |    %3d:%3d:%3d ",
-                              &pViS->SFS2, &pViS->SFT2, &pViS->SBR2, &pVpS[0].SFS2, &pVpS[0].SFT2, &pVpS[0].SBR2, &pVpS[1].SFS2, &pVpS[1].SFT2, &pVpS[1].SBR2, &pVpS[2].SFS2, &pVpS[2].SFT2, &pVpS[2].SBR2,&pVpNRc->SFy.SFS2,&pVpNRc->SFy.SFT2,&pVpNRc->SFy.SBR2);
-        }
+    value = ISPCFG_GetValue(viPipe, "hiNRX_PARAM_MANUAL_V2_S:stNRXParamV2.SFy.SFT2");
+    pNrnManuParamV2->SFy.SFT2 = value;
 
-        //第4行数据
-        snprintf(aszIniNodeName, 128, "iso_%d:-nXsf4", ((HI_U32)pow(2.0,(float)u32IdxM)) * 100);
-        ISPCFG_GetString(viPipe, &pString, aszIniNodeName);
-        if (pString != NULL)
-        {
-            sscanf(pString,"%3d:%3d:%3d |    %3d:%3d:%3d |     %3d:%3d:%3d |     %3d:%3d:%3d |    %3d:%3d:%3d ",
-                              &pViS->SFS4, &pViS->SFT4, &pViS->SBR4, &pVpS[0].SFS4, &pVpS[0].SFT4, &pVpS[0].SBR4, &pVpS[1].SFS4, &pVpS[1].SFT4, &pVpS[1].SBR4, &pVpS[2].SFS4, &pVpS[2].SFT4, &pVpS[2].SBR4,&pVpNRc->SFy.SFS4,&pVpNRc->SFy.SFT4,&pVpNRc->SFy.SBR4);
-        }
+    value = ISPCFG_GetValue(viPipe, "hiNRX_PARAM_MANUAL_V2_S:stNRXParamV2.SFy.SBR2");
+    pNrnManuParamV2->SFy.SBR2 = value;
 
-        //第5行数据
-        snprintf(aszIniNodeName, 128, "iso_%d:-bwsf4", ((HI_U32)pow(2.0,(float)u32IdxM)) * 100);
-        ISPCFG_GetString(viPipe, &pString, aszIniNodeName);
-        if (pString != NULL)
-        {
-            sscanf(pString,"%3d |            %3d |                 |                 |            %3d",
-                             &pViS->BWSF4, &pVpS[0].BWSF4,&pVpNRc->SFy.BWSF4);
-        }
+    value = ISPCFG_GetValue(viPipe, "hiNRX_PARAM_MANUAL_V2_S:stNRXParamV2.SFy.SFS4");
+    pNrnManuParamV2->SFy.SFS4 = value;
 
-        //第6行数据
-        snprintf(aszIniNodeName, 128, "iso_%d:-kmsf4", ((HI_U32)pow(2.0,(float)u32IdxM)) * 100);
-        ISPCFG_GetString(viPipe, &pString, aszIniNodeName);
-        if (pString != NULL)
-        {
-            sscanf(pString,"           |                 |             %3d |             %3d |                ",
-                             &pVpS[1].kMode, &pVpS[2].kMode);
-        }
+    value = ISPCFG_GetValue(viPipe, "hiNRX_PARAM_MANUAL_V2_S:stNRXParamV2.SFy.SFT4");
+    pNrnManuParamV2->SFy.SFT4 = value;
 
-        //第7行数据
-        snprintf(aszIniNodeName, 128, "iso_%d:-nXsf5", ((HI_U32)pow(2.0,(float)u32IdxM)) * 100);
-        ISPCFG_GetString(viPipe, &pString, aszIniNodeName);
-        if (pString != NULL)
-        {
-            sscanf(pString," %3d:%3d:%3d:%3d | %3d:%3d:%3d:%3d | %3d:%3d:%3d:%3d | %3d:%3d:%3d:%3d | %3d:%3d:%3d:%3d",
-                             &pViI->IES0, &pViI->IES1, &pViI->IES2, &pViI->IES3, &pVpI[0].IES0, &pVpI[0].IES1, &pVpI[0].IES2, &pVpI[0].IES3, &pVpI[1].IES0, &pVpI[1].IES1, &pVpI[1].IES2, &pVpI[1].IES3, &pVpI[2].IES0, &pVpI[2].IES1, &pVpI[2].IES2, &pVpI[2].IES3, &pVpNRc->IEy.IES0, &pVpNRc->IEy.IES1, &pVpNRc->IEy.IES2, &pVpNRc->IEy.IES3);
-        }
+    value = ISPCFG_GetValue(viPipe, "hiNRX_PARAM_MANUAL_V2_S:stNRXParamV2.SFy.SBR4");
+    pNrnManuParamV2->SFy.SBR4 = value;
 
-        //第8行数据
-        snprintf(aszIniNodeName, 128, "iso_%d:-dzsf5", ((HI_U32)pow(2.0,(float)u32IdxM)) * 100);
-        ISPCFG_GetString(viPipe, &pString, aszIniNodeName);
-        if (pString != NULL)
-        {
-            sscanf(pString,"       %3d |             %3d |             %3d |             %4d |            %4d ",
-                             &pViI->IEDZ, &pVpI[0].IEDZ, &pVpI[1].IEDZ, &pVpI[2].IEDZ, &pVpNRc->IEy.IEDZ);
-        }
+    value = ISPCFG_GetValue(viPipe, "hiNRX_PARAM_MANUAL_V2_S:stNRXParamV2.SFy.STH1");
+    pNrnManuParamV2->SFy.STH1 = value;
 
-        //第9行数据
-        snprintf(aszIniNodeName, 128, "iso_%d:-nXsf6", ((HI_U32)pow(2.0,(float)u32IdxM)) * 100);
-        ISPCFG_GetString(viPipe, &pString, aszIniNodeName);
-        if (pString != NULL)
-        {
-            sscanf(pString,"%3d:%3d:%3d:%3d | %3d:%3d:%3d:%3d | %3d:%3d:%3d:%3d | %3d:%3d:%3d:%3d | %3d:%3d:%3d:%3d",
-                             &pViS->SPN6, &pViS->SBN6, &pViS->PBR6, &pViS->JMODE, &pVpS[0].SPN6, &pVpS[0].SBN6, &pVpS[0].PBR6, &pVpS[0].JMODE, &pVpS[1].SPN6, &pVpS[1].SBN6, &pVpS[1].PBR6, &pVpS[1].JMODE, &pVpS[2].SPN6, &pVpS[2].SBN6, &pVpS[2].PBR6, &pVpS[2].JMODE,&pVpNRc->SFy.SPN6,&pVpNRc->SFy.SBN6,&pVpNRc->SFy.PBR6,&pVpNRc->SFy.JMODE);
-        }
+    value = ISPCFG_GetValue(viPipe, "hiNRX_PARAM_MANUAL_V2_S:stNRXParamV2.SFy.SFN1");
+    pNrnManuParamV2->SFy.SFN1 = value;
 
-        //第10行数据
-        snprintf(aszIniNodeName, 128, "iso_%d:-nXsfr6", ((HI_U32)pow(2.0,(float)u32IdxM)) * 100);
-        ISPCFG_GetString(viPipe, &pString, aszIniNodeName);
-        if (pString != NULL)
-        {
-            sscanf(pString,"%3d:%3d:%3d |    %3d:%3d:%3d |     %3d:%3d:%3d |     %3d:%3d:%3d |     %3d:%3d:%3d",
-                             &pViS->SFR6[0], &pViS->SFR6[1], &pViS->SFR6[2], &pVpS[0].SFR6[0], &pVpS[0].SFR6[1], &pVpS[0].SFR6[2], &pVpS[1].SFR6[0], &pVpS[1].SFR6[1], &pVpS[1].SFR6[2], &pVpS[2].SFR6[0], &pVpS[2].SFR6[1], &pVpS[2].SFR6[2],&pVpNRc->SFy.SFR6[0],&pVpNRc->SFy.SFR6[1],&pVpNRc->SFy.SFR6[2]);
-        }
+    value = ISPCFG_GetValue(viPipe, "hiNRX_PARAM_MANUAL_V2_S:stNRXParamV2.SFy.NRyEn");
+    pNrnManuParamV2->SFy.NRyEn = value;
 
-        //第11行数据
-        snprintf(aszIniNodeName, 128, "iso_%d:-SelRt", ((HI_U32)pow(2.0,(float)u32IdxM)) * 100);
-        ISPCFG_GetString(viPipe, &pString, aszIniNodeName);
-        if (pString != NULL)
-        {
-            sscanf(pString,"   %3d:%3d |                 |                 |                 |         %3d:%3d ",
-                            &pViS->SRT0, &pViS->SRT1, &pVpNRc->SFy.SRT0, &pVpNRc->SFy.SRT1);
-        }
+    value = ISPCFG_GetValue(viPipe, "hiNRX_PARAM_MANUAL_V2_S:stNRXParamV2.SFy.SFN0");
+    pNrnManuParamV2->SFy.SFN0 = value;
 
-        //第12行数据
-        snprintf(aszIniNodeName, 128, "iso_%d:-DeRt", ((HI_U32)pow(2.0,(float)u32IdxM)) * 100);
-        ISPCFG_GetString(viPipe, &pString, aszIniNodeName);
-        if (pString != NULL)
-        {
-            sscanf(pString,"   %3d:%3d |                 |                 |                 |         %3d:%3d",
-                            &pViS->DeRate, &pViS->DeIdx, &pVpNRc->SFy.DeRate, &pVpNRc->SFy.DeIdx);
-        }
+    value = ISPCFG_GetValue(viPipe, "hiNRX_PARAM_MANUAL_V2_S:stNRXParamV2.SFy.STH2");
+    pNrnManuParamV2->SFy.STH2 = value;
 
-        //第13行数据
-        snprintf(aszIniNodeName, 128, "iso_%d:-TriTh", ((HI_U32)pow(2.0,(float)u32IdxM)) * 100);
-        ISPCFG_GetString(viPipe, &pString, aszIniNodeName);
-        if (pString != NULL)
-        {
-            sscanf(pString,"       %3d |             %3d |             %3d |             %3d |            %3d ",
-                           &pViS->TriTh, &pVpS[0].TriTh, &pVpS[1].TriTh, &pVpS[2].TriTh, &pVpNRc->SFy.TriTh);
-        }
+    value = ISPCFG_GetValue(viPipe, "hiNRX_PARAM_MANUAL_V2_S:stNRXParamV2.SFy.SFN2");
+    pNrnManuParamV2->SFy.SFN2 = value;
 
-        //第14行数据
-        snprintf(aszIniNodeName, 128, "iso_%d:-nXsfn", ((HI_U32)pow(2.0,(float)u32IdxM)) * 100);
-        ISPCFG_GetString(viPipe, &pString, aszIniNodeName);
-        if (pString != NULL)
-        {
-            sscanf(pString,"%3d:%3d:%3d:%3d | %3d:%3d:%3d:%3d | %3d:%3d:%3d:%3d | %3d:%3d:%3d:%3d | %3d:%3d:%3d:%3d",
-                            &pViS->SFN0, &pViS->SFN1, &pViS->SFN3, &pViS->SFN3, &pVpS[0].SFN0, &pVpS[0].SFN1, &pVpS[0].SFN2, &pVpS[0].SFN3, &pVpS[1].SFN0, &pVpS[1].SFN1, &pVpS[1].SFN2, &pVpS[1].SFN3, &pVpS[2].SFN0, &pVpS[2].SFN1, &pVpS[2].SFN2, &pVpS[2].SFN3, &pVpNRc->SFy.SFN0, &pVpNRc->SFy.SFN1, &pVpNRc->SFy.SFN2, &pVpNRc->SFy.SFN3);
-        }
+    value = ISPCFG_GetValue(viPipe, "hiNRX_PARAM_MANUAL_V2_S:stNRXParamV2.SFy.BWSF4");
+    pNrnManuParamV2->SFy.BWSF4 = value;
 
-        //第15行数据
-        snprintf(aszIniNodeName, 128, "iso_%d:-nXsth", ((HI_U32)pow(2.0,(float)u32IdxM)) * 100);
-        ISPCFG_GetString(viPipe, &pString, aszIniNodeName);
-        if (pString != NULL)
-        {
-            sscanf(pString," %3d:%3d:%3d |       %3d:%3d:%3d |     %3d:%3d:%3d |     %3d:%3d:%3d |    %3d:%3d:%3d",
-                            &pViS->STH1, &pViS->STH2, &pViS->STH3, &pVpS[0].STH1, &pVpS[0].STH2, &pVpS[0].STH3, &pVpS[1].STH1, &pVpS[1].STH2, &pVpS[1].STH3, &pVpS[2].STH1, &pVpS[2].STH2, &pVpS[2].STH3, &pVpNRc->SFy.STH1, &pVpNRc->SFy.STH2, &pVpNRc->SFy.STH3);
-        }
+    value = ISPCFG_GetValue(viPipe, "hiNRX_PARAM_MANUAL_V2_S:stNRXParamV2.SFy.kMode");
+    pNrnManuParamV2->SFy.kMode = value;
 
-        //第16行数据
-        snprintf(aszIniNodeName, 128, "iso_%d:-sfr0", ((HI_U32)pow(2.0,(float)u32IdxM)) * 100);
-        ISPCFG_GetString(viPipe, &pString, aszIniNodeName);
-        if (pString != NULL)
-        {
-            sscanf(pString," %3d |               %3d |             %3d |             %3d |            %3d ",
-                             &pViS->SFR, &pVpS[0].SFR, &pVpS[1].SFR, &pVpS[2].SFR, &pVpNRc->SFy.SFR);
-        }
+    value = ISPCFG_GetValue(viPipe, "hiNRX_PARAM_MANUAL_V2_S:stNRXParamV2.SFy.STH3");
+    pNrnManuParamV2->SFy.STH3 = value;
 
-        //第17行数据
-        snprintf(aszIniNodeName, 128, "iso_%d:-tedge", ((HI_U32)pow(2.0,(float)u32IdxM)) * 100);
-        ISPCFG_GetString(viPipe, &pString, aszIniNodeName);
-        if (pString != NULL)
-        {
-            sscanf(pString,"           |             %3d |             %3d |                ",
-                             &pVpT[0].tEdge, &pVpT[1].tEdge);
-        }
+    value = ISPCFG_GetValue(viPipe, "hiNRX_PARAM_MANUAL_V2_S:stNRXParamV2.SFy.SFN3");
+    pNrnManuParamV2->SFy.SFN3 = value;
 
-        //第18行数据
-        snprintf(aszIniNodeName, 128, "iso_%d:-ref", ((HI_U32)pow(2.0,(float)u32IdxM)) * 100);
-        ISPCFG_GetString(viPipe, &pString, aszIniNodeName);
-        if (pString != NULL)
-        {
-            sscanf(pString,"           |             %3d |                 |                ",
-                           &pVpT[0].bRef);
-        }
+    value = ISPCFG_GetValue(viPipe, "hiNRX_PARAM_MANUAL_V2_S:stNRXParamV2.SFy.TriTh");
+    pNrnManuParamV2->SFy.TriTh = value;
 
-        //第19行数据
-        snprintf(aszIniNodeName, 128, "iso_%d:-refUpt", ((HI_U32)pow(2.0,(float)u32IdxM)) * 100);
-        ISPCFG_GetString(viPipe, &pString, aszIniNodeName);
-        if (pString != NULL)
-        {
-            sscanf(pString,"           |             %3d |                 |                  ",
-                             &pVpR[0].RFUI);
-        }
+    value = ISPCFG_GetValue(viPipe, "hiNRX_PARAM_MANUAL_V2_S:stNRXParamV2.SFy._rb0_");
+    pNrnManuParamV2->SFy._rb0_ = value;
 
-        //第20行数据
-        snprintf(aszIniNodeName, 128, "iso_%d:-rftIdx", ((HI_U32)pow(2.0,(float)u32IdxM)) * 100);
-        ISPCFG_GetString(viPipe, &pString, aszIniNodeName);
-        if (pString != NULL)
-        {
-            sscanf(pString,"           |         %3d:%3d |                 |                 ",
-                              &pVpT[0].RFI,&pVpT[1].RFI);
-        }
-
-        //第21行数据
-        snprintf(aszIniNodeName, 128, "iso_%d:-refCtl", ((HI_U32)pow(2.0,(float)u32IdxM)) * 100);
-        ISPCFG_GetString(viPipe, &pString, aszIniNodeName);
-        if (pString != NULL)
-        {
-            sscanf(pString,"           |         %3d:%3d |                 |                ",
-                              &pVpR[0].RFDZ, &pVpR[0].RFSLP);
-        }
-
-        //第22行数据
-        snprintf(aszIniNodeName, 128, "iso_%d:-biPath", ((HI_U32)pow(2.0,(float)u32IdxM)) * 100);
-        ISPCFG_GetString(viPipe, &pString, aszIniNodeName);
-        if (pString != NULL)
-        {
-            sscanf(pString,"           |             %3d |             %3d |                 ",
-                              &pVpM[0].biPath, &pVpM[1].biPath);
-        }
-
-        //第23行数据
-        snprintf(aszIniNodeName, 128, "iso_%d:-nXstr1", ((HI_U32)pow(2.0,(float)u32IdxM)) * 100);
-        ISPCFG_GetString(viPipe, &pString, aszIniNodeName);
-        if (pString != NULL)
-        {
-            sscanf(pString,"           |         %3d:%3d |         %3d:%3d |                ",
-                              &pVpT[0].STR0, &pVpT[0].STR1, &pVpT[1].STR0, &pVpT[1].STR1);
-        }
-
-        //第24行数据
-        snprintf(aszIniNodeName, 128, "iso_%d:-nXsdz", ((HI_U32)pow(2.0,(float)u32IdxM)) * 100);
-        ISPCFG_GetString(viPipe, &pString, aszIniNodeName);
-        if (pString != NULL)
-        {
-            sscanf(pString,"       |         %3d:%3d |         %3d:%3d |                  ",
-                              &pVpT[0].SDZ0, &pVpT[0].SDZ1, &pVpT[1].SDZ0, &pVpT[1].SDZ1);
-        }
-
-        //第25行数据
-        snprintf(aszIniNodeName, 128, "iso_%d:-nXtss", ((HI_U32)pow(2.0,(float)u32IdxM)) * 100);
-        ISPCFG_GetString(viPipe, &pString, aszIniNodeName);
-        if (pString != NULL)
-        {
-            sscanf(pString,"           |         %3d:%3d |         %3d:%3d |                 ",
-                              &pVpT[0].TSS0, &pVpT[0].TSS1, &pVpT[1].TSS0, &pVpT[1].TSS1);
-        }
-
-
-        //第26行数据
-        snprintf(aszIniNodeName, 128, "iso_%d:-nXtsi", ((HI_U32)pow(2.0,(float)u32IdxM)) * 100);
-        ISPCFG_GetString(viPipe, &pString, aszIniNodeName);
-        if (pString != NULL)
-        {
-            sscanf(pString,"              |         %3d:%3d |         %3d:%3d |                 ",
-                              &pVpT[0].TSI0, &pVpT[0].TSI1, &pVpT[1].TSI0, &pVpT[1].TSI1);
-        }
-
-        //第27行数据
-        snprintf(aszIniNodeName, 128, "iso_%d:-nXtfs3", ((HI_U32)pow(2.0,(float)u32IdxM)) * 100);
-        ISPCFG_GetString(viPipe, &pString, aszIniNodeName);
-        if (pString != NULL)
-        {
-            sscanf(pString,"            |         %3d:%3d |         %3d:%3d |                 ",
-                              &pVpT[0].TFS0, &pVpT[0].TFS1, &pVpT[1].TFS0, &pVpT[1].TFS1);
-        }
-
-        //第28行数据
-        snprintf(aszIniNodeName, 128, "iso_%d:-nXdzm", ((HI_U32)pow(2.0,(float)u32IdxM)) * 100);
-        ISPCFG_GetString(viPipe, &pString, aszIniNodeName);
-        if (pString != NULL)
-        {
-            sscanf(pString,"            |         %3d:%3d |         %3d:%3d |                 ",
-                              &pVpT[0].DZMode0, &pVpT[0].DZMode1, &pVpT[1].DZMode0, &pVpT[1].DZMode1);
-        }
-
-        //第29行数据
-        snprintf(aszIniNodeName, 128, "iso_%d:-nXtdz", ((HI_U32)pow(2.0,(float)u32IdxM)) * 100);
-        ISPCFG_GetString(viPipe, &pString, aszIniNodeName);
-        if (pString != NULL)
-        {
-            sscanf(pString,"            |         %3d:%3d |         %3d:%3d |                 ",
-                              &pVpT[0].TDZ0, &pVpT[0].TDZ1, &pVpT[1].TDZ0, &pVpT[1].TDZ1);
-        }
-
-        //第30行数据
-        snprintf(aszIniNodeName, 128, "iso_%d:-nXtdx", ((HI_U32)pow(2.0,(float)u32IdxM)) * 100);
-        ISPCFG_GetString(viPipe, &pString, aszIniNodeName);
-        if (pString != NULL)
-        {
-            sscanf(pString,"            |         %3d:%3d |         %3d:%3d |                 ",
-                              &pVpT[0].TDX0, &pVpT[0].TDX1, &pVpT[1].TDX0, &pVpT[1].TDX1);
-            //prtMD("<%s>,%d ,%d,%d,%d\n",__FUNCTION__,pVpT[0].TDX0, pVpT[0].TDX1, pVpT[1].TDX0, pVpT[1].TDX1);
-        }
-
-        //第31行数据 //待定
-        snprintf(aszIniNodeName, 128, "iso_%d:-nXtfr0", ((HI_U32)pow(2.0,(float)u32IdxM)) * 100);
-        ISPCFG_GetString(viPipe, &pString, aszIniNodeName);
-        if (pString != NULL)
-        {
-            sscanf(pString,"  |%3d:%3d:%3d |     %3d:%3d:%3d |     %3d:%3d:%3d |  %3d:%3d:%3d | ",
-                              &pVpT[0].TFR0[0], &pVpT[0].TFR0[1], &pVpT[0].TFR0[2], &pVpT[1].TFR0[0], &pVpT[1].TFR0[1], &pVpT[1].TFR0[2],&pVpT[0].TFR0[3], &pVpT[0].TFR0[4], &pVpT[0].TFR0[5], &pVpT[1].TFR0[3], &pVpT[1].TFR0[4], &pVpT[1].TFR0[5]);
-        }
-
-        //第32行数据 //待定
-        snprintf(aszIniNodeName, 128, "iso_%d:-nXtfr1", ((HI_U32)pow(2.0,(float)u32IdxM)) * 100);
-        //prtMD("<%s>,iso_%d\n",__FUNCTION__,((HI_U32)pow(2.0,(float)u32IdxM)) * 100);
-        ISPCFG_GetString(viPipe, &pString, aszIniNodeName);
-        if (pString != NULL)
-        {
-            sscanf(pString," | %3d:%3d:%3d |     %3d:%3d:%3d |     %3d:%3d:%3d |   %3d:%3d:%3d | ",
-                              &pVpT[0].TFR1[0], &pVpT[0].TFR1[1], &pVpT[0].TFR1[2], &pVpT[1].TFR1[0], &pVpT[1].TFR1[1], &pVpT[1].TFR1[2],&pVpT[0].TFR1[3], &pVpT[0].TFR1[4], &pVpT[0].TFR1[5], &pVpT[1].TFR1[3], &pVpT[1].TFR1[4], &pVpT[1].TFR1[5]);
-
-            //prtMD("%d,  %d,  %d,  %d,  %d,  %d,  %d,  %d,  %d,  %d,  %d,  %d\n", pVpT[0].TFR1[0], pVpT[0].TFR1[1], pVpT[0].TFR1[2], pVpT[1].TFR1[0], pVpT[1].TFR1[1], pVpT[1].TFR1[2],pVpT[0].TFR1[3], pVpT[0].TFR1[4], pVpT[0].TFR1[5], pVpT[1].TFR1[3], pVpT[1].TFR1[4], pVpT[1].TFR1[5]);
-        }
-
-        //第33行数据
-        snprintf(aszIniNodeName, 128, "iso_%d:-mXid0", ((HI_U32)pow(2.0,(float)u32IdxM)) * 100);
-        ISPCFG_GetString(viPipe, &pString, aszIniNodeName);
-        if (pString != NULL)
-        {
-            sscanf(pString,"           |     %3d:%3d:%3d |     %3d:%3d:%3d |                 ",
-                              &pVpM[0].MAI00, &pVpM[0].MAI01, &pVpM[0].MAI02, &pVpM[1].MAI00, &pVpM[1].MAI01, &pVpM[1].MAI02);
-        }
-
-        //第34行数据
-        snprintf(aszIniNodeName, 128, "iso_%d:-mXid1", ((HI_U32)pow(2.0,(float)u32IdxM)) * 100);
-        ISPCFG_GetString(viPipe, &pString, aszIniNodeName);
-        if (pString != NULL)
-        {
-            sscanf(pString,"           |     %3d:%3d:%3d |     %3d:%3d:%3d |                 ",
-                              &pVpM[0].MAI10, &pVpM[0].MAI11, &pVpM[0].MAI12, &pVpM[1].MAI10, &pVpM[1].MAI11, &pVpM[1].MAI12);
-        }
-
-        //第35行数据
-        snprintf(aszIniNodeName, 128, "iso_%d:-mXmadz", ((HI_U32)pow(2.0,(float)u32IdxM)) * 100);
-        ISPCFG_GetString(viPipe, &pString, aszIniNodeName);
-        if (pString != NULL)
-        {
-            sscanf(pString,"             |         %3d:%3d |         %3d:%3d |               ",
-                              &pVpM[0].MADZ0, &pVpM[0].MADZ1, &pVpM[1].MADZ0, &pVpM[1].MADZ1);
-        }
-
-        //第36行数据
-        snprintf(aszIniNodeName, 128, "iso_%d:-mXmabr", ((HI_U32)pow(2.0,(float)u32IdxM)) * 100);
-        ISPCFG_GetString(viPipe, &pString, aszIniNodeName);
-        if (pString != NULL)
-        {
-            sscanf(pString,"             |         %3d:%3d |         %3d:%3d |               ",
-                              &pVpM[0].MABR0, &pVpM[0].MABR1, &pVpM[1].MABR0, &pVpM[1].MABR1);
-        }
-
-        //第37行数据
-        snprintf(aszIniNodeName, 128, "iso_%d:-AdvMath", ((HI_U32)pow(2.0,(float)u32IdxM)) * 100);
-        ISPCFG_GetString(viPipe, &pString, aszIniNodeName);
-        if (pString != NULL)
-        {
-            sscanf(pString,"           |         %3d     |                 ",
-                              &pVpR[0].advMATH);
-        }
-
-        //第38行数据
-        snprintf(aszIniNodeName, 128, "iso_%d:-sfc", ((HI_U32)pow(2.0,(float)u32IdxM)) * 100);
-        ISPCFG_GetString(viPipe, &pString, aszIniNodeName);
-        if (pString != NULL)
-        {
-            sscanf(pString,"  %3d  ",&pVpPNRc->SFC);
-        }
-
-        //第39行数据
-        snprintf(aszIniNodeName, 128, "iso_%d:-mXmath", ((HI_U32)pow(2.0,(float)u32IdxM)) * 100);
-        ISPCFG_GetString(viPipe, &pString, aszIniNodeName);
-        if (pString != NULL)
-        {
-            sscanf(pString,"       |         %3d:%3d |         %3d:%3d |                 ",
-                              &pVpM[0].MATH0, &pVpM[0].MATH1, &pVpM[1].MATH0, &pVpM[1].MATH1);
-        }
-
-        //第40行数据
-        snprintf(aszIniNodeName, 128, "iso_%d:-ctfs", ((HI_U32)pow(2.0,(float)u32IdxM)) * 100);
-        ISPCFG_GetString(viPipe, &pString, aszIniNodeName);
-        if (pString != NULL)
-        {
-            sscanf(pString," %3d  ",&pVpPNRc->CTFS);
-        }
-
-
-        //第41行数据
-        snprintf(aszIniNodeName, 128, "iso_%d:-tfc", ((HI_U32)pow(2.0,(float)u32IdxM)) * 100);
-        ISPCFG_GetString(viPipe, &pString, aszIniNodeName);
-        if (pString != NULL)
-        {
-            sscanf(pString,"  %3d   ",&pVpPNRc->TFC);
-        }
-
-        //第42行数据
-        snprintf(aszIniNodeName, 128, "iso_%d:-mXmate", ((HI_U32)pow(2.0,(float)u32IdxM)) * 100);
-        ISPCFG_GetString(viPipe, &pString, aszIniNodeName);
-        if (pString != NULL)
-        {
-            sscanf(pString,"           |         %3d:%3d |         %3d:%3d |                 ",
-                              &pVpM[0].MATE0, &pVpM[0].MATE1, &pVpM[1].MATE0, &pVpM[1].MATE1);
-        }
-
-        //第43行数据
-        snprintf(aszIniNodeName, 128, "iso_%d:-mXmabw", ((HI_U32)pow(2.0,(float)u32IdxM)) * 100);
-        ISPCFG_GetString(viPipe, &pString, aszIniNodeName);
-        if (pString != NULL)
-        {
-            sscanf(pString,"           |         %3d:%3d |         %3d:%3d |                 ",
-                              &pVpM[0].MABW0, &pVpM[0].MABW1, &pVpM[1].MABW0, &pVpM[1].MABW1);
-        }
-
-        //第44行数据
-        snprintf(aszIniNodeName, 128, "iso_%d:-mXmatw", ((HI_U32)pow(2.0,(float)u32IdxM)) * 100);
-        ISPCFG_GetString(viPipe, &pString, aszIniNodeName);
-        if (pString != NULL)
-        {
-            sscanf(pString,"           |             %3d |             %3d |                ", &pVpM[0].MATW, &pVpM[1].MATW);
-        }
-
-        //第45行数据
-        snprintf(aszIniNodeName, 128, "iso_%d:-mXmasw", ((HI_U32)pow(2.0,(float)u32IdxM)) * 100);
-        ISPCFG_GetString(viPipe, &pString, aszIniNodeName);
-        if (pString != NULL)
-        {
-            sscanf(pString,"       |             %3d |             %3d |                ", &pVpM[0].MASW, &pVpM[1].MASW);
-        }
-
-    }
-
-    //prtMD("ISPCFG_GetDynamic3DNRend -------------------------------\n");
     return 0;
 }
 
-int ISPCFG_GetStaticFSWDR(VI_PIPE viPipe, ISPCFG_STATIC_WDRFS_S *pStaticWDRFs)
+static int ISPCFG_GetVpssNR(VI_PIPE viPipe, ISPCFG_VPSS_NR_PARAM_S *pNrxParam)
+{
+    int value = 0;
+    unsigned int i = 0;
+    unsigned int j = 0;
+    char strings[256] = {0};
+    char *pString = NULL;
+    VPSS_NRX_V2_S *pNrxManual = NULL;
+
+    if ((viPipe >= VI_MAX_PIPE_NUM) || (NULL == pNrxParam))
+    {
+        prtMD("invalid input viPipe = %d, pNrxParam = %p\n", viPipe, pNrxParam);
+        return -1;
+    }
+
+    /* 开启 or 关闭 */
+    value = ISPCFG_GetValue(viPipe, "hiVPSS_3DNRX_ATTR_S:bNrEn");
+    pNrxParam->bOpen = value;
+
+    /* 版本信息 */
+    value = ISPCFG_GetValue(viPipe, "hiVPSS_3DNRX_ATTR_S:enNRVersion");
+    pNrxParam->stNrParam.enNRVer = value;
+    if (pNrxParam->stNrParam.enNRVer != VPSS_NR_V2)
+    {
+        prtMD("unsupported value = %d\n", value);
+        return -1;
+    }
+
+    /* 手动或自动 */
+    value = ISPCFG_GetValue(viPipe, "hiVPSS_3DNRX_ATTR_S:enOptMode");
+    pNrxParam->stNrParam.stNRXParam_V2.enOptMode = value;
+    if (pNrxParam->stNrParam.stNRXParam_V2.enOptMode != OPERATION_MODE_MANUAL)
+    {
+        prtMD("unsupported value = %d\n", value);
+        return -1;
+    }
+
+    pNrxManual = &pNrxParam->stNrParam.stNRXParam_V2.stNRXManual.stNRXParam;
+
+    for (i = 0; i < 3; i++)
+    {
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.IEy[%d].IES0", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->IEy[i].IES0 = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.IEy[%d].IES1", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->IEy[i].IES1 = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.IEy[%d].IES2", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->IEy[i].IES2 = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.IEy[%d].IES3", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->IEy[i].IES3 = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.IEy[%d].IEDZ", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->IEy[i].IEDZ = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.IEy[%d]._rb_", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->IEy[i]._rb_ = value;
+    }
+
+    for (i = 0; i < 3; i++)
+    {
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.SFy[%d].SPN6", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->SFy[i].SPN6 = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.SFy[%d].SFR", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->SFy[i].SFR = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.SFy[%d].SBN6", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->SFy[i].SBN6 = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.SFy[%d].PBR6", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->SFy[i].PBR6 = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.SFy[%d].SRT0", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->SFy[i].SRT0 = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.SFy[%d].SRT1", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->SFy[i].SRT1 = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.SFy[%d].JMODE", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->SFy[i].JMODE = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.SFy[%d].DeIdx", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->SFy[i].DeIdx = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.SFy[%d].DeRate", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->SFy[i].DeRate = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.SFy[%d].SFR6", i);
+        value = ISPCFG_GetString(viPipe, &pString, strings);
+        ISPCFG_GetNumInLine(pString);
+        for (j = 0; j < 3; j++)
+        {
+            pNrxManual->SFy[i].SFR6[j] = ISPCFG_LineValue[j];
+        }
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.SFy[%d].SFS1", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->SFy[i].SFS1 = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.SFy[%d].SFT1", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->SFy[i].SFT1 = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.SFy[%d].SBR1", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->SFy[i].SBR1 = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.SFy[%d].SFS2", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->SFy[i].SFS2 = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.SFy[%d].SFT2", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->SFy[i].SFT2 = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.SFy[%d].SBR2", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->SFy[i].SBR2 = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.SFy[%d].SFS4", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->SFy[i].SFS4 = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.SFy[%d].SFT4", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->SFy[i].SFT4 = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.SFy[%d].SBR4", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->SFy[i].SBR4 = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.SFy[%d].STH1", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->SFy[i].STH1 = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.SFy[%d].SFN1", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->SFy[i].SFN1 = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.SFy[%d].SFN0", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->SFy[i].SFN0 = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.SFy[%d].NRyEn", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->SFy[i].NRyEn = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.SFy[%d].STH2", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->SFy[i].STH2 = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.SFy[%d].SFN2", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->SFy[i].SFN2 = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.SFy[%d].BWSF4", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->SFy[i].BWSF4 = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.SFy[%d].kMode", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->SFy[i].kMode = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.SFy[%d].STH3", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->SFy[i].STH3 = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.SFy[%d].SFN3", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->SFy[i].SFN3 = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.SFy[%d].TriTh", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->SFy[i].TriTh = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.SFy[%d]._rb0_", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->SFy[i]._rb0_ = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.SFy[%d].SBSk", i);
+        value = ISPCFG_GetString(viPipe, &pString, strings);
+        ISPCFG_GetNumInLine(pString);
+        for (j = 0; j < 32; j++)
+        {
+            pNrxManual->SFy[i].SBSk[j] = (HI_U16)ISPCFG_LineValue[j];
+        }
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.SFy[%d].SDSk", i);
+        value = ISPCFG_GetString(viPipe, &pString, strings);
+        ISPCFG_GetNumInLine(pString);
+        for (j = 0; j < 32; j++)
+        {
+            pNrxManual->SFy[i].SDSk[j] = (HI_U16)ISPCFG_LineValue[j];
+        }
+    }
+
+    for (i = 0; i < 2; i++)
+    {
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.MDy[%d].MADZ0", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->MDy[i].MADZ0 = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.MDy[%d].MAI00", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->MDy[i].MAI00 = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.MDy[%d].MAI01", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->MDy[i].MAI01 = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.MDy[%d].MAI02", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->MDy[i].MAI02 = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.MDy[%d].biPath", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->MDy[i].biPath = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.MDy[%d].MADZ1", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->MDy[i].MADZ1 = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.MDy[%d].MAI10", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->MDy[i].MAI10 = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.MDy[%d].MAI11", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->MDy[i].MAI11 = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.MDy[%d].MAI12", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->MDy[i].MAI12 = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.MDy[%d]._rb0_", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->MDy[i]._rb0_ = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.MDy[%d].MABR0", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->MDy[i].MABR0 = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.MDy[%d].MABR1", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->MDy[i].MABR1 = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.MDy[%d].MATH0", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->MDy[i].MATH0 = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.MDy[%d].MATE0", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->MDy[i].MATE0 = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.MDy[%d].MATW", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->MDy[i].MATW = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.MDy[%d].MATH1", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->MDy[i].MATH1 = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.MDy[%d].MATE1", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->MDy[i].MATE1 = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.MDy[%d]._rb1_", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->MDy[i]._rb1_ = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.MDy[%d].MASW", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->MDy[i].MASW = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.MDy[%d]._rb2_", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->MDy[i]._rb2_ = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.MDy[%d].MABW0", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->MDy[i].MABW0 = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.MDy[%d].MABW1", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->MDy[i].MABW1 = value;
+    }
+
+    value = ISPCFG_GetValue(viPipe, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.RFs.advMATH");
+    pNrxManual->RFs.advMATH = value;
+
+    value = ISPCFG_GetValue(viPipe, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.RFs.RFDZ");
+    pNrxManual->RFs.RFDZ = value;
+
+    value = ISPCFG_GetValue(viPipe, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.RFs._rb_");
+    pNrxManual->RFs._rb_ = value;
+
+    value = ISPCFG_GetValue(viPipe, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.RFs.RFUI");
+    pNrxManual->RFs.RFUI = value;
+
+    value = ISPCFG_GetValue(viPipe, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.RFs.RFSLP");
+    pNrxManual->RFs.RFSLP = value;
+
+    for (i = 0; i < 2; i++)
+    {
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.TFy[%d].TFS0", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->TFy[i].TFS0 = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.TFy[%d].TDZ0", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->TFy[i].TDZ0 = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.TFy[%d].TDX0", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->TFy[i].TDX0 = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.TFy[%d].TFS1", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->TFy[i].TFS1 = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.TFy[%d].TDZ1", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->TFy[i].TDZ1 = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.TFy[%d].TDX1", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->TFy[i].TDX1 = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.TFy[%d].SDZ0", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->TFy[i].SDZ0 = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.TFy[%d].STR0", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->TFy[i].STR0 = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.TFy[%d].DZMode0", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->TFy[i].DZMode0 = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.TFy[%d].SDZ1", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->TFy[i].SDZ1 = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.TFy[%d].STR1", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->TFy[i].STR1 = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.TFy[%d].DZMode1", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->TFy[i].DZMode1 = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.TFy[%d].TFR0", i);
+        ISPCFG_GetString(viPipe, &pString, strings);
+        ISPCFG_GetNumInLine(pString);
+        for (j = 0; j < 6; j++)
+        {
+            pNrxManual->TFy[i].TFR0[j] = ISPCFG_LineValue[j];
+        }
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.TFy[%d].TSS0", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->TFy[i].TSS0 = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.TFy[%d].TSI0", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->TFy[i].TSI0 = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.TFy[%d].TFR1", i);
+        ISPCFG_GetString(viPipe, &pString, strings);
+        ISPCFG_GetNumInLine(pString);
+        for (j = 0; j < 6; j++)
+        {
+            pNrxManual->TFy[i].TFR1[j] = ISPCFG_LineValue[j];
+        }
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.TFy[%d].TSS1", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->TFy[i].TSS1 = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.TFy[%d].TSI1", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->TFy[i].TSI1 = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.TFy[%d].RFI", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->TFy[i].RFI = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.TFy[%d].tEdge", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->TFy[i].tEdge = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.TFy[%d].bRef", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->TFy[i].bRef = value;
+
+        snprintf(strings, 256, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.TFy[%d]._rb_", i);
+        value = ISPCFG_GetValue(viPipe, strings);
+        pNrxManual->TFy[i]._rb_ = value;
+    }
+
+    value = ISPCFG_GetValue(viPipe, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.pNRc.SFC");
+    pNrxManual->pNRc.SFC = value;
+
+    value = ISPCFG_GetValue(viPipe, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.pNRc.CTFS");
+    pNrxManual->pNRc.CTFS = value;
+
+    value = ISPCFG_GetValue(viPipe, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.pNRc._rb_");
+    pNrxManual->pNRc._rb_ = value;
+
+    value = ISPCFG_GetValue(viPipe, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.pNRc.TFC");
+    pNrxManual->pNRc.TFC = value;
+
+    value = ISPCFG_GetValue(viPipe, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.pNRc._rb1_");
+    pNrxManual->pNRc._rb1_ = value;
+
+    value = ISPCFG_GetValue(viPipe, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.pNRc.MODE");
+    pNrxManual->pNRc.MODE = value;
+
+    value = ISPCFG_GetValue(viPipe, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.pNRc._rb2_");
+    pNrxManual->pNRc._rb2_ = value;
+
+    value = ISPCFG_GetValue(viPipe, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.pNRc.PRESFC");
+    pNrxManual->pNRc.PRESFC = value;
+
+    value = ISPCFG_GetValue(viPipe, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.NRc.IEy.IES0");
+    pNrxManual->NRc.IEy.IES0 = value;
+
+    value = ISPCFG_GetValue(viPipe, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.NRc.IEy.IES1");
+    pNrxManual->NRc.IEy.IES1 = value;
+
+    value = ISPCFG_GetValue(viPipe, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.NRc.IEy.IES2");
+    pNrxManual->NRc.IEy.IES2 = value;
+
+    value = ISPCFG_GetValue(viPipe, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.NRc.IEy.IES3");
+    pNrxManual->NRc.IEy.IES3 = value;
+
+    value = ISPCFG_GetValue(viPipe, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.NRc.IEy.IEDZ");
+    pNrxManual->NRc.IEy.IEDZ = value;
+
+    value = ISPCFG_GetValue(viPipe, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.NRc.IEy._rb_");
+    pNrxManual->NRc.IEy._rb_ = value;
+
+    value = ISPCFG_GetValue(viPipe, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.NRc.SFy.SPN6");
+    pNrxManual->NRc.SFy.SPN6 = value;
+
+    value = ISPCFG_GetValue(viPipe, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.NRc.SFy.SFR");
+    pNrxManual->NRc.SFy.SFR = value;
+
+    value = ISPCFG_GetValue(viPipe, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.NRc.SFy.SBN6");
+    pNrxManual->NRc.SFy.SBN6 = value;
+
+    value = ISPCFG_GetValue(viPipe, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.NRc.SFy.PBR6");
+    pNrxManual->NRc.SFy.PBR6 = value;
+
+    value = ISPCFG_GetValue(viPipe, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.NRc.SFy.SRT0");
+    pNrxManual->NRc.SFy.SRT0 = value;
+
+    value = ISPCFG_GetValue(viPipe, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.NRc.SFy.SRT1");
+    pNrxManual->NRc.SFy.SRT1 = value;
+
+    value = ISPCFG_GetValue(viPipe, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.NRc.SFy.JMODE");
+    pNrxManual->NRc.SFy.JMODE = value;
+
+    value = ISPCFG_GetValue(viPipe, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.NRc.SFy.DeIdx");
+    pNrxManual->NRc.SFy.DeIdx = value;
+
+    value = ISPCFG_GetValue(viPipe, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.NRc.SFy.DeRate");
+    pNrxManual->NRc.SFy.DeRate = value;
+
+    value = ISPCFG_GetString(viPipe, &pString, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.NRc.SFy.SFR6");
+    ISPCFG_GetNumInLine(pString);
+    for (i = 0; i < 3; i++)
+    {
+        pNrxManual->NRc.SFy.SFR6[i] = ISPCFG_LineValue[i];
+    }
+
+    value = ISPCFG_GetValue(viPipe, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.NRc.SFy.SFS1");
+    pNrxManual->NRc.SFy.SFS1 = value;
+
+    value = ISPCFG_GetValue(viPipe, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.NRc.SFy.SFT1");
+    pNrxManual->NRc.SFy.SFT1 = value;
+
+    value = ISPCFG_GetValue(viPipe, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.NRc.SFy.SBR1");
+    pNrxManual->NRc.SFy.SBR1 = value;
+
+    value = ISPCFG_GetValue(viPipe, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.NRc.SFy.SFS2");
+    pNrxManual->NRc.SFy.SFS2 = value;
+
+    value = ISPCFG_GetValue(viPipe, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.NRc.SFy.SFT2");
+    pNrxManual->NRc.SFy.SFT2 = value;
+
+    value = ISPCFG_GetValue(viPipe, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.NRc.SFy.SBR2");
+    pNrxManual->NRc.SFy.SBR2 = value;
+
+    value = ISPCFG_GetValue(viPipe, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.NRc.SFy.SFS4");
+    pNrxManual->NRc.SFy.SFS4 = value;
+
+    value = ISPCFG_GetValue(viPipe, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.NRc.SFy.SFT4");
+    pNrxManual->NRc.SFy.SFT4 = value;
+
+    value = ISPCFG_GetValue(viPipe, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.NRc.SFy.SBR4");
+    pNrxManual->NRc.SFy.SBR4 = value;
+
+    value = ISPCFG_GetValue(viPipe, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.NRc.SFy.STH1");
+    pNrxManual->NRc.SFy.STH1 = value;
+
+    value = ISPCFG_GetValue(viPipe, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.NRc.SFy.SFN1");
+    pNrxManual->NRc.SFy.SFN1 = value;
+
+    value = ISPCFG_GetValue(viPipe, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.NRc.SFy.SFN0");
+    pNrxManual->NRc.SFy.SFN0 = value;
+
+    value = ISPCFG_GetValue(viPipe, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.NRc.SFy.NRyEn");
+    pNrxManual->NRc.SFy.NRyEn = value;
+
+    value = ISPCFG_GetValue(viPipe, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.NRc.SFy.STH2");
+    pNrxManual->NRc.SFy.STH2 = value;
+
+    value = ISPCFG_GetValue(viPipe, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.NRc.SFy.SFN2");
+    pNrxManual->NRc.SFy.SFN2 = value;
+
+    value = ISPCFG_GetValue(viPipe, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.NRc.SFy.BWSF4");
+    pNrxManual->NRc.SFy.BWSF4 = value;
+
+    value = ISPCFG_GetValue(viPipe, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.NRc.SFy.kMode");
+    pNrxManual->NRc.SFy.kMode = value;
+
+    value = ISPCFG_GetValue(viPipe, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.NRc.SFy.STH3");
+    pNrxManual->NRc.SFy.STH3 = value;
+
+    value = ISPCFG_GetValue(viPipe, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.NRc.SFy.SFN3");
+    pNrxManual->NRc.SFy.SFN3 = value;
+
+    value = ISPCFG_GetValue(viPipe, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.NRc.SFy.TriTh");
+    pNrxManual->NRc.SFy.TriTh = value;
+
+    value = ISPCFG_GetValue(viPipe, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.NRc.SFy._rb0_");
+    pNrxManual->NRc.SFy._rb0_ = value;
+
+    value = ISPCFG_GetString(viPipe, &pString, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.NRc.SFy.SBSk");
+    ISPCFG_GetNumInLine(pString);
+    for (i = 0; i < 32; i++)
+    {
+        pNrxManual->NRc.SFy.SBSk[i] = ISPCFG_LineValue[i];
+    }
+
+    value = ISPCFG_GetString(viPipe, &pString, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.NRc.SFy.SDSk");
+    ISPCFG_GetNumInLine(pString);
+    for (i = 0; i < 32; i++)
+    {
+        pNrxManual->NRc.SFy.SDSk[i] = ISPCFG_LineValue[i];
+    }
+
+    value = ISPCFG_GetValue(viPipe, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.NRc.NRcEn");
+    pNrxManual->NRc.NRcEn = value;
+
+    value = ISPCFG_GetValue(viPipe, "hiVPSS_NRX_PARAM_MANUAL_V2_S:stNRXParam.NRc._rb_");
+    pNrxManual->NRc._rb_ = value;
+
+    return 0;
+}
+
+int ISPCFG_GetFSWDR(VI_PIPE viPipe, ISPCFG_WDRFS_PARAM_S *pStaticWDRFs)
 {
     unsigned int u32Value = 0;
     unsigned int u32IdxM = 0;
@@ -2009,81 +2202,81 @@ int ISPCFG_GetStaticFSWDR(VI_PIPE viPipe, ISPCFG_STATIC_WDRFS_S *pStaticWDRFs)
     }
 
     /*MergeMode*/
-    u32Value = ISPCFG_GetValue(viPipe, "static_fswdr:MergeMode");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_WDR_FS_ATTR_S:enWDRMergeMode");
     pStaticWDRFs->enWDRMergeMode = (HI_U8)u32Value;
 
     /*bEnable*/
-    u32Value = ISPCFG_GetValue(viPipe, "static_fswdr:MotionComp");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_WDR_FS_ATTR_S:stWDRCombine.bMotionComp");
     pStaticWDRFs->bCombineMotionComp = (HI_BOOL)u32Value;
 
     /*CombineShortThr*/
-    u32Value = ISPCFG_GetValue(viPipe, "static_fswdr:CombineShortThr");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_WDR_FS_ATTR_S:stWDRCombine.u16ShortThr");
     pStaticWDRFs->u16CombineShortThr = (HI_U16)u32Value;
     //prtMD("pStaticWDRFs->u16CombineShortThr = %d\n",pStaticWDRFs->u16CombineShortThr);
 
     /*CombineLongThr*/
-    u32Value = ISPCFG_GetValue(viPipe, "static_fswdr:CombineLongThr");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_WDR_FS_ATTR_S:stWDRCombine.u16LongThr");
     pStaticWDRFs->u16CombineLongThr = (HI_U16)u32Value;
     //prtMD("pStaticWDRFs->u16CombineLongThr = %d\n",pStaticWDRFs->u16CombineLongThr);
 
     /*CombineForceLong*/
-    u32Value = ISPCFG_GetValue(viPipe, "static_fswdr:CombineForceLong");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_WDR_FS_ATTR_S:stWDRCombine.bForceLong");
     pStaticWDRFs->bCombineForceLong = (HI_BOOL)u32Value;
 
     /*CombineForceLongLowThr*/
-    u32Value = ISPCFG_GetValue(viPipe, "static_fswdr:CombineForceLongLowThr");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_WDR_FS_ATTR_S:stWDRCombine.u16ForceLongLowThr");
     pStaticWDRFs->u16CombineForceLongLowThr = (HI_U16)u32Value;
 
     /*CombineForceLongHigThr*/
-    u32Value = ISPCFG_GetValue(viPipe, "static_fswdr:CombineForceLongHigThr");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_WDR_FS_ATTR_S:stWDRCombine.u16ForceLongHigThr");
     pStaticWDRFs->u16CombineForceLongHigThr = (HI_U16)u32Value;
 
     /*WDRMdtShortExpoChk*/
-    u32Value = ISPCFG_GetValue(viPipe, "static_fswdr:WDRMdtShortExpoChk");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_WDR_FS_ATTR_S:stWDRCombine.stWDRMdt.bShortExpoChk");
     pStaticWDRFs->bWDRMdtShortExpoChk = (HI_U16)u32Value;
 
     /*WDRMdtShortCheckThd*/
-    u32Value = ISPCFG_GetValue(viPipe, "static_fswdr:WDRMdtShortCheckThd");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_WDR_FS_ATTR_S:stWDRCombine.stWDRMdt.u16ShortCheckThd");
     pStaticWDRFs->u16WDRMdtShortCheckThd = (HI_U16)u32Value;
 
     /*WDRMdtMDRefFlicker*/
-    u32Value = ISPCFG_GetValue(viPipe, "static_fswdr:WDRMdtMDRefFlicker");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_WDR_FS_ATTR_S:stWDRCombine.stWDRMdt.bMDRefFlicker");
     pStaticWDRFs->bWDRMdtMDRefFlicker = (HI_BOOL)u32Value;
 
     /*WDRMdtMdtStillThd*/
-    u32Value = ISPCFG_GetValue(viPipe, "static_fswdr:WDRMdtMdtStillThd");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_WDR_FS_ATTR_S:stWDRCombine.stWDRMdt.u8MdtStillThd");
     pStaticWDRFs->u8WDRMdtMdtStillThd = (HI_U8)u32Value;
 
     /*WDRMdtMdtLongBlend*/
-    u32Value = ISPCFG_GetValue(viPipe, "static_fswdr:WDRMdtMdtLongBlend");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_WDR_FS_ATTR_S:stWDRCombine.stWDRMdt.u8MdtLongBlend");
     pStaticWDRFs->u8WDRMdtMdtLongBlend = (HI_U8)u32Value;
 
     /*WDRMdtOpType*/
-    u32Value = ISPCFG_GetValue(viPipe, "static_fswdr:WDRMdtOpType");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_WDR_FS_ATTR_S:stWDRCombine.stWDRMdt.enOpType");
     pStaticWDRFs->u8WDRMdtOpType = (HI_U8)u32Value;
 
     /*AutoMdThrLowGain*/
-    ISPCFG_GetString(viPipe, &pString, "static_fswdr:AutoMdThrLowGain");
+    ISPCFG_GetString(viPipe, &pString, "hiISP_WDR_FS_ATTR_S:stWDRCombine.stWDRMdt.stAuto.au8MdThrLowGain");
     ISPCFG_GetNumInLine(pString);
 
-    for(u32IdxM = 0; u32IdxM < 16; u32IdxM++)
+    for(u32IdxM = 0; u32IdxM < ISP_AUTO_ISO_STRENGTH_NUM; u32IdxM++)
     {
         u32Value = ISPCFG_LineValue[u32IdxM];
         pStaticWDRFs->au8AutoMdThrLowGain[u32IdxM] = ISPCFG_LineValue[u32IdxM];
     }
 
     /*AutoMdThrHigGain*/
-    ISPCFG_GetString(viPipe, &pString, "static_fswdr:AutoMdThrHigGain");
+    ISPCFG_GetString(viPipe, &pString, "hiISP_WDR_FS_ATTR_S:stWDRCombine.stWDRMdt.stAuto.au8MdThrHigGain");
     ISPCFG_GetNumInLine(pString);
 
-    for(u32IdxM = 0; u32IdxM < 16; u32IdxM++)
+    for(u32IdxM = 0; u32IdxM < ISP_AUTO_ISO_STRENGTH_NUM; u32IdxM++)
     {
         u32Value = ISPCFG_LineValue[u32IdxM];
         pStaticWDRFs->au8AutoMdThrHigGain[u32IdxM] = ISPCFG_LineValue[u32IdxM];
     }
 
     /*FusionFusionThr*/
-    ISPCFG_GetString(viPipe, &pString, "static_fswdr:FusionFusionThr");
+    ISPCFG_GetString(viPipe, &pString, "hiISP_WDR_FS_ATTR_S:stFusion.au16FusionThr");
     ISPCFG_GetNumInLine(pString);
 
     for(u32IdxM = 0; u32IdxM < 4; u32IdxM++)
@@ -2095,13 +2288,11 @@ int ISPCFG_GetStaticFSWDR(VI_PIPE viPipe, ISPCFG_STATIC_WDRFS_S *pStaticWDRFs)
     return 0;
 }
 
-static int ISPCFG_GetDynamicGamma(VI_PIPE viPipe, ISPCFG_DYNAMIC_GAMMA_S *pDynamicGamma)
+static int ISPCFG_GetGamma(VI_PIPE viPipe, ISPCFG_GAMMA_PARAM_S *pDynamicGamma)
 {
     int i = 0;
-    int j = 0;
     unsigned int u32Value = 0;
     char *pString = NULL;
-    char aszIniNodeName[128] = {0};
 
     if ((viPipe >= VI_MAX_PIPE_NUM) || (pDynamicGamma == NULL))
     {
@@ -2110,38 +2301,32 @@ static int ISPCFG_GetDynamicGamma(VI_PIPE viPipe, ISPCFG_DYNAMIC_GAMMA_S *pDynam
     }
 
     /*bEnable*/
-    u32Value = ISPCFG_GetValue(viPipe, "dynamic_gamma:bEnable");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_GAMMA_ATTR_S:bEnable");
     pDynamicGamma->bEnable = (int)u32Value;
 
     /*enCurveType*/
-    u32Value = ISPCFG_GetValue(viPipe, "dynamic_gamma:enCurveType");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_GAMMA_ATTR_S:enCurveType");
     pDynamicGamma->enCurveType = (ISP_GAMMA_CURVE_TYPE_E)u32Value;
 
-    //add gamma
-    for(i = 0;i < 25;i++)
-    {
-        snprintf(aszIniNodeName, 128, "dynamic_gamma:gammaTable%d", i);
-        /* Table */
-        ISPCFG_GetString(viPipe, &pString, aszIniNodeName);
-        ISPCFG_GetNumInLine(pString);
+    /* Table */
+    ISPCFG_GetString(viPipe, &pString, "hiISP_GAMMA_ATTR_S:u16Table");
+    ISPCFG_GetNumInLine(pString);
 
-        for(j = 0;j < 41;j++)
-        {
-            u32Value = ISPCFG_LineValue[j];
-            pDynamicGamma->u16Table[i][j] = ISPCFG_LineValue[j];
-        }
+    for(i = 0; i < GAMMA_NODE_NUM; i++)
+    {
+        pDynamicGamma->u16Table[i] = ISPCFG_LineValue[i];
     }
 
     return 0;
 }
 
-static int ISPCFG_GetStaticBNR(VI_PIPE viPipe, ISPCFG_STATIC_BNR_S *pStaticBnr)
+static int ISPCFG_GetBNR(VI_PIPE viPipe, ISPCFG_BNR_PARAM_S *pStaticBnr)
 {
     unsigned int u32Value = 0;
-    unsigned int u32IdxM = 0;
-    int i = 0;
+    unsigned int u32Idx = 0;
+    unsigned int i = 0;
+    unsigned int j = 0;
     char * pString = NULL;
-    char aszIniNodeName[128] = {0};
 
     if ((viPipe >= VI_MAX_PIPE_NUM) || (pStaticBnr == NULL))
     {
@@ -2150,84 +2335,79 @@ static int ISPCFG_GetStaticBNR(VI_PIPE viPipe, ISPCFG_STATIC_BNR_S *pStaticBnr)
     }
 
     /*BnrEnable*/
-    u32Value = ISPCFG_GetValue(viPipe, "static_BNR:BnrEnable");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_NR_ATTR_S:bEnable");
     pStaticBnr->bEnable = (HI_BOOL)u32Value;
 
     /*NrLscEnable*/
-    u32Value = ISPCFG_GetValue(viPipe, "static_BNR:NrLscEnable");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_NR_ATTR_S:bNrLscEnable");
     pStaticBnr->bNrLscEnable = (HI_BOOL)u32Value;
 
     /*BnrLscMaxGain*/
-    u32Value = ISPCFG_GetValue(viPipe, "static_BNR:BnrLscMaxGain");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_NR_ATTR_S:u8BnrLscMaxGain");
     pStaticBnr->u8BnrMaxGain = (HI_U8)u32Value;
 
     /*BnrLscCmpStrength*/
-    u32Value = ISPCFG_GetValue(viPipe, "static_BNR:BnrLscCmpStrength");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_NR_ATTR_S:u16BnrLscCmpStrength");
     pStaticBnr->u16BnrLscCmpStrength = (HI_U16)u32Value;
 
     /*BnrOpType*/
-    u32Value = ISPCFG_GetValue(viPipe, "static_BNR:BnrOpType");
+    u32Value = ISPCFG_GetValue(viPipe, "hiISP_NR_ATTR_S:enOpType");
     pStaticBnr->u8BnrOptype = (HI_U8)u32Value;
 
     /* AutoChromaStr */
-    for(i = 0;i < 4;i++)
+    ISPCFG_GetString(viPipe, &pString, "hiISP_NR_ATTR_S:stAuto.au8ChromaStr");
+    ISPCFG_GetNumInLine(pString);
+
+    u32Idx = 0;
+    for (i = 0; i < ISP_BAYER_CHN_NUM; i++)
     {
-        snprintf(aszIniNodeName,128,"static_BNR:AutoChromaStr%d",i);
-        ISPCFG_GetString(viPipe, &pString, aszIniNodeName);
-        ISPCFG_GetNumInLine(pString);
-
-        for(u32IdxM = 0; u32IdxM < 16; u32IdxM++)
+        for (j = 0; j < ISP_AUTO_ISO_STRENGTH_NUM; j++)
         {
-            u32Value = ISPCFG_LineValue[u32IdxM];
-            pStaticBnr->au8ChromaStr[i][u32IdxM] = ISPCFG_LineValue[u32IdxM];
+            pStaticBnr->au8ChromaStr[i][j] = ISPCFG_LineValue[u32Idx ++];
         }
-
-        //prtMD("%s\n",aszIniNodeName);
     }
 
     /* AutoFineStr */
-    ISPCFG_GetString(viPipe, &pString, "static_BNR:AutoFineStr");
+    ISPCFG_GetString(viPipe, &pString, "hiISP_NR_ATTR_S:stAuto.au8FineStr");
     ISPCFG_GetNumInLine(pString);
 
-    for(u32IdxM = 0; u32IdxM < 16; u32IdxM++)
+    u32Idx = 0;
+    for (i = 0; i < ISP_AUTO_ISO_STRENGTH_NUM; i++)
     {
-        u32Value = ISPCFG_LineValue[u32IdxM];
-        pStaticBnr->au8FineStr[u32IdxM] = ISPCFG_LineValue[u32IdxM];
+        pStaticBnr->au8FineStr[i] = ISPCFG_LineValue[u32Idx ++];
     }
 
     /* AutoCoringWgt */
-    ISPCFG_GetString(viPipe, &pString, "static_BNR:AutoCoringWgt");
+    ISPCFG_GetString(viPipe, &pString, "hiISP_NR_ATTR_S:stAuto.au16CoringWgt");
     ISPCFG_GetNumInLine(pString);
 
-    for(u32IdxM = 0; u32IdxM < 16; u32IdxM++)
+    u32Idx = 0;
+    for (i = 0; i < ISP_AUTO_ISO_STRENGTH_NUM; i++)
     {
-        u32Value = ISPCFG_LineValue[u32IdxM];
-        pStaticBnr->au16CoringWgt[u32IdxM] = ISPCFG_LineValue[u32IdxM];
+        pStaticBnr->au16CoringWgt[i] = ISPCFG_LineValue[u32Idx ++];
     }
 
     /* AutoCoarseSt */
-    for(i = 0;i < 4;i++)
-    {
-        snprintf(aszIniNodeName,128,"static_BNR:AutoCoarseSt%d",i);
-        ISPCFG_GetString(viPipe, &pString, aszIniNodeName);
-        ISPCFG_GetNumInLine(pString);
+    ISPCFG_GetString(viPipe, &pString, "hiISP_NR_ATTR_S:stAuto.au16CoarseStr");
+    ISPCFG_GetNumInLine(pString);
 
-        for(u32IdxM = 0; u32IdxM < 16; u32IdxM++)
+    u32Idx = 0;
+    for (i = 0; i < ISP_BAYER_CHN_NUM; i++)
+    {
+        for(j = 0; j < ISP_AUTO_ISO_STRENGTH_NUM; j++)
         {
-            u32Value = ISPCFG_LineValue[u32IdxM];
-            pStaticBnr->au16CoarseStr[i][u32IdxM] = ISPCFG_LineValue[u32IdxM];
+            pStaticBnr->au16CoarseStr[i][j] = ISPCFG_LineValue[u32Idx ++];
         }
-        //prtMD("%s\n",aszIniNodeName);
     }
 
     /* WDRFrameStr */
-    ISPCFG_GetString(viPipe, &pString, "static_BNR:WDRFrameStr");
+    ISPCFG_GetString(viPipe, &pString, "hiISP_NR_ATTR_S:stWdr.au8WDRFrameStr");
     ISPCFG_GetNumInLine(pString);
 
-    for(u32IdxM = 0; u32IdxM < 4; u32IdxM++)
+    u32Idx = 0;
+    for(i = 0; i < ISP_BAYER_CHN_NUM; i++)
     {
-        u32Value = ISPCFG_LineValue[u32IdxM];
-        pStaticBnr->au8WDRFrameStr[u32IdxM] = ISPCFG_LineValue[u32IdxM];
+        pStaticBnr->au8WDRFrameStr[i] = ISPCFG_LineValue[u32Idx ++];
     }
 
     return 0;
@@ -2251,43 +2431,43 @@ int ISPCFG_SetBypass(VI_PIPE ViPipe)
         prtMD("HI_MPI_ISP_GetModuleControl is failed!\n");
     }
 
-    stModCtrl.bitBypassISPDGain =  stISPCfgPipeParam[ViPipe].stModuleState.bitBypassISPDGain;
-    stModCtrl.bitBypassAntiFC = stISPCfgPipeParam[ViPipe].stModuleState.bitBypassAntiFC;
-    stModCtrl.bitBypassCrosstalkR = stISPCfgPipeParam[ViPipe].stModuleState.bitBypassCrosstalkR;
+    stModCtrl.bitBypassISPDGain =  stISPCfgPipeParam[ViPipe].stBypassParam.bitBypassISPDGain;
+    stModCtrl.bitBypassAntiFC = stISPCfgPipeParam[ViPipe].stBypassParam.bitBypassAntiFC;
+    stModCtrl.bitBypassCrosstalkR = stISPCfgPipeParam[ViPipe].stBypassParam.bitBypassCrosstalkR;
 
-    stModCtrl.bitBypassDPC = stISPCfgPipeParam[ViPipe].stModuleState.bitBypassDPC;
-    stModCtrl.bitBypassNR = stISPCfgPipeParam[ViPipe].stModuleState.bitBypassNR;
-    stModCtrl.bitBypassDehaze = stISPCfgPipeParam[ViPipe].stModuleState.bitBypassDehaze;
-    stModCtrl.bitBypassWBGain = stISPCfgPipeParam[ViPipe].stModuleState.bitBypassWBGain;
+    stModCtrl.bitBypassDPC = stISPCfgPipeParam[ViPipe].stBypassParam.bitBypassDPC;
+    stModCtrl.bitBypassNR = stISPCfgPipeParam[ViPipe].stBypassParam.bitBypassNR;
+    stModCtrl.bitBypassDehaze = stISPCfgPipeParam[ViPipe].stBypassParam.bitBypassDehaze;
+    stModCtrl.bitBypassWBGain = stISPCfgPipeParam[ViPipe].stBypassParam.bitBypassWBGain;
 
-    stModCtrl.bitBypassMeshShading = stISPCfgPipeParam[ViPipe].stModuleState.bitBypassMeshShading;
-    stModCtrl.bitBypassDRC = stISPCfgPipeParam[ViPipe].stModuleState.bitBypassDRC;
-    stModCtrl.bitBypassDemosaic = stISPCfgPipeParam[ViPipe].stModuleState.bitBypassDemosaic;
-    stModCtrl.bitBypassColorMatrix = stISPCfgPipeParam[ViPipe].stModuleState.bitBypassColorMatrix;
-    stModCtrl.bitBypassGamma = stISPCfgPipeParam[ViPipe].stModuleState.bitBypassGamma;
-    stModCtrl.bitBypassFSWDR = stISPCfgPipeParam[ViPipe].stModuleState.bitBypassFSWDR;
+    stModCtrl.bitBypassMeshShading = stISPCfgPipeParam[ViPipe].stBypassParam.bitBypassMeshShading;
+    stModCtrl.bitBypassDRC = stISPCfgPipeParam[ViPipe].stBypassParam.bitBypassDRC;
+    stModCtrl.bitBypassDemosaic = stISPCfgPipeParam[ViPipe].stBypassParam.bitBypassDemosaic;
+    stModCtrl.bitBypassColorMatrix = stISPCfgPipeParam[ViPipe].stBypassParam.bitBypassColorMatrix;
+    stModCtrl.bitBypassGamma = stISPCfgPipeParam[ViPipe].stBypassParam.bitBypassGamma;
+    stModCtrl.bitBypassFSWDR = stISPCfgPipeParam[ViPipe].stBypassParam.bitBypassFSWDR;
 
-    stModCtrl.bitBypassCA = stISPCfgPipeParam[ViPipe].stModuleState.bitBypassCA;
-    stModCtrl.bitBypassCsConv = stISPCfgPipeParam[ViPipe].stModuleState.bitBypassCsConv;
-    stModCtrl.bitBypassSharpen = stISPCfgPipeParam[ViPipe].stModuleState.bitBypassSharpen;
-    stModCtrl.bitBypassLCAC = stISPCfgPipeParam[ViPipe].stModuleState.bitBypassLCAC;
-    stModCtrl.bitBypassGCAC = stISPCfgPipeParam[ViPipe].stModuleState.bitBypassGCAC;
+    stModCtrl.bitBypassCA = stISPCfgPipeParam[ViPipe].stBypassParam.bitBypassCA;
+    stModCtrl.bitBypassCsConv = stISPCfgPipeParam[ViPipe].stBypassParam.bitBypassCsConv;
+    stModCtrl.bitBypassSharpen = stISPCfgPipeParam[ViPipe].stBypassParam.bitBypassSharpen;
+    stModCtrl.bitBypassLCAC = stISPCfgPipeParam[ViPipe].stBypassParam.bitBypassLCAC;
+    stModCtrl.bitBypassGCAC = stISPCfgPipeParam[ViPipe].stBypassParam.bitBypassGCAC;
 
-    stModCtrl.bit2ChnSelect = stISPCfgPipeParam[ViPipe].stModuleState.bit2ChnSelect;
-    stModCtrl.bitBypassLdci = stISPCfgPipeParam[ViPipe].stModuleState.bitBypassLdci;
+    stModCtrl.bit2ChnSelect = stISPCfgPipeParam[ViPipe].stBypassParam.bit2ChnSelect;
+    stModCtrl.bitBypassLdci = stISPCfgPipeParam[ViPipe].stBypassParam.bitBypassLdci;
 
-    stModCtrl.bitBypassPreGamma = stISPCfgPipeParam[ViPipe].stModuleState.bitBypassPreGamma;
-    stModCtrl.bitBypassAEStatFE = stISPCfgPipeParam[ViPipe].stModuleState.bitBypassAEStatFE;
+    stModCtrl.bitBypassPreGamma = stISPCfgPipeParam[ViPipe].stBypassParam.bitBypassPreGamma;
+    stModCtrl.bitBypassAEStatFE = stISPCfgPipeParam[ViPipe].stBypassParam.bitBypassAEStatFE;
 
-    stModCtrl.bitBypassAEStatBE = stISPCfgPipeParam[ViPipe].stModuleState.bitBypassAEStatBE;
-    stModCtrl.bitBypassMGStat = stISPCfgPipeParam[ViPipe].stModuleState.bitBypassMGSta;
-    stModCtrl.bitBypassDE = stISPCfgPipeParam[ViPipe].stModuleState.bitBypassDE;
-    stModCtrl.bitBypassAFStatBE = stISPCfgPipeParam[ViPipe].stModuleState.bitBypassAFStatBE;
+    stModCtrl.bitBypassAEStatBE = stISPCfgPipeParam[ViPipe].stBypassParam.bitBypassAEStatBE;
+    stModCtrl.bitBypassMGStat = stISPCfgPipeParam[ViPipe].stBypassParam.bitBypassMGSta;
+    stModCtrl.bitBypassDE = stISPCfgPipeParam[ViPipe].stBypassParam.bitBypassDE;
+    stModCtrl.bitBypassAFStatBE = stISPCfgPipeParam[ViPipe].stBypassParam.bitBypassAFStatBE;
 
-    stModCtrl.bitBypassAWBStat = stISPCfgPipeParam[ViPipe].stModuleState.bitBypassAWBStat;
-    stModCtrl.bitBypassCLUT = stISPCfgPipeParam[ViPipe].stModuleState.bitBypassCLUT;
-    stModCtrl.bitBypassHLC = stISPCfgPipeParam[ViPipe].stModuleState.bitBypassHLC;
-    stModCtrl.bitBypassEdgeMark = stISPCfgPipeParam[ViPipe].stModuleState.bitBypassEdgeMark;
+    stModCtrl.bitBypassAWBStat = stISPCfgPipeParam[ViPipe].stBypassParam.bitBypassAWBStat;
+    stModCtrl.bitBypassCLUT = stISPCfgPipeParam[ViPipe].stBypassParam.bitBypassCLUT;
+    stModCtrl.bitBypassHLC = stISPCfgPipeParam[ViPipe].stBypassParam.bitBypassHLC;
+    stModCtrl.bitBypassEdgeMark = stISPCfgPipeParam[ViPipe].stBypassParam.bitBypassEdgeMark;
 
     prtMD("stModCtrl.bitBypassEdgeMark = %d\n", stModCtrl.bitBypassEdgeMark);
     s32Ret = HI_MPI_ISP_SetModuleControl(ViPipe, &stModCtrl);
@@ -2299,7 +2479,7 @@ int ISPCFG_SetBypass(VI_PIPE ViPipe)
     return 0;
 }
 
-static int ISPCFG_SetStaticBlackLevel(VI_PIPE ViPipe)
+static int ISPCFG_SetBlackLevel(VI_PIPE ViPipe)
 {
     HI_S32 s32Ret = HI_SUCCESS;
     int i = 0;
@@ -2317,10 +2497,10 @@ static int ISPCFG_SetStaticBlackLevel(VI_PIPE ViPipe)
         prtMD("HI_MPI_ISP_GetBlackLevelAttr is failed!s32Ret = %#x\n",s32Ret);
     }
 
-    stBlackLevel.enOpType = (ISP_OP_TYPE_E)stISPCfgPipeParam[ViPipe].stStaticBlackLevel.enOpType;
+    stBlackLevel.enOpType = (ISP_OP_TYPE_E)stISPCfgPipeParam[ViPipe].stBlackParam.enOpType;
     for(i = 0;i < 4;i++)
     {
-        stBlackLevel.au16BlackLevel[i] = stISPCfgPipeParam[ViPipe].stStaticBlackLevel.au16BlackLevel[i];
+        stBlackLevel.au16BlackLevel[i] = stISPCfgPipeParam[ViPipe].stBlackParam.au16BlackLevel[i];
     }
 
     s32Ret = HI_MPI_ISP_SetBlackLevelAttr(ViPipe, &stBlackLevel);
@@ -2333,7 +2513,7 @@ static int ISPCFG_SetStaticBlackLevel(VI_PIPE ViPipe)
 }
 
 /* 设置自动曝光参数值 */
-static int ISPCFG_SetDynamicAE(VI_PIPE ViPipe)
+static int ISPCFG_SetAE(VI_PIPE ViPipe)
 {
     HI_S32 s32Ret = HI_SUCCESS;
     ISP_EXPOSURE_ATTR_S stExposureAttr = {0};
@@ -2352,66 +2532,66 @@ static int ISPCFG_SetDynamicAE(VI_PIPE ViPipe)
     }
 
     /* AE 扩展分配路线是否生效开关: 1-使用 AE 扩展分配路线; 0-使用普通 AE 分配路线 */
-    stExposureAttr.bAERouteExValid = stISPCfgPipeParam[ViPipe].stStaticAe.bAERouteExValid;
+    stExposureAttr.bAERouteExValid = stISPCfgPipeParam[ViPipe].stAeParam.bAERouteExValid;
 
     /* 曝光类型: 0-auto;1-手动 */
-    stExposureAttr.enOpType = stISPCfgPipeParam[ViPipe].stStaticAe.ExposureOpType;
+    stExposureAttr.enOpType = stISPCfgPipeParam[ViPipe].stAeParam.ExposureOpType;
 
     /* AE 算法运行的间隔 */
-    stExposureAttr.u8AERunInterval = stISPCfgPipeParam[ViPipe].stStaticAe.u8AERunInterval;
+    stExposureAttr.u8AERunInterval = stISPCfgPipeParam[ViPipe].stAeParam.u8AERunInterval;
 
     /* 曝光时间 */
-    stExposureAttr.stAuto.stExpTimeRange.u32Max = stISPCfgPipeParam[ViPipe].stStaticAe.u32AutoExpTimeMax;
-    stExposureAttr.stAuto.stExpTimeRange.u32Min = stISPCfgPipeParam[ViPipe].stStaticAe.u32AutoExpTimeMin;
+    stExposureAttr.stAuto.stExpTimeRange.u32Max = stISPCfgPipeParam[ViPipe].stAeParam.u32AutoExpTimeMax;
+    stExposureAttr.stAuto.stExpTimeRange.u32Min = stISPCfgPipeParam[ViPipe].stAeParam.u32AutoExpTimeMin;
 
     /* sensor模拟增益 */
-    stExposureAttr.stAuto.stAGainRange.u32Max = stISPCfgPipeParam[ViPipe].stStaticAe.u32AutoAGainMax;
-    stExposureAttr.stAuto.stAGainRange.u32Min = stISPCfgPipeParam[ViPipe].stStaticAe.u32AutoAGainMin;
+    stExposureAttr.stAuto.stAGainRange.u32Max = stISPCfgPipeParam[ViPipe].stAeParam.u32AutoAGainMax;
+    stExposureAttr.stAuto.stAGainRange.u32Min = stISPCfgPipeParam[ViPipe].stAeParam.u32AutoAGainMin;
 
     /* sensor数字增益 */
-    stExposureAttr.stAuto.stDGainRange.u32Max = stISPCfgPipeParam[ViPipe].stStaticAe.u32AutoDGainMax;
-    stExposureAttr.stAuto.stDGainRange.u32Min = stISPCfgPipeParam[ViPipe].stStaticAe.u32AutoDGainMin;
+    stExposureAttr.stAuto.stDGainRange.u32Max = stISPCfgPipeParam[ViPipe].stAeParam.u32AutoDGainMax;
+    stExposureAttr.stAuto.stDGainRange.u32Min = stISPCfgPipeParam[ViPipe].stAeParam.u32AutoDGainMin;
 
     /* ISP数字增益 */
-    stExposureAttr.stAuto.stISPDGainRange.u32Max = stISPCfgPipeParam[ViPipe].stStaticAe.u32AutoISPDGainMax;
-    stExposureAttr.stAuto.stISPDGainRange.u32Min = stISPCfgPipeParam[ViPipe].stStaticAe.u32AutoISPDGainMin;
+    stExposureAttr.stAuto.stISPDGainRange.u32Max = stISPCfgPipeParam[ViPipe].stAeParam.u32AutoISPDGainMax;
+    stExposureAttr.stAuto.stISPDGainRange.u32Min = stISPCfgPipeParam[ViPipe].stAeParam.u32AutoISPDGainMin;
 
     /* 系统增益 */
-    stExposureAttr.stAuto.stSysGainRange.u32Max = stISPCfgPipeParam[ViPipe].stStaticAe.u32AutoSysGainMax;
-    stExposureAttr.stAuto.stSysGainRange.u32Min = stISPCfgPipeParam[ViPipe].stStaticAe.u32AutoSysGainMin;
+    stExposureAttr.stAuto.stSysGainRange.u32Max = stISPCfgPipeParam[ViPipe].stAeParam.u32AutoSysGainMax;
+    stExposureAttr.stAuto.stSysGainRange.u32Min = stISPCfgPipeParam[ViPipe].stAeParam.u32AutoSysGainMin;
 
     /* 自动降帧时的系统增益门限值 */
-    stExposureAttr.stAuto.u32GainThreshold = stISPCfgPipeParam[ViPipe].stStaticAe.u32AutoGainThreshold;
+    stExposureAttr.stAuto.u32GainThreshold = stISPCfgPipeParam[ViPipe].stAeParam.u32AutoGainThreshold;
 
     /* 自动曝光调整速度 */
-    stExposureAttr.stAuto.u8Speed = stISPCfgPipeParam[ViPipe].stStaticAe.u8AutoSpeed;
+    stExposureAttr.stAuto.u8Speed = stISPCfgPipeParam[ViPipe].stAeParam.u8AutoSpeed;
 
     /* 画面由暗到亮 AE 调节速度的偏差值，该值越大，画面从暗到 亮的速度越快 */
-    stExposureAttr.stAuto.u16BlackSpeedBias = stISPCfgPipeParam[ViPipe].stStaticAe.u16AutoBlackSpeedBias;
+    stExposureAttr.stAuto.u16BlackSpeedBias = stISPCfgPipeParam[ViPipe].stAeParam.u16AutoBlackSpeedBias;
 
     /* 自动曝光调整时的目标亮度 */
-    stExposureAttr.stAuto.u8Compensation = stISPCfgPipeParam[ViPipe].stStaticAe.u8AutostaticCompesation[0];
+    stExposureAttr.stAuto.u8Compensation = stISPCfgPipeParam[ViPipe].stAeParam.u8AutostaticCompesation;
 
     /* 自动曝光调整时的曝光量偏差值 */
-    stExposureAttr.stAuto.u16EVBias = stISPCfgPipeParam[ViPipe].stStaticAe.u16AutoEVBias;
+    stExposureAttr.stAuto.u16EVBias = stISPCfgPipeParam[ViPipe].stAeParam.u16AutoEVBias;
 
     /* 自动曝光策略:高光优先或低光优先 */
-    stExposureAttr.stAuto.enAEStrategyMode = stISPCfgPipeParam[ViPipe].stStaticAe.bAutoAEStrategMode;
+    stExposureAttr.stAuto.enAEStrategyMode = stISPCfgPipeParam[ViPipe].stAeParam.bAutoAEStrategMode;
 
     /* 感兴趣区域的权重 */
-    stExposureAttr.stAuto.u16HistRatioSlope = stISPCfgPipeParam[ViPipe].stStaticAe.u16AutoHistRatioSlope;
+    stExposureAttr.stAuto.u16HistRatioSlope = stISPCfgPipeParam[ViPipe].stAeParam.u16AutoHistRatioSlope;
 
     /* 感兴趣区域对统计平均值影响的最大程度 */
-    stExposureAttr.stAuto.u8MaxHistOffset = stISPCfgPipeParam[ViPipe].stStaticAe.u8AutoMaxHistOffset;
+    stExposureAttr.stAuto.u8MaxHistOffset = stISPCfgPipeParam[ViPipe].stAeParam.u8AutoMaxHistOffset;
 
     /* 自动曝光调整时对画面亮度的容忍偏差 */
-    stExposureAttr.stAuto.u8Tolerance = stISPCfgPipeParam[ViPipe].stStaticAe.u8AutoTolerance;
+    stExposureAttr.stAuto.u8Tolerance = stISPCfgPipeParam[ViPipe].stAeParam.u8AutoTolerance;
 
     /* 延时属性设置 */
-    stExposureAttr.stAuto.stAEDelayAttr.u16BlackDelayFrame = stISPCfgPipeParam[ViPipe].stStaticAe.u16AutoBlackDelayFrame;
-    stExposureAttr.stAuto.stAEDelayAttr.u16WhiteDelayFrame = stISPCfgPipeParam[ViPipe].stStaticAe.u16AutoWhiteDelayFrame;
+    stExposureAttr.stAuto.stAEDelayAttr.u16BlackDelayFrame = stISPCfgPipeParam[ViPipe].stAeParam.u16AutoBlackDelayFrame;
+    stExposureAttr.stAuto.stAEDelayAttr.u16WhiteDelayFrame = stISPCfgPipeParam[ViPipe].stAeParam.u16AutoWhiteDelayFrame;
 
-    //stExposureAttr.stAuto.enFSWDRMode = stISPCfgPipeParam[ViPipe].stStaticAe.enFSWDRMode;
+    //stExposureAttr.stAuto.enFSWDRMode = stISPCfgPipeParam[ViPipe].stAeParam.enFSWDRMode;
 
     prtMD("bAERouteExValid = %d, u8AERunInterval = %d, u32Max = %d, u8Compensation = %d\n",
         stExposureAttr.bAERouteExValid,
@@ -2460,7 +2640,7 @@ int ISPCFG_SetLongFrameAE(VI_PIPE ViPipe)
     return 0;
 }
 
-static int ISPCFG_SetStaticAWB(VI_PIPE ViPipe)
+static int ISPCFG_SetAWB(VI_PIPE ViPipe)
 {
     HI_S32 i = 0;
     HI_S32 s32Ret = HI_SUCCESS;
@@ -2479,23 +2659,23 @@ static int ISPCFG_SetStaticAWB(VI_PIPE ViPipe)
         return -1;
     }
 
-    stWbAttr.stAuto.u16RefColorTemp = stISPCfgPipeParam[ViPipe].stStaticAwb.u16AutoRefColorTemp;
+    stWbAttr.stAuto.u16RefColorTemp = stISPCfgPipeParam[ViPipe].stAwbParam.u16AutoRefColorTemp;
     for(i = 0;i < 4;i++)
     {
-        stWbAttr.stAuto.au16StaticWB[i] = stISPCfgPipeParam[ViPipe].stStaticAwb.au16AutoStaticWB[i];
+        stWbAttr.stAuto.au16StaticWB[i] = stISPCfgPipeParam[ViPipe].stAwbParam.au16AutoStaticWB[i];
     }
 
     for(i = 0; i < 6;i++)
     {
-        stWbAttr.stAuto.as32CurvePara[i] = stISPCfgPipeParam[ViPipe].stStaticAwb.as32AutoCurvePara[i];
+        stWbAttr.stAuto.as32CurvePara[i] = stISPCfgPipeParam[ViPipe].stAwbParam.as32AutoCurvePara[i];
     }
 
-    stWbAttr.stAuto.u8RGStrength = stISPCfgPipeParam[ViPipe].stStaticAwb.u8AutoRGStrength;
-    stWbAttr.stAuto.u8BGStrength = stISPCfgPipeParam[ViPipe].stStaticAwb.u8AutoBGStrength;
-    stWbAttr.stAuto.u16Speed = stISPCfgPipeParam[ViPipe].stStaticAwb.u16AutoSpeed;
-    stWbAttr.stAuto.u16ZoneSel = stISPCfgPipeParam[ViPipe].stStaticAwb.u16AutoZoneSel;
-    stWbAttr.stAuto.u16HighColorTemp = stISPCfgPipeParam[ViPipe].stStaticAwb.u16AutoHighColorTemp;
-    stWbAttr.stAuto.u16LowColorTemp = stISPCfgPipeParam[ViPipe].stStaticAwb.u16AutoLowColorTemp;
+    stWbAttr.stAuto.u8RGStrength = stISPCfgPipeParam[ViPipe].stAwbParam.u8AutoRGStrength;
+    stWbAttr.stAuto.u8BGStrength = stISPCfgPipeParam[ViPipe].stAwbParam.u8AutoBGStrength;
+    stWbAttr.stAuto.u16Speed = stISPCfgPipeParam[ViPipe].stAwbParam.u16AutoSpeed;
+    stWbAttr.stAuto.u16ZoneSel = stISPCfgPipeParam[ViPipe].stAwbParam.u16AutoZoneSel;
+    stWbAttr.stAuto.u16HighColorTemp = stISPCfgPipeParam[ViPipe].stAwbParam.u16AutoHighColorTemp;
+    stWbAttr.stAuto.u16LowColorTemp = stISPCfgPipeParam[ViPipe].stAwbParam.u16AutoLowColorTemp;
 
     s32Ret = HI_MPI_ISP_SetWBAttr(ViPipe, &stWbAttr);
     if(s32Ret != HI_SUCCESS)
@@ -2507,7 +2687,7 @@ static int ISPCFG_SetStaticAWB(VI_PIPE ViPipe)
     return 0;
 }
 
-static int ISPCFG_SetWDRExposure(VI_PIPE ViPipe)
+static int ISPCFG_SetWdrAE(VI_PIPE ViPipe)
 {
     HI_S32 i = 0;
     HI_S32 s32Ret = HI_SUCCESS;
@@ -2526,16 +2706,16 @@ static int ISPCFG_SetWDRExposure(VI_PIPE ViPipe)
         return -1;
     }
 
-    stWdrExposureAttr.enExpRatioType = (ISP_OP_TYPE_E)stISPCfgPipeParam[ViPipe].stStaticWdrExposure.u8ExpRatioType;
-    stWdrExposureAttr.u32ExpRatioMax = stISPCfgPipeParam[ViPipe].stStaticWdrExposure.u32ExpRatioMax;
-    stWdrExposureAttr.u32ExpRatioMin = stISPCfgPipeParam[ViPipe].stStaticWdrExposure.u32ExpRatioMin;
+    stWdrExposureAttr.enExpRatioType = (ISP_OP_TYPE_E)stISPCfgPipeParam[ViPipe].stWdrAeParam.u8ExpRatioType;
+    stWdrExposureAttr.u32ExpRatioMax = stISPCfgPipeParam[ViPipe].stWdrAeParam.u32ExpRatioMax;
+    stWdrExposureAttr.u32ExpRatioMin = stISPCfgPipeParam[ViPipe].stWdrAeParam.u32ExpRatioMin;
 
-    stWdrExposureAttr.u16Tolerance = stISPCfgPipeParam[ViPipe].stStaticWdrExposure.u16Tolerance;
-    stWdrExposureAttr.u16Speed = stISPCfgPipeParam[ViPipe].stStaticWdrExposure.u16Speed;
-    stWdrExposureAttr.u16RatioBias = stISPCfgPipeParam[ViPipe].stStaticWdrExposure.u16RatioBias;
+    stWdrExposureAttr.u16Tolerance = stISPCfgPipeParam[ViPipe].stWdrAeParam.u16Tolerance;
+    stWdrExposureAttr.u16Speed = stISPCfgPipeParam[ViPipe].stWdrAeParam.u16Speed;
+    stWdrExposureAttr.u16RatioBias = stISPCfgPipeParam[ViPipe].stWdrAeParam.u16RatioBias;
     for(i = 0 ; i < 3; i++)
     {
-        stWdrExposureAttr.au32ExpRatio[i] = stISPCfgPipeParam[ViPipe].stStaticWdrExposure.au32ExpRatio[i];
+        stWdrExposureAttr.au32ExpRatio[i] = stISPCfgPipeParam[ViPipe].stWdrAeParam.au32ExpRatio[i];
     }
 
     s32Ret = HI_MPI_ISP_SetWDRExposureAttr(ViPipe, &stWdrExposureAttr);
@@ -2568,12 +2748,12 @@ static int ISPCFG_SetSaturation(VI_PIPE ViPipe)
         return -1;
     }
 
-    stSaturationAttr.enOpType = (ISP_OP_TYPE_E)stISPCfgPipeParam[ViPipe].stStaticSaturation.bOpType;
-    stSaturationAttr.stManual.u8Saturation = stISPCfgPipeParam[ViPipe].stStaticSaturation.u8ManualSat;
+    stSaturationAttr.enOpType = (ISP_OP_TYPE_E)stISPCfgPipeParam[ViPipe].stSaturationParam.bOpType;
+    stSaturationAttr.stManual.u8Saturation = stISPCfgPipeParam[ViPipe].stSaturationParam.u8ManualSat;
 
     for (i = 0; i < 16; i++)
     {
-        stSaturationAttr.stAuto.au8Sat[i] = stISPCfgPipeParam[ViPipe].stStaticSaturation.au8AutoSat[i];
+        stSaturationAttr.stAuto.au8Sat[i] = stISPCfgPipeParam[ViPipe].stSaturationParam.au8AutoSat[i];
     }
 
     s32Ret = HI_MPI_ISP_SetSaturationAttr(ViPipe, &stSaturationAttr);
@@ -2604,41 +2784,41 @@ static int ISPCFG_SetDRC(VI_PIPE ViPipe)
         return -1;
     }
 
-    stDrcAttr.bEnable = stISPCfgPipeParam[ViPipe].stStaticDrc.bEnable;
-    stDrcAttr.enCurveSelect = (ISP_DRC_CURVE_SELECT_E)stISPCfgPipeParam[ViPipe].stStaticDrc.u8CurveSelect;
+    stDrcAttr.bEnable = stISPCfgPipeParam[ViPipe].stDrcParam.bEnable;
+    stDrcAttr.enCurveSelect = (ISP_DRC_CURVE_SELECT_E)stISPCfgPipeParam[ViPipe].stDrcParam.u8CurveSelect;
 
-    stDrcAttr.u8PDStrength = stISPCfgPipeParam[ViPipe].stStaticDrc.u8PDStrength;
-    stDrcAttr.u8LocalMixingBrightMax = stISPCfgPipeParam[ViPipe].stStaticDrc.u8LocalMixingBrightMax;
-    stDrcAttr.u8LocalMixingBrightMin = stISPCfgPipeParam[ViPipe].stStaticDrc.u8LocalMixingBrightMin;
-    stDrcAttr.u8LocalMixingBrightThr = stISPCfgPipeParam[ViPipe].stStaticDrc.u8LocalMixingBrightThr;
-    stDrcAttr.s8LocalMixingBrightSlo = stISPCfgPipeParam[ViPipe].stStaticDrc.s8LocalMixingBrightSlo;
+    stDrcAttr.u8PDStrength = stISPCfgPipeParam[ViPipe].stDrcParam.u8PDStrength;
+    stDrcAttr.u8LocalMixingBrightMax = stISPCfgPipeParam[ViPipe].stDrcParam.u8LocalMixingBrightMax;
+    stDrcAttr.u8LocalMixingBrightMin = stISPCfgPipeParam[ViPipe].stDrcParam.u8LocalMixingBrightMin;
+    stDrcAttr.u8LocalMixingBrightThr = stISPCfgPipeParam[ViPipe].stDrcParam.u8LocalMixingBrightThr;
+    stDrcAttr.s8LocalMixingBrightSlo = stISPCfgPipeParam[ViPipe].stDrcParam.s8LocalMixingBrightSlo;
 
-    stDrcAttr.u8LocalMixingDarkMax = stISPCfgPipeParam[ViPipe].stStaticDrc.u8LocalMixingDarkMax;
-    stDrcAttr.u8LocalMixingDarkMin = stISPCfgPipeParam[ViPipe].stStaticDrc.u8LocalMixingDarkMin;
-    stDrcAttr.u8LocalMixingDarkThr = stISPCfgPipeParam[ViPipe].stStaticDrc.u8LocalMixingDarkThr;
-    stDrcAttr.s8LocalMixingDarkSlo = stISPCfgPipeParam[ViPipe].stStaticDrc.s8LocalMixingDarkSlo;
+    stDrcAttr.u8LocalMixingDarkMax = stISPCfgPipeParam[ViPipe].stDrcParam.u8LocalMixingDarkMax;
+    stDrcAttr.u8LocalMixingDarkMin = stISPCfgPipeParam[ViPipe].stDrcParam.u8LocalMixingDarkMin;
+    stDrcAttr.u8LocalMixingDarkThr = stISPCfgPipeParam[ViPipe].stDrcParam.u8LocalMixingDarkThr;
+    stDrcAttr.s8LocalMixingDarkSlo = stISPCfgPipeParam[ViPipe].stDrcParam.s8LocalMixingDarkSlo;
 
-    stDrcAttr.u8BrightGainLmt = stISPCfgPipeParam[ViPipe].stStaticDrc.u8BrightGainLmt;
-    stDrcAttr.u8BrightGainLmtStep = stISPCfgPipeParam[ViPipe].stStaticDrc.u8BrightGainLmtStep;
-    stDrcAttr.u8DarkGainLmtY = stISPCfgPipeParam[ViPipe].stStaticDrc.u8DarkGainLmtY;
-    stDrcAttr.u8DarkGainLmtC = stISPCfgPipeParam[ViPipe].stStaticDrc.u8DarkGainLmtC;
-    stDrcAttr.u8ContrastControl = stISPCfgPipeParam[ViPipe].stStaticDrc.u8ContrastControl;
-    stDrcAttr.s8DetailAdjustFactor = stISPCfgPipeParam[ViPipe].stStaticDrc.s8DetailAdjustFactor;
-    stDrcAttr.u8SpatialFltCoef = stISPCfgPipeParam[ViPipe].stStaticDrc.u8SpatialFltCoef;
-    stDrcAttr.u8RangeFltCoef = stISPCfgPipeParam[ViPipe].stStaticDrc.u8RangeFltCoef;
-    stDrcAttr.u8RangeAdaMax = stISPCfgPipeParam[ViPipe].stStaticDrc.u8RangeAdaMax;
-    stDrcAttr.u8GradRevMax = stISPCfgPipeParam[ViPipe].stStaticDrc.u8GradRevMax;
-    stDrcAttr.u8GradRevThr = stISPCfgPipeParam[ViPipe].stStaticDrc.u8GradRevThr;
-    stDrcAttr.enOpType = (ISP_OP_TYPE_E)stISPCfgPipeParam[ViPipe].stStaticDrc.u8DRCOpType;
-    stDrcAttr.stAuto.u16Strength = stISPCfgPipeParam[ViPipe].stStaticDrc.u16AutoStrength;
-    stDrcAttr.stAuto.u16StrengthMax = stISPCfgPipeParam[ViPipe].stStaticDrc.u16AutoStrengthMax;
-    stDrcAttr.stAuto.u16StrengthMin = stISPCfgPipeParam[ViPipe].stStaticDrc.u16AutoStrengthMin;
-    stDrcAttr.stManual.u16Strength = stISPCfgPipeParam[ViPipe].stStaticDrc.u16ManualStrength;
+    stDrcAttr.u8BrightGainLmt = stISPCfgPipeParam[ViPipe].stDrcParam.u8BrightGainLmt;
+    stDrcAttr.u8BrightGainLmtStep = stISPCfgPipeParam[ViPipe].stDrcParam.u8BrightGainLmtStep;
+    stDrcAttr.u8DarkGainLmtY = stISPCfgPipeParam[ViPipe].stDrcParam.u8DarkGainLmtY;
+    stDrcAttr.u8DarkGainLmtC = stISPCfgPipeParam[ViPipe].stDrcParam.u8DarkGainLmtC;
+    stDrcAttr.u8ContrastControl = stISPCfgPipeParam[ViPipe].stDrcParam.u8ContrastControl;
+    stDrcAttr.s8DetailAdjustFactor = stISPCfgPipeParam[ViPipe].stDrcParam.s8DetailAdjustFactor;
+    stDrcAttr.u8SpatialFltCoef = stISPCfgPipeParam[ViPipe].stDrcParam.u8SpatialFltCoef;
+    stDrcAttr.u8RangeFltCoef = stISPCfgPipeParam[ViPipe].stDrcParam.u8RangeFltCoef;
+    stDrcAttr.u8RangeAdaMax = stISPCfgPipeParam[ViPipe].stDrcParam.u8RangeAdaMax;
+    stDrcAttr.u8GradRevMax = stISPCfgPipeParam[ViPipe].stDrcParam.u8GradRevMax;
+    stDrcAttr.u8GradRevThr = stISPCfgPipeParam[ViPipe].stDrcParam.u8GradRevThr;
+    stDrcAttr.enOpType = (ISP_OP_TYPE_E)stISPCfgPipeParam[ViPipe].stDrcParam.u8DRCOpType;
+    stDrcAttr.stAuto.u16Strength = stISPCfgPipeParam[ViPipe].stDrcParam.u16AutoStrength;
+    stDrcAttr.stAuto.u16StrengthMax = stISPCfgPipeParam[ViPipe].stDrcParam.u16AutoStrengthMax;
+    stDrcAttr.stAuto.u16StrengthMin = stISPCfgPipeParam[ViPipe].stDrcParam.u16AutoStrengthMin;
+    stDrcAttr.stManual.u16Strength = stISPCfgPipeParam[ViPipe].stDrcParam.u16ManualStrength;
 
-    stDrcAttr.stAsymmetryCurve.u8Asymmetry = stISPCfgPipeParam[ViPipe].stStaticDrc.u8Asymmetry;
-    stDrcAttr.stAsymmetryCurve.u8Compress = stISPCfgPipeParam[ViPipe].stStaticDrc.u8Compress;
-    stDrcAttr.stAsymmetryCurve.u8SecondPole = stISPCfgPipeParam[ViPipe].stStaticDrc.u8SecondPole;
-    stDrcAttr.stAsymmetryCurve.u8Stretch = stISPCfgPipeParam[ViPipe].stStaticDrc.u8Stretch;
+    stDrcAttr.stAsymmetryCurve.u8Asymmetry = stISPCfgPipeParam[ViPipe].stDrcParam.u8Asymmetry;
+    stDrcAttr.stAsymmetryCurve.u8Compress = stISPCfgPipeParam[ViPipe].stDrcParam.u8Compress;
+    stDrcAttr.stAsymmetryCurve.u8SecondPole = stISPCfgPipeParam[ViPipe].stDrcParam.u8SecondPole;
+    stDrcAttr.stAsymmetryCurve.u8Stretch = stISPCfgPipeParam[ViPipe].stDrcParam.u8Stretch;
 #if 0
     HI_S32 i = 0,j = 0;
 
@@ -2646,7 +2826,7 @@ static int ISPCFG_SetDRC(VI_PIPE ViPipe)
     {
     for(j = 0; j < 20;j++)
     {
-    stDrcAttr.au16ToneMappingValue[(i * 20) + j] = stISPCfgPipeParam[ViPipe].stStaticDrc.au16ToneMappingValue[i][j];
+    stDrcAttr.au16ToneMappingValue[(i * 20) + j] = stISPCfgPipeParam[ViPipe].stDrcParam.au16ToneMappingValue[i][j];
     //prtMD("stDrcAttr.au16ToneMappingValue[%d] = %d\n",((i * 20) + j),stDrcAttr.au16ToneMappingValue[(i * 20) + j]);
     }
     }
@@ -2654,7 +2834,7 @@ static int ISPCFG_SetDRC(VI_PIPE ViPipe)
 #if 0
     for(i = 0;i < 33; i++)
     {
-    stDrcAttr.au16ColorCorrectionLut[i] = stISPCfgPipeParam[ViPipe].stStaticDrc.au16ColorCorrectionLut[i];
+    stDrcAttr.au16ColorCorrectionLut[i] = stISPCfgPipeParam[ViPipe].stDrcParam.au16ColorCorrectionLut[i];
     }
 #endif
 
@@ -2687,18 +2867,18 @@ static int ISPCFG_SetCCM(VI_PIPE ViPipe)
         return -1;
     }
 
-    stCCMAttr.enOpType = stISPCfgPipeParam[ViPipe].stStaticCCMAttr.CcmOpType;
+    stCCMAttr.enOpType = stISPCfgPipeParam[ViPipe].stCcmParam.CcmOpType;
     if(stCCMAttr.enOpType == OP_TYPE_AUTO)
     {
-        stCCMAttr.stAuto.bISOActEn = stISPCfgPipeParam[ViPipe].stStaticCCMAttr.bISOActEn;
-        stCCMAttr.stAuto.bTempActEn = stISPCfgPipeParam[ViPipe].stStaticCCMAttr.bTempActEn;
-        stCCMAttr.stAuto.u16CCMTabNum = stISPCfgPipeParam[ViPipe].stStaticCCMAttr.u16CCMTabNum;
+        stCCMAttr.stAuto.bISOActEn = stISPCfgPipeParam[ViPipe].stCcmParam.bISOActEn;
+        stCCMAttr.stAuto.bTempActEn = stISPCfgPipeParam[ViPipe].stCcmParam.bTempActEn;
+        stCCMAttr.stAuto.u16CCMTabNum = stISPCfgPipeParam[ViPipe].stCcmParam.u16CCMTabNum;
         for(i = 0;i < stCCMAttr.stAuto.u16CCMTabNum;i++)
         {
-            stCCMAttr.stAuto.astCCMTab[i].u16ColorTemp = stISPCfgPipeParam[ViPipe].stStaticCCMAttr.astCCMTab[i].u16ColorTemp;
+            stCCMAttr.stAuto.astCCMTab[i].u16ColorTemp = stISPCfgPipeParam[ViPipe].stCcmParam.astCCMTab[i].u16ColorTemp;
             for(j = 0;j < 9;j++)
             {
-                stCCMAttr.stAuto.astCCMTab[i].au16CCM[j] = stISPCfgPipeParam[ViPipe].stStaticCCMAttr.astCCMTab[i].au16CCM[j];
+                stCCMAttr.stAuto.astCCMTab[i].au16CCM[j] = stISPCfgPipeParam[ViPipe].stCcmParam.astCCMTab[i].au16CCM[j];
             }
         }
     }
@@ -2736,18 +2916,18 @@ static int ISPCFG_SetDehaze(VI_PIPE ViPipe)
         return -1;
     }
 
-    stDehazeAttr.bEnable = stISPCfgPipeParam[ViPipe].stStaticDehaze.bEnable;
-    stDehazeAttr.enOpType = (ISP_OP_TYPE_E)stISPCfgPipeParam[ViPipe].stStaticDehaze.u8DehazeOpType;
-    stDehazeAttr.bUserLutEnable = stISPCfgPipeParam[ViPipe].stStaticDehaze.bUserLutEnable;
+    stDehazeAttr.bEnable = stISPCfgPipeParam[ViPipe].stDehazeParam.bEnable;
+    stDehazeAttr.enOpType = (ISP_OP_TYPE_E)stISPCfgPipeParam[ViPipe].stDehazeParam.u8DehazeOpType;
+    stDehazeAttr.bUserLutEnable = stISPCfgPipeParam[ViPipe].stDehazeParam.bUserLutEnable;
 
-    stDehazeAttr.stManual.u8strength = stISPCfgPipeParam[ViPipe].stStaticDehaze.u8ManualStrength;
-    stDehazeAttr.stAuto.u8strength = stISPCfgPipeParam[ViPipe].stStaticDehaze.u8Autostrength;
-    stDehazeAttr.u16TmprfltIncrCoef = stISPCfgPipeParam[ViPipe].stStaticDehaze.u16prfltIncrCoef;
-    stDehazeAttr.u16TmprfltDecrCoef = stISPCfgPipeParam[ViPipe].stStaticDehaze.u16prfltDecrCoef;
+    stDehazeAttr.stManual.u8strength = stISPCfgPipeParam[ViPipe].stDehazeParam.u8ManualStrength;
+    stDehazeAttr.stAuto.u8strength = stISPCfgPipeParam[ViPipe].stDehazeParam.u8Autostrength;
+    stDehazeAttr.u16TmprfltIncrCoef = stISPCfgPipeParam[ViPipe].stDehazeParam.u16prfltIncrCoef;
+    stDehazeAttr.u16TmprfltDecrCoef = stISPCfgPipeParam[ViPipe].stDehazeParam.u16prfltDecrCoef;
 
     for (i = 0; i < 256; i++)
     {
-        stDehazeAttr.au8DehazeLut[i] = stISPCfgPipeParam[ViPipe].stStaticDehaze.au8DehazeLut[i];
+        stDehazeAttr.au8DehazeLut[i] = stISPCfgPipeParam[ViPipe].stDehazeParam.au8DehazeLut[i];
     }
 
     s32Ret = HI_MPI_ISP_SetDehazeAttr(ViPipe, &stDehazeAttr);
@@ -2760,6 +2940,7 @@ static int ISPCFG_SetDehaze(VI_PIPE ViPipe)
     return 0;
 }
 
+/* 设置3A统计配置信息 */
 int ISPCFG_SetStatistics(VI_PIPE ViPipe)
 {
     HI_S32 i, j = 0;
@@ -2779,14 +2960,11 @@ int ISPCFG_SetStatistics(VI_PIPE ViPipe)
         return -1;
     }
 
-    if(ISPCFG_SceneMode == 0)
+    for (i = 0; i < AE_ZONE_ROW; i++)
     {
-        for (i = 0; i < AE_ZONE_ROW; i++)
+        for (j = 0; j < AE_ZONE_COLUMN; j++)
         {
-            for (j = 0; j < AE_ZONE_COLUMN; j++)
-            {
-                stStatisticsCfg.stAECfg.au8Weight[i][j] = stISPCfgPipeParam[ViPipe].stStatistics.au8AEWeight[i][j];
-            }
+            stStatisticsCfg.stAECfg.au8Weight[i][j] = stISPCfgPipeParam[ViPipe].stStatisticsParam.au8AEWeight[i][j];
         }
     }
 
@@ -2818,10 +2996,10 @@ static int ISPCFG_SetCSC(VI_PIPE ViPipe)
         return -1;
     }
 
-    stCSCAttr.bEnable = stISPCfgPipeParam[ViPipe].stStaticCsc.bEnable;
+    stCSCAttr.bEnable = stISPCfgPipeParam[ViPipe].stCscParam.bEnable;
 
-    stCSCAttr.u8Contr = stISPCfgPipeParam[ViPipe].stStaticCsc.u8Contr;
-    stCSCAttr.u8Luma = stISPCfgPipeParam[ViPipe].stStaticCsc.u8Luma;
+    stCSCAttr.u8Contr = stISPCfgPipeParam[ViPipe].stCscParam.u8Contr;
+    stCSCAttr.u8Luma = stISPCfgPipeParam[ViPipe].stCscParam.u8Luma;
     if(ViPipe == 2)
     {
         stCSCAttr.u8Satu = 0;   //如果是IR数据输出，饱和度设置为0
@@ -2829,10 +3007,10 @@ static int ISPCFG_SetCSC(VI_PIPE ViPipe)
     }
     else
     {
-        stCSCAttr.u8Satu = stISPCfgPipeParam[ViPipe].stStaticCsc.u8Satu;  //RGB输出
-        stCSCAttr.u8Hue = stISPCfgPipeParam[ViPipe].stStaticCsc.u8Hue;
+        stCSCAttr.u8Satu = stISPCfgPipeParam[ViPipe].stCscParam.u8Satu;  //RGB输出
+        stCSCAttr.u8Hue = stISPCfgPipeParam[ViPipe].stCscParam.u8Hue;
     }
-    stCSCAttr.enColorGamut = stISPCfgPipeParam[ViPipe].stStaticCsc.enColorGamut;
+    stCSCAttr.enColorGamut = stISPCfgPipeParam[ViPipe].stCscParam.enColorGamut;
 
     s32Ret = HI_MPI_ISP_SetCSCAttr(ViPipe, &stCSCAttr);
     if(s32Ret != HI_SUCCESS)
@@ -2863,18 +3041,18 @@ int ISPCFG_SetLDCI(VI_PIPE ViPipe)
         return -1;
     }
 
-    stLDCI.bEnable = stISPCfgPipeParam[ViPipe].stStaticLdci.bEnable;
-    stLDCI.enOpType = stISPCfgPipeParam[ViPipe].stStaticLdci.u8LDCIOpType;
+    stLDCI.bEnable = stISPCfgPipeParam[ViPipe].stLdciParam.bEnable;
+    stLDCI.enOpType = stISPCfgPipeParam[ViPipe].stLdciParam.u8LDCIOpType;
 
     if(stLDCI.enOpType == OP_TYPE_MANUAL)
     {
-        stLDCI.stManual.u16BlcCtrl = stISPCfgPipeParam[ViPipe].stStaticLdci.u16ManualBlcCtrl;
+        stLDCI.stManual.u16BlcCtrl = stISPCfgPipeParam[ViPipe].stLdciParam.u16ManualBlcCtrl;
     }
     else if(stLDCI.enOpType == OP_TYPE_AUTO)
     {
         for(i = 0; i< 16;i++)
         {
-            stLDCI.stAuto.au16BlcCtrl[i] = stISPCfgPipeParam[ViPipe].stStaticLdci.u16AutoBlcCtrl[i];
+            stLDCI.stAuto.au16BlcCtrl[i] = stISPCfgPipeParam[ViPipe].stLdciParam.u16AutoBlcCtrl[i];
         }
     }
 
@@ -2906,7 +3084,7 @@ static int ISPCFG_SetMeshShading(VI_PIPE ViPipe)
         return -1;
     }
 
-    stShadingAttr.bEnable = stISPCfgPipeParam[ViPipe].stStaticShading.bEnable;
+    stShadingAttr.bEnable = stISPCfgPipeParam[ViPipe].stShadingParam.bEnable;
 
     s32Ret = HI_MPI_ISP_SetMeshShadingAttr(ViPipe, &stShadingAttr);
     if(s32Ret != HI_SUCCESS)
@@ -2937,57 +3115,65 @@ static int ISPCFG_SetSharpen(VI_PIPE ViPipe)
         return -1;
     }
 
-    stSharpenAttr.bEnable =  stISPCfgPipeParam[ViPipe].stStaticSharpen.bEnable;
-    stSharpenAttr.enOpType = (ISP_OP_TYPE_E)stISPCfgPipeParam[ViPipe].stStaticSharpen.enOpType;
+    stSharpenAttr.bEnable =  stISPCfgPipeParam[ViPipe].stSharpenParam.bEnable;
+    stSharpenAttr.enOpType = (ISP_OP_TYPE_E)stISPCfgPipeParam[ViPipe].stSharpenParam.enOpType;
     if(stSharpenAttr.enOpType == OP_TYPE_MANUAL)
     {
-        stSharpenAttr.stManual.u16TextureFreq = stISPCfgPipeParam[ViPipe].stStaticSharpen.ManualTextureFreq;
-        stSharpenAttr.stManual.u16EdgeFreq = stISPCfgPipeParam[ViPipe].stStaticSharpen.ManualEdgeFreq;
-        stSharpenAttr.stManual.u8OverShoot = stISPCfgPipeParam[ViPipe].stStaticSharpen.ManualOvershoot;
-        stSharpenAttr.stManual.u8UnderShoot = stISPCfgPipeParam[ViPipe].stStaticSharpen.ManualUnderShoot;
-        stSharpenAttr.stManual.u8ShootSupStr = stISPCfgPipeParam[ViPipe].stStaticSharpen.ManualSupStr;
-        stSharpenAttr.stManual.u8ShootSupAdj = stISPCfgPipeParam[ViPipe].stStaticSharpen.ManualSupAdj;
-        stSharpenAttr.stManual.u8DetailCtrl = stISPCfgPipeParam[ViPipe].stStaticSharpen.ManualDetailCtrl;
-        stSharpenAttr.stManual.u8DetailCtrlThr = stISPCfgPipeParam[ViPipe].stStaticSharpen.ManualDetailCtrlThr;
-        stSharpenAttr.stManual.u8EdgeFiltStr = stISPCfgPipeParam[ViPipe].stStaticSharpen.ManualEdgeFiltStr;
+        stSharpenAttr.stManual.u16TextureFreq = stISPCfgPipeParam[ViPipe].stSharpenParam.ManualTextureFreq;
+        stSharpenAttr.stManual.u16EdgeFreq = stISPCfgPipeParam[ViPipe].stSharpenParam.ManualEdgeFreq;
+        stSharpenAttr.stManual.u8OverShoot = stISPCfgPipeParam[ViPipe].stSharpenParam.ManualOvershoot;
+        stSharpenAttr.stManual.u8UnderShoot = stISPCfgPipeParam[ViPipe].stSharpenParam.ManualUnderShoot;
+        stSharpenAttr.stManual.u8ShootSupStr = stISPCfgPipeParam[ViPipe].stSharpenParam.ManualSupStr;
+        stSharpenAttr.stManual.u8ShootSupAdj = stISPCfgPipeParam[ViPipe].stSharpenParam.ManualSupAdj;
+        stSharpenAttr.stManual.u8DetailCtrl = stISPCfgPipeParam[ViPipe].stSharpenParam.ManualDetailCtrl;
+        stSharpenAttr.stManual.u8DetailCtrlThr = stISPCfgPipeParam[ViPipe].stSharpenParam.ManualDetailCtrlThr;
+        stSharpenAttr.stManual.u8EdgeFiltStr = stISPCfgPipeParam[ViPipe].stSharpenParam.ManualEdgeFiltStr;
     }
     else if(stSharpenAttr.enOpType == OP_TYPE_AUTO)
     {
         for(i = 0;i < 16;i++)
         {
-            stSharpenAttr.stAuto.au16TextureFreq[i] = stISPCfgPipeParam[ViPipe].stStaticSharpen.AutoTextureFreq[i];
+            stSharpenAttr.stAuto.au16TextureFreq[i] = stISPCfgPipeParam[ViPipe].stSharpenParam.AutoTextureFreq[i];
             //prtMD("stSharpenAttr.stAuto.au16TextureFreq[%d] = %d\n",i,stSharpenAttr.stAuto.au16TextureFreq[i]);
-            stSharpenAttr.stAuto.au16EdgeFreq[i] = stISPCfgPipeParam[ViPipe].stStaticSharpen.AutoEdgeFreq[i];
-            stSharpenAttr.stAuto.au8ShootSupStr[i] = stISPCfgPipeParam[ViPipe].stStaticSharpen.AutoSupStr[i];
-            stSharpenAttr.stAuto.au8ShootSupAdj[i] = stISPCfgPipeParam[ViPipe].stStaticSharpen.AutoSupAdj[i];
-            stSharpenAttr.stAuto.au8DetailCtrl[i] = stISPCfgPipeParam[ViPipe].stStaticSharpen.AutoDetailCtrl[i];
-            stSharpenAttr.stAuto.au8DetailCtrlThr[i] = stISPCfgPipeParam[ViPipe].stStaticSharpen.AutoDetailCtrlThr[i];
-            stSharpenAttr.stAuto.au8EdgeFiltStr[i] = stISPCfgPipeParam[ViPipe].stStaticSharpen.AutoEdgeFiltStr[i];
-            stSharpenAttr.stAuto.au8EdgeFiltMaxCap[i] = stISPCfgPipeParam[ViPipe].stStaticSharpen.AutoEdgeFiltMaxCap[i];
-            stSharpenAttr.stAuto.au8RGain[i] = stISPCfgPipeParam[ViPipe].stStaticSharpen.AutoRGain[i];
-            stSharpenAttr.stAuto.au8GGain[i] = stISPCfgPipeParam[ViPipe].stStaticSharpen.AutoGGain[i];
-            stSharpenAttr.stAuto.au8BGain[i] = stISPCfgPipeParam[ViPipe].stStaticSharpen.AutoBGain[i];
-            stSharpenAttr.stAuto.au8SkinGain[i] = stISPCfgPipeParam[ViPipe].stStaticSharpen.AutoSkinGain[i];
-            stSharpenAttr.stAuto.au16MaxSharpGain[i] = stISPCfgPipeParam[ViPipe].stStaticSharpen.AutoMaxSharpGain[i];
+            stSharpenAttr.stAuto.au16EdgeFreq[i] = stISPCfgPipeParam[ViPipe].stSharpenParam.AutoEdgeFreq[i];
+            stSharpenAttr.stAuto.au8ShootSupStr[i] = stISPCfgPipeParam[ViPipe].stSharpenParam.AutoSupStr[i];
+            stSharpenAttr.stAuto.au8ShootSupAdj[i] = stISPCfgPipeParam[ViPipe].stSharpenParam.AutoSupAdj[i];
+            stSharpenAttr.stAuto.au8DetailCtrl[i] = stISPCfgPipeParam[ViPipe].stSharpenParam.AutoDetailCtrl[i];
+            stSharpenAttr.stAuto.au8DetailCtrlThr[i] = stISPCfgPipeParam[ViPipe].stSharpenParam.AutoDetailCtrlThr[i];
+            stSharpenAttr.stAuto.au8EdgeFiltStr[i] = stISPCfgPipeParam[ViPipe].stSharpenParam.AutoEdgeFiltStr[i];
+            stSharpenAttr.stAuto.au8EdgeFiltMaxCap[i] = stISPCfgPipeParam[ViPipe].stSharpenParam.AutoEdgeFiltMaxCap[i];
+            stSharpenAttr.stAuto.au8RGain[i] = stISPCfgPipeParam[ViPipe].stSharpenParam.AutoRGain[i];
+            stSharpenAttr.stAuto.au8GGain[i] = stISPCfgPipeParam[ViPipe].stSharpenParam.AutoGGain[i];
+            stSharpenAttr.stAuto.au8BGain[i] = stISPCfgPipeParam[ViPipe].stSharpenParam.AutoBGain[i];
+            stSharpenAttr.stAuto.au8SkinGain[i] = stISPCfgPipeParam[ViPipe].stSharpenParam.AutoSkinGain[i];
+            stSharpenAttr.stAuto.au16MaxSharpGain[i] = stISPCfgPipeParam[ViPipe].stSharpenParam.AutoMaxSharpGain[i];
         }
 
-        for (i = 0; i < 16; i++)
+        for (i = 0; i < ISP_AUTO_ISO_STRENGTH_NUM; i++)
         {
-            stSharpenAttr.stAuto.au8OverShoot[i] = stISPCfgPipeParam[ViPipe].stStaticSharpen.au8OverShoot[i];
-            stSharpenAttr.stAuto.au8UnderShoot[i] = stISPCfgPipeParam[ViPipe].stStaticSharpen.au8UnderShoot[i];
+            stSharpenAttr.stAuto.au8OverShoot[i] = stISPCfgPipeParam[ViPipe].stSharpenParam.au8OverShoot[i];
+            stSharpenAttr.stAuto.au8UnderShoot[i] = stISPCfgPipeParam[ViPipe].stSharpenParam.au8UnderShoot[i];
         }
-#if 1
-        for(j = 0; j < 16;j++)
+
+        for (i = 0; i < ISP_SHARPEN_LUMA_NUM; i++)
         {
-            for(i = 0; i < 32; i++)
+            for (j = 0; j < ISP_AUTO_ISO_STRENGTH_NUM; j++)
             {
-                stSharpenAttr.stAuto.au8LumaWgt[i][j] = stISPCfgPipeParam[ViPipe].stStaticSharpen.AutoLumaWgt[j][i];
-                stSharpenAttr.stAuto.au16TextureStr[i][j] = stISPCfgPipeParam[ViPipe].stStaticSharpen.au16TextureStr[j][i];
-                stSharpenAttr.stAuto.au16EdgeStr[i][j] = stISPCfgPipeParam[ViPipe].stStaticSharpen.au16EdgeStr[j][i];
+                stSharpenAttr.stAuto.au8LumaWgt[i][j] = stISPCfgPipeParam[ViPipe].stSharpenParam.AutoLumaWgt[i][j];
             }
         }
-#endif
+
+        for(i = 0; i < ISP_SHARPEN_GAIN_NUM; i++)
+        {
+            for(j = 0; j < ISP_AUTO_ISO_STRENGTH_NUM; j++)
+            {
+                stSharpenAttr.stAuto.au16TextureStr[i][j] = stISPCfgPipeParam[ViPipe].stSharpenParam.au16TextureStr[i][j];
+                stSharpenAttr.stAuto.au16EdgeStr[i][j] = stISPCfgPipeParam[ViPipe].stSharpenParam.au16EdgeStr[i][j];
+            }
+        }
     }
+
+    prtMD("!!!!!!!!!!!%d!!%d!!!!!!!!!!!!!!!\n", stSharpenAttr.enOpType, stISPCfgPipeParam[ViPipe].stSharpenParam.enOpType);
 
     s32Ret = HI_MPI_ISP_SetIspSharpenAttr(ViPipe, &stSharpenAttr);
     if(s32Ret != HI_SUCCESS)
@@ -3018,33 +3204,32 @@ int ISPCFG_SetDemosaic(VI_PIPE ViPipe)
         return -1;
     }
 
-    stDemosaicAttr.bEnable = stISPCfgPipeParam[ViPipe].stStaticDemosaic.bEnable;
-    stDemosaicAttr.enOpType = stISPCfgPipeParam[ViPipe].stStaticDemosaic.enOpType;
+    stDemosaicAttr.bEnable = stISPCfgPipeParam[ViPipe].stDemosaicParam.bEnable;
+    stDemosaicAttr.enOpType = stISPCfgPipeParam[ViPipe].stDemosaicParam.enOpType;
     if(stDemosaicAttr.enOpType == OP_TYPE_AUTO)
     {
         prtMD("stDemosaicAttr.stAuto.au8DetailSmoothRange:");
         for(i = 0; i < 16; i++)
         {
-            stDemosaicAttr.stAuto.au8NonDirStr[i] = stISPCfgPipeParam[ViPipe].stStaticDemosaic.u8AutoNonDirStr[i];
-            stDemosaicAttr.stAuto.au8NonDirMFDetailEhcStr[i] = stISPCfgPipeParam[ViPipe].stStaticDemosaic.u8AutoNonDirMFDetailEhcStr[i];
-            stDemosaicAttr.stAuto.au8NonDirHFDetailEhcStr[i] = stISPCfgPipeParam[ViPipe].stStaticDemosaic.u8AutoNonDirHFDetailEhcStr[i];
-            stDemosaicAttr.stAuto.au8DetailSmoothRange[i] = stISPCfgPipeParam[ViPipe].stStaticDemosaic.u16AutoDetailSmoothRange[i];
+            stDemosaicAttr.stAuto.au8NonDirStr[i] = stISPCfgPipeParam[ViPipe].stDemosaicParam.u8AutoNonDirStr[i];
+            stDemosaicAttr.stAuto.au8NonDirMFDetailEhcStr[i] = stISPCfgPipeParam[ViPipe].stDemosaicParam.u8AutoNonDirMFDetailEhcStr[i];
+            stDemosaicAttr.stAuto.au8NonDirHFDetailEhcStr[i] = stISPCfgPipeParam[ViPipe].stDemosaicParam.u8AutoNonDirHFDetailEhcStr[i];
+            stDemosaicAttr.stAuto.au8DetailSmoothRange[i] = stISPCfgPipeParam[ViPipe].stDemosaicParam.u16AutoDetailSmoothRange[i];
             printf(" %d", stDemosaicAttr.stAuto.au8DetailSmoothRange[i]);
-            #if 0
-            stDemosaicAttr.stAuto.au8ColorNoiseThdF[i] = stISPCfgPipeParam[ViPipe].stStaticDemosaic.u8AutoColorNoiseThdF;
-            stDemosaicAttr.stAuto.au8ColorNoiseStrF[i] = stISPCfgPipeParam[ViPipe].stStaticDemosaic.u8AutoColorNoiseStrF;
-            stDemosaicAttr.stAuto.au8ColorNoiseThdY[i] = stISPCfgPipeParam[ViPipe].stStaticDemosaic.u8AutoColorNoiseThdY;
-            stDemosaicAttr.stAuto.au8ColorNoiseStrY[i] = stISPCfgPipeParam[ViPipe].stStaticDemosaic.u8AutoColorNoiseStrY;
-            #endif
+
+            stDemosaicAttr.stAuto.au8ColorNoiseThdF[i] = stISPCfgPipeParam[ViPipe].stDemosaicParam.u8AutoColorNoiseThdF[i];
+            stDemosaicAttr.stAuto.au8ColorNoiseStrF[i] = stISPCfgPipeParam[ViPipe].stDemosaicParam.u8AutoColorNoiseStrF[i];
+            stDemosaicAttr.stAuto.au8ColorNoiseThdY[i] = stISPCfgPipeParam[ViPipe].stDemosaicParam.u8AutoColorNoiseThdY[i];
+            stDemosaicAttr.stAuto.au8ColorNoiseStrY[i] = stISPCfgPipeParam[ViPipe].stDemosaicParam.u8AutoColorNoiseStrY[i];
         }
         printf("\n");
     }
     else
     {
-        stDemosaicAttr.stManual.u8NonDirStr = stISPCfgPipeParam[ViPipe].stStaticDemosaic.u8ManualNonDirStr;
-        stDemosaicAttr.stManual.u8NonDirMFDetailEhcStr = stISPCfgPipeParam[ViPipe].stStaticDemosaic.u8ManualNonDirMFDetailEhcStr;
-        stDemosaicAttr.stManual.u8NonDirHFDetailEhcStr = stISPCfgPipeParam[ViPipe].stStaticDemosaic.u8ManualNonDirHFDetailEhcStr;
-        stDemosaicAttr.stManual.u8DetailSmoothRange = stISPCfgPipeParam[ViPipe].stStaticDemosaic.u16ManualDetailSmoothStr;
+        stDemosaicAttr.stManual.u8NonDirStr = stISPCfgPipeParam[ViPipe].stDemosaicParam.u8ManualNonDirStr;
+        stDemosaicAttr.stManual.u8NonDirMFDetailEhcStr = stISPCfgPipeParam[ViPipe].stDemosaicParam.u8ManualNonDirMFDetailEhcStr;
+        stDemosaicAttr.stManual.u8NonDirHFDetailEhcStr = stISPCfgPipeParam[ViPipe].stDemosaicParam.u8ManualNonDirHFDetailEhcStr;
+        stDemosaicAttr.stManual.u8DetailSmoothRange = stISPCfgPipeParam[ViPipe].stDemosaicParam.u16ManualDetailSmoothStr;
     }
 
     s32Ret = HI_MPI_ISP_SetDemosaicAttr(ViPipe, &stDemosaicAttr);
@@ -3057,296 +3242,51 @@ int ISPCFG_SetDemosaic(VI_PIPE ViPipe)
     return 0;
 }
 
-int ISPCFG_SetPipeParam(VI_PIPE ViPipe, VPSS_GRP VpssGrp)
+int ISPCFG_SetViNR(VI_PIPE viPipe, ISPCFG_VI_NR_PARAM_S *pNrxParam)
 {
-    HI_U32 i = 0;
-    HI_U32 j = 0;
     HI_S32 s32Ret = HI_SUCCESS;
-    VI_PIPE_NRX_PARAM_S stVINRXParam = {0};
-    HI_U32 u32IsoLevel = 0;
+    VI_PIPE_ATTR_S stPipeAttr = {0};
+
+    if ((viPipe >= VI_MAX_PIPE_NUM) || (pNrxParam == NULL))
+    {
+        prtMD("invalid input viPipe = %d, pNrxParam = %p\n", viPipe, pNrxParam);
+        return -1;
+    }
+
+    /* 设置使能标志 */
+    s32Ret = HI_MPI_VI_GetPipeAttr(viPipe, &stPipeAttr);
+    if (HI_SUCCESS != s32Ret)
+    {
+        prtMD("HI_MPI_VI_GetPipeAttr error! s32Ret = %#x\n", s32Ret);
+    }
+
+    stPipeAttr.bNrEn = pNrxParam->bOpen;
+
+    s32Ret = HI_MPI_VI_SetPipeAttr(viPipe, &stPipeAttr);
+    if (HI_SUCCESS != s32Ret)
+    {
+        prtMD("HI_MPI_VI_SetPipeAttr error! s32Ret = %#x\n", s32Ret);
+    }
+
+    /* 设置降噪参数 */
+    s32Ret = HI_MPI_VI_SetPipeNRXParam(viPipe, &pNrxParam->stNrParam);
+    if (HI_SUCCESS != s32Ret)
+    {
+        prtMD("HI_MPI_VI_SetPipeNRXParam error! s32Ret = %#x\n", s32Ret);
+        return -1;
+    }
+
+    return 0;
+}
+
+int ISPCFG_SetVpssNR(VPSS_GRP VpssGrp, ISPCFG_VPSS_NR_PARAM_S *pVpssParam)
+{
+    int s32Ret = HI_SUCCESS;
     VPSS_GRP_ATTR_S stGrpAttr = {0};
-    VPSS_GRP_NRX_PARAM_S stVPSSNRXParam = {0};
 
-    if (ViPipe >= VI_MAX_PIPE_NUM)
+    if (pVpssParam == NULL)
     {
-        prtMD("invalid input ViPipe = %d\n", ViPipe);
-        return -1;
-    }
-
-    stVINRXParam.enNRVersion = VI_NR_V2;
-    stVINRXParam.stNRXParamV2.enOptMode = OPERATION_MODE_MANUAL;
-    stVPSSNRXParam .enNRVer = VPSS_NR_V2;
-    stVPSSNRXParam .stNRXParam_V2.enOptMode = OPERATION_MODE_MANUAL;//OPERATION_MODE_AUTO;
-
-    s32Ret = HI_MPI_VI_GetPipeNRXParam(ViPipe, &stVINRXParam);
-    if(s32Ret != HI_SUCCESS)
-    {
-        prtMD("HI_MPI_VI_GetPipeNRXParam is failed! s32Ret = %#x\n",s32Ret);
-        return -1;
-    }
-
-    s32Ret = HI_MPI_VPSS_GetGrpNRXParam(VpssGrp, &stVPSSNRXParam);
-    if(s32Ret != HI_SUCCESS)
-    {
-        prtMD("HI_MPI_VPSS_GetGrpNRXParam is failed! s32Ret = %#x\n",s32Ret);
-        return -1;
-    }
-
-    u32IsoLevel = ISPCFG_GetThreshValue(ISPCFG_IsoValue[ViPipe], stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.u32ThreeDNRCount, stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.au32ThreeDNRIso);
-
-    /*VI*/
-    stVINRXParam.stNRXParamV2.stNRXManualV2.stNRXParamV2.SFy.SFS1 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVIValue[u32IsoLevel].SFy.SFS1;
-    stVINRXParam.stNRXParamV2.stNRXManualV2.stNRXParamV2.SFy.SFS2 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVIValue[u32IsoLevel].SFy.SFS2;
-
-    stVINRXParam.stNRXParamV2.stNRXManualV2.stNRXParamV2.SFy.SFS4 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVIValue[u32IsoLevel].SFy.SFS4;
-    stVINRXParam.stNRXParamV2.stNRXManualV2.stNRXParamV2.SFy.SFT1 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVIValue[u32IsoLevel].SFy.SFT1;
-
-    stVINRXParam.stNRXParamV2.stNRXManualV2.stNRXParamV2.SFy.SFT2 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVIValue[u32IsoLevel].SFy.SFT2;
-
-    stVINRXParam.stNRXParamV2.stNRXManualV2.stNRXParamV2.SFy.SFT4 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVIValue[u32IsoLevel].SFy.SFT4;
-
-    stVINRXParam.stNRXParamV2.stNRXManualV2.stNRXParamV2.SFy.SBR1 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVIValue[u32IsoLevel].SFy.SBR1;
-
-    stVINRXParam.stNRXParamV2.stNRXManualV2.stNRXParamV2.SFy.SBR2 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVIValue[u32IsoLevel].SFy.SBR2;
-
-    stVINRXParam.stNRXParamV2.stNRXManualV2.stNRXParamV2.SFy.SBR4 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVIValue[u32IsoLevel].SFy.SBR4;
-
-    stVINRXParam.stNRXParamV2.stNRXManualV2.stNRXParamV2.SFy.SRT0 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVIValue[u32IsoLevel].SFy.SRT0;
-    stVINRXParam.stNRXParamV2.stNRXManualV2.stNRXParamV2.SFy.SRT1 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVIValue[u32IsoLevel].SFy.SRT1;
-    stVINRXParam.stNRXParamV2.stNRXManualV2.stNRXParamV2.SFy.DeRate = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVIValue[u32IsoLevel].SFy.DeRate;
-    stVINRXParam.stNRXParamV2.stNRXManualV2.stNRXParamV2.SFy.SFR = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVIValue[u32IsoLevel].SFy.SFR;
-
-    stVINRXParam.stNRXParamV2.stNRXManualV2.stNRXParamV2.IEy.IES0 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVIValue[u32IsoLevel].IEy.IES0;
-    stVINRXParam.stNRXParamV2.stNRXManualV2.stNRXParamV2.IEy.IES1 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVIValue[u32IsoLevel].IEy.IES1;
-    stVINRXParam.stNRXParamV2.stNRXManualV2.stNRXParamV2.IEy.IES2 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVIValue[u32IsoLevel].IEy.IES2;
-    stVINRXParam.stNRXParamV2.stNRXManualV2.stNRXParamV2.IEy.IES3 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVIValue[u32IsoLevel].IEy.IES3;
-    stVINRXParam.stNRXParamV2.stNRXManualV2.stNRXParamV2.IEy.IEDZ = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVIValue[u32IsoLevel].IEy.IEDZ;
-
-    for (j = 0; j < 3; j++)
-    {
-        stVINRXParam.stNRXParamV2.stNRXManualV2.stNRXParamV2.SFy.SFR6[j]  = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVIValue[u32IsoLevel].SFy.SFR6[j];
-    }
-
-    stVINRXParam.stNRXParamV2.stNRXManualV2.stNRXParamV2.SFy.BWSF4 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVIValue[u32IsoLevel].SFy.BWSF4;
-    stVINRXParam.stNRXParamV2.stNRXManualV2.stNRXParamV2.SFy.SPN6  = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVIValue[u32IsoLevel].SFy.SPN6;
-    stVINRXParam.stNRXParamV2.stNRXManualV2.stNRXParamV2.SFy.SBN6  = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVIValue[u32IsoLevel].SFy.SBN6;
-    stVINRXParam.stNRXParamV2.stNRXManualV2.stNRXParamV2.SFy.PBR6  = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVIValue[u32IsoLevel].SFy.PBR6;
-    stVINRXParam.stNRXParamV2.stNRXManualV2.stNRXParamV2.SFy.JMODE = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVIValue[u32IsoLevel].SFy.JMODE;
-    stVINRXParam.stNRXParamV2.stNRXManualV2.stNRXParamV2.SFy.DeIdx = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVIValue[u32IsoLevel].SFy.DeIdx;
-    stVINRXParam.stNRXParamV2.stNRXManualV2.stNRXParamV2.SFy.TriTh = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVIValue[u32IsoLevel].SFy.TriTh;
-    if (stVINRXParam.stNRXParamV2.stNRXManualV2.stNRXParamV2.SFy.TriTh)
-    {
-        stVINRXParam.stNRXParamV2.stNRXManualV2.stNRXParamV2.SFy.SFN0 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVIValue[u32IsoLevel].SFy.SFN0;
-        stVINRXParam.stNRXParamV2.stNRXManualV2.stNRXParamV2.SFy.SFN1 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVIValue[u32IsoLevel].SFy.SFN1;
-        stVINRXParam.stNRXParamV2.stNRXManualV2.stNRXParamV2.SFy.SFN2 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVIValue[u32IsoLevel].SFy.SFN2;
-        stVINRXParam.stNRXParamV2.stNRXManualV2.stNRXParamV2.SFy.SFN3 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVIValue[u32IsoLevel].SFy.SFN3;
-
-        stVINRXParam.stNRXParamV2.stNRXManualV2.stNRXParamV2.SFy.STH1 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVIValue[u32IsoLevel].SFy.STH1;
-        stVINRXParam.stNRXParamV2.stNRXManualV2.stNRXParamV2.SFy.STH2 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVIValue[u32IsoLevel].SFy.STH2;
-        stVINRXParam.stNRXParamV2.stNRXManualV2.stNRXParamV2.SFy.STH3 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVIValue[u32IsoLevel].SFy.STH3;
-    }
-    else
-    {
-        stVINRXParam.stNRXParamV2.stNRXManualV2.stNRXParamV2.SFy.SFN0 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVIValue[u32IsoLevel].SFy.SFN0;
-        stVINRXParam.stNRXParamV2.stNRXManualV2.stNRXParamV2.SFy.SFN1 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVIValue[u32IsoLevel].SFy.SFN1;
-        stVINRXParam.stNRXParamV2.stNRXManualV2.stNRXParamV2.SFy.SFN3 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVIValue[u32IsoLevel].SFy.SFN3;
-
-        stVINRXParam.stNRXParamV2.stNRXManualV2.stNRXParamV2.SFy.STH1 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVIValue[u32IsoLevel].SFy.STH1;
-        stVINRXParam.stNRXParamV2.stNRXManualV2.stNRXParamV2.SFy.STH3 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVIValue[u32IsoLevel].SFy.STH3;
-    }
-
-    /* VPSS */
-
-    for(i = 0;i < 3;i++)
-    {
-        stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.SFy[i].SFS1 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].SFy[i].SFS1;
-
-        stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.SFy[i].SFS2 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].SFy[i].SFS2;
-        stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.SFy[i].SFS4 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].SFy[i].SFS4;
-
-        stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.SFy[i].SFT1 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].SFy[i].SFT1;
-        stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.SFy[i].SFT2 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].SFy[i].SFT2;
-        stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.SFy[i].SFT4 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].SFy[i].SFT4;
-        stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.SFy[i].SBR1 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].SFy[i].SBR1;
-        stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.SFy[i].SBR2 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].SFy[i].SBR2;
-        stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.SFy[i].SBR4 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].SFy[i].SBR4;
-
-        stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.SFy[i].SFR  = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].SFy[i].SFR;
-
-        stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.IEy[i].IES0 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].IEy[i].IES0;
-        stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.IEy[i].IES1 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].IEy[i].IES1;
-        stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.IEy[i].IES2 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].IEy[i].IES2;
-        stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.IEy[i].IES3 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].IEy[i].IES3;
-
-        stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.IEy[i].IEDZ = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].IEy[i].IEDZ;
-
-        for(j = 0; j < 3; j++)
-        {
-            stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.SFy[i].SFR6[j] = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].SFy[i].SFR6[j];
-        }
-
-        stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.SFy[i].NRyEn = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].SFy[i].NRyEn;
-        stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.SFy[i].BWSF4 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].SFy[i].BWSF4;
-        stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.SFy[i].SPN6 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].SFy[i].SPN6;
-        stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.SFy[i].SBN6 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].SFy[i].SBN6;
-        stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.SFy[i].PBR6 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].SFy[i].PBR6;
-        stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.SFy[i].JMODE = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].SFy[i].JMODE;
-        stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.SFy[i].TriTh = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].SFy[i].TriTh;
-
-        if(stVINRXParam.stNRXParamV2.stNRXManualV2.stNRXParamV2.SFy.TriTh)
-        {
-            stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.SFy[i].SFN0 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].SFy[i].SFN0;
-            stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.SFy[i].SFN1 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].SFy[i].SFN1;
-            stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.SFy[i].SFN2 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].SFy[i].SFN2;
-            stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.SFy[i].SFN3 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].SFy[i].SFN3;
-
-            stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.SFy[i].STH1 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].SFy[i].STH1;
-            stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.SFy[i].STH2 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].SFy[i].STH2;
-            stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.SFy[i].STH3 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].SFy[i].STH3;
-        }
-        else
-        {
-            stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.SFy[i].SFN0 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].SFy[i].SFN0;
-            stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.SFy[i].SFN1 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].SFy[i].SFN1;
-            stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.SFy[i].SFN3 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].SFy[i].SFN3;
-
-            stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.SFy[i].STH1 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].SFy[i].STH1;
-            stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.SFy[i].STH3 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].SFy[i].STH3;
-        }
-    }
-
-    stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.SFy[1].kMode = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].SFy[1].kMode;
-    stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.SFy[2].kMode = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].SFy[2].kMode;
-
-    if(stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.SFy[1].kMode > 1)
-    {
-        for(j = 0; j < 32; j++)
-        {
-            stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.SFy[1].SBSk[j] = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].SFy[1].SBSk[j];
-            stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.SFy[1].SDSk[j] = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].SFy[1].SDSk[j];
-        }
-    }
-
-    if(stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.SFy[2].kMode > 1)
-    {
-        for(j = 0; j < 32; j++)
-        {
-            stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.SFy[2].SBSk[j] = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].SFy[2].SBSk[j];
-            stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.SFy[2].SDSk[j] = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].SFy[2].SDSk[j];
-        }
-    }
-
-    stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.TFy[0].tEdge = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].TFy[0].tEdge;
-    stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.TFy[1].tEdge = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].TFy[1].tEdge;
-    stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.TFy[0].bRef = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].TFy[0].bRef;
-    ///组数据
-    stGrpAttr.stNrAttr.enNrMotionMode = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].GMC.GMEMode;
-    ////////////////////////////////////////////
-
-    stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.TFy[0].RFI = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].TFy[0].RFI;
-
-    stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.TFy[0].DZMode0 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].TFy[0].DZMode0;
-    stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.TFy[0].DZMode1 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].TFy[0].DZMode1;
-    stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.TFy[1].DZMode0 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].TFy[1].DZMode0;
-    stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.TFy[1].DZMode1 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].TFy[1].DZMode1;
-
-    stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.RFs.RFUI = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].RFs.RFUI;
-    stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.RFs.RFDZ = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].RFs.RFDZ ;
-    stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.RFs.RFSLP = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].RFs.RFSLP;
-    stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.RFs.advMATH = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].RFs.advMATH;
-
-    for(i=0; i < 2;i++)
-    {
-        stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.MDy[i].MATH0 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].MDy[i].MATH0;
-        stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.MDy[i].MATH1 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].MDy[i].MATH1;
-
-        stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.MDy[i].MATE0 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].MDy[i].MATE0;
-        stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.MDy[i].MATE1 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].MDy[i].MATE1;
-
-        stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.MDy[i].MABW0 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].MDy[i].MABW0;
-        stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.MDy[i].MABW1 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].MDy[i].MABW1;
-
-        stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.MDy[i].MASW = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].MDy[i].MASW;
-
-        stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.MDy[i].MADZ0 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].MDy[i].MADZ0;
-        stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.MDy[i].MADZ1 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].MDy[i].MADZ1;
-
-        if ((stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.MDy[i].MADZ0 > 0) || (stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.MDy[i].MADZ1 > 0))
-        {
-            stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.MDy[i].MABR0 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].MDy[i].MABR0;
-            stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.MDy[i].MABR1 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].MDy[i].MABR1;
-        }
-
-        stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.MDy[i].biPath = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].MDy[i].biPath;
-
-        stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.MDy[i].MAI00 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].MDy[i].MAI00;
-        stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.MDy[i].MAI01 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].MDy[i].MAI01;
-        stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.MDy[i].MAI02 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].MDy[i].MAI02;
-
-        stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.MDy[i].MAI10 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].MDy[i].MAI10;
-        stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.MDy[i].MAI11 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].MDy[i].MAI11;
-        stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.MDy[i].MAI12 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].MDy[i].MAI12;
-
-        stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.MDy[i].MATW = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].MDy[i].MATW;
-        stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.MDy[i].MASW = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].MDy[i].MASW;
-    }
-
-    for(i =0;i < 2;i++)
-    {
-        stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.TFy[i].TSS0 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].TFy[i].TSS0;
-        stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.TFy[i].TSS1 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].TFy[i].TSS1;
-
-        stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.TFy[i].TFS0 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].TFy[i].TFS0;
-        stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.TFy[i].TFS1 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].TFy[i].TFS1;
-        prtMD("stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.TFy[i].TSS0 = %d,TFS0 = %d\n",stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.TFy[i].TSS0,stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.TFy[i].TFS0);
-
-#if 1    ///待定参数
-        for (j = 0; j < 6; j++)
-        {
-            stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.TFy[i].TFR0[j] = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].TFy[i].TFR0[j];
-            stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.TFy[i].TFR0[j] = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].TFy[i].TFR0[j];
-            stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.TFy[i].TFR1[j] = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].TFy[i].TFR1[j];
-            stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.TFy[i].TFR1[j] = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].TFy[i].TFR1[j];
-        }
-#endif
-
-        stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.TFy[i].STR0 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].TFy[i].STR0;
-        stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.TFy[i].STR1 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].TFy[i].STR1;
-
-        stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.TFy[i].SDZ0 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].TFy[i].SDZ0;
-        stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.TFy[i].SDZ1 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].TFy[i].SDZ1;
-
-        stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.TFy[i].TSI0 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].TFy[i].TSI0;
-        stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.TFy[i].TSI1 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].TFy[i].TSI1;
-
-        stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.TFy[i].TDZ0 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].TFy[i].TDZ0;
-        stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.TFy[i].TDZ1 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].TFy[i].TDZ1;
-
-        stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.TFy[i].TDX0 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].TFy[i].TDX0;
-        stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.TFy[i].TDX1 = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].TFy[i].TDX1;
-    }
-
-
-    stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.pNRc.SFC = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].pNRc.SFC;
-    stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.pNRc.CTFS = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].pNRc.CTFS;
-    stVPSSNRXParam.stNRXParam_V2.stNRXManual.stNRXParam.pNRc.TFC = stISPCfgPipeParam[ViPipe].stDynamicThreeDNR.astThreeDNRVPSSValue[u32IsoLevel].pNRc.TFC;
-	prtMD("----------------------------3D noise -----!\n");
-    stVINRXParam .enNRVersion = VI_NR_V2;
-    stVINRXParam .stNRXParamV2.enOptMode = OPERATION_MODE_MANUAL;
-    stVPSSNRXParam .enNRVer = VPSS_NR_V2;
-    stVPSSNRXParam .stNRXParam_V2.enOptMode = OPERATION_MODE_MANUAL;
-
-    s32Ret = HI_MPI_VI_SetPipeNRXParam(ViPipe, &stVINRXParam);
-    if(s32Ret != HI_SUCCESS)
-    {
-        prtMD("HI_MPI_VI_SetPipeNRXParam is failed! s32Ret = %#x\n",s32Ret);
-        return -1;
-    }
-
-    s32Ret = HI_MPI_VPSS_SetGrpNRXParam(VpssGrp, &stVPSSNRXParam);
-    if(s32Ret != HI_SUCCESS)
-    {
-        prtMD("HI_MPI_VPSS_SetGrpNRXParam is failed! s32Ret = %#x\n",s32Ret);
+        prtMD("invalid input pVpssParam = %p\n", pVpssParam);
         return -1;
     }
 
@@ -3357,11 +3297,18 @@ int ISPCFG_SetPipeParam(VI_PIPE ViPipe, VPSS_GRP VpssGrp)
         return -1;
     }
 
-    stGrpAttr.bNrEn = HI_TRUE;
-    s32Ret = HI_MPI_VPSS_SetGrpAttr(VpssGrp, &stGrpAttr );
+    stGrpAttr.bNrEn = pVpssParam->bOpen;
+    s32Ret = HI_MPI_VPSS_SetGrpAttr(VpssGrp, &stGrpAttr);
     if(s32Ret != HI_SUCCESS)
     {
         prtMD("HI_MPI_VPSS_SetGrpAttr is failed! s32Ret = %#x\n",s32Ret);
+        return -1;
+    }
+
+    s32Ret = HI_MPI_VPSS_SetGrpNRXParam(VpssGrp, &pVpssParam->stNrParam);
+    if(s32Ret != HI_SUCCESS)
+    {
+        prtMD("HI_MPI_VPSS_SetGrpNRXParam is failed! s32Ret = %#x\n",s32Ret);
         return -1;
     }
 
@@ -3370,7 +3317,7 @@ int ISPCFG_SetPipeParam(VI_PIPE ViPipe, VPSS_GRP VpssGrp)
 
 static int ISPCFG_SetGamma(VI_PIPE ViPipe)
 {
-    HI_U32 i, j = 0;
+    HI_U32 i = 0;
     HI_S32 s32Ret = HI_SUCCESS;
     ISP_GAMMA_ATTR_S stIspGammaAttr = {0};
 
@@ -3387,16 +3334,13 @@ static int ISPCFG_SetGamma(VI_PIPE ViPipe)
         return -1;
     }
 
-    stIspGammaAttr.bEnable = stISPCfgPipeParam[ViPipe].stDynamicGamma.bEnable;
-    for (i = 0; i < 25; i++)
+    stIspGammaAttr.bEnable = stISPCfgPipeParam[ViPipe].stGammaParam.bEnable;
+    for (i = 0; i < GAMMA_NODE_NUM; i++)
     {
-        for(j = 0;j < 41;j++)
-        {
-            stIspGammaAttr.u16Table[(i * 41) + j] = stISPCfgPipeParam[ViPipe].stDynamicGamma.u16Table[i][j];  //gamma参数
-        }
+        stIspGammaAttr.u16Table[i] = stISPCfgPipeParam[ViPipe].stGammaParam.u16Table[i];
     }
 
-    stIspGammaAttr.enCurveType = stISPCfgPipeParam[ViPipe].stDynamicGamma.enCurveType;
+    stIspGammaAttr.enCurveType = stISPCfgPipeParam[ViPipe].stGammaParam.enCurveType;
 
     s32Ret = HI_MPI_ISP_SetGammaAttr(ViPipe, &stIspGammaAttr);
     if(s32Ret != HI_SUCCESS)
@@ -3427,33 +3371,33 @@ static int ISPCFG_SetFSWDR(VI_PIPE ViPipe)
         return -1;
     }
 
-    stIspWDRFSAttr.enWDRMergeMode = stISPCfgPipeParam[ViPipe].stStaticWDRFS.enWDRMergeMode;
+    stIspWDRFSAttr.enWDRMergeMode = stISPCfgPipeParam[ViPipe].stWdrfsParam.enWDRMergeMode;
 
     if(stIspWDRFSAttr.enWDRMergeMode ==  0)
     {
-        stIspWDRFSAttr.stWDRCombine.bMotionComp = stISPCfgPipeParam[ViPipe].stStaticWDRFS.bCombineMotionComp;
-        stIspWDRFSAttr.stWDRCombine.u16ShortThr = stISPCfgPipeParam[ViPipe].stStaticWDRFS.u16CombineShortThr;
+        stIspWDRFSAttr.stWDRCombine.bMotionComp = stISPCfgPipeParam[ViPipe].stWdrfsParam.bCombineMotionComp;
+        stIspWDRFSAttr.stWDRCombine.u16ShortThr = stISPCfgPipeParam[ViPipe].stWdrfsParam.u16CombineShortThr;
 
-        stIspWDRFSAttr.stWDRCombine.u16LongThr = stISPCfgPipeParam[ViPipe].stStaticWDRFS.u16CombineLongThr;
-        stIspWDRFSAttr.stWDRCombine.bForceLong = stISPCfgPipeParam[ViPipe].stStaticWDRFS.bCombineForceLong;
-        stIspWDRFSAttr.stWDRCombine.u16ForceLongHigThr = stISPCfgPipeParam[ViPipe].stStaticWDRFS.u16CombineForceLongHigThr;
-        stIspWDRFSAttr.stWDRCombine.u16ForceLongLowThr = stISPCfgPipeParam[ViPipe].stStaticWDRFS.u16CombineForceLongLowThr;
-        stIspWDRFSAttr.stWDRCombine.stWDRMdt.bShortExpoChk = stISPCfgPipeParam[ViPipe].stStaticWDRFS.bWDRMdtShortExpoChk;
-        stIspWDRFSAttr.stWDRCombine.stWDRMdt.u16ShortCheckThd = stISPCfgPipeParam[ViPipe].stStaticWDRFS.u16WDRMdtShortCheckThd;
-        stIspWDRFSAttr.stWDRCombine.stWDRMdt.bMDRefFlicker = stISPCfgPipeParam[ViPipe].stStaticWDRFS.bWDRMdtMDRefFlicker;
-        stIspWDRFSAttr.stWDRCombine.stWDRMdt.u8MdtStillThd = stISPCfgPipeParam[ViPipe].stStaticWDRFS.u8WDRMdtMdtStillThd;
-        stIspWDRFSAttr.stWDRCombine.stWDRMdt.u8MdtLongBlend = stISPCfgPipeParam[ViPipe].stStaticWDRFS.u8WDRMdtMdtLongBlend;
-        stIspWDRFSAttr.stWDRCombine.stWDRMdt.enOpType = stISPCfgPipeParam[ViPipe].stStaticWDRFS.u8WDRMdtOpType;
+        stIspWDRFSAttr.stWDRCombine.u16LongThr = stISPCfgPipeParam[ViPipe].stWdrfsParam.u16CombineLongThr;
+        stIspWDRFSAttr.stWDRCombine.bForceLong = stISPCfgPipeParam[ViPipe].stWdrfsParam.bCombineForceLong;
+        stIspWDRFSAttr.stWDRCombine.u16ForceLongHigThr = stISPCfgPipeParam[ViPipe].stWdrfsParam.u16CombineForceLongHigThr;
+        stIspWDRFSAttr.stWDRCombine.u16ForceLongLowThr = stISPCfgPipeParam[ViPipe].stWdrfsParam.u16CombineForceLongLowThr;
+        stIspWDRFSAttr.stWDRCombine.stWDRMdt.bShortExpoChk = stISPCfgPipeParam[ViPipe].stWdrfsParam.bWDRMdtShortExpoChk;
+        stIspWDRFSAttr.stWDRCombine.stWDRMdt.u16ShortCheckThd = stISPCfgPipeParam[ViPipe].stWdrfsParam.u16WDRMdtShortCheckThd;
+        stIspWDRFSAttr.stWDRCombine.stWDRMdt.bMDRefFlicker = stISPCfgPipeParam[ViPipe].stWdrfsParam.bWDRMdtMDRefFlicker;
+        stIspWDRFSAttr.stWDRCombine.stWDRMdt.u8MdtStillThd = stISPCfgPipeParam[ViPipe].stWdrfsParam.u8WDRMdtMdtStillThd;
+        stIspWDRFSAttr.stWDRCombine.stWDRMdt.u8MdtLongBlend = stISPCfgPipeParam[ViPipe].stWdrfsParam.u8WDRMdtMdtLongBlend;
+        stIspWDRFSAttr.stWDRCombine.stWDRMdt.enOpType = stISPCfgPipeParam[ViPipe].stWdrfsParam.u8WDRMdtOpType;
 
-        for(i = 0 ; i < 16;i++)
+        for(i = 0 ; i < ISP_AUTO_ISO_STRENGTH_NUM;i++)
         {
-            stIspWDRFSAttr.stWDRCombine.stWDRMdt.stAuto.au8MdThrHigGain[i] = stISPCfgPipeParam[ViPipe].stStaticWDRFS.au8AutoMdThrHigGain[i];
-            stIspWDRFSAttr.stWDRCombine.stWDRMdt.stAuto.au8MdThrLowGain[i] = stISPCfgPipeParam[ViPipe].stStaticWDRFS.au8AutoMdThrLowGain[i];
+            stIspWDRFSAttr.stWDRCombine.stWDRMdt.stAuto.au8MdThrHigGain[i] = stISPCfgPipeParam[ViPipe].stWdrfsParam.au8AutoMdThrHigGain[i];
+            stIspWDRFSAttr.stWDRCombine.stWDRMdt.stAuto.au8MdThrLowGain[i] = stISPCfgPipeParam[ViPipe].stWdrfsParam.au8AutoMdThrLowGain[i];
         }
 
         for(i = 0;i < 4;i++)
         {
-            stIspWDRFSAttr.stFusion.au16FusionThr[i] = stISPCfgPipeParam[ViPipe].stStaticWDRFS.u16FusionFusionThr[i];
+            stIspWDRFSAttr.stFusion.au16FusionThr[i] = stISPCfgPipeParam[ViPipe].stWdrfsParam.u16FusionFusionThr[i];
         }
     }
 
@@ -3486,32 +3430,32 @@ static int ISPCFG_SetNR(VI_PIPE ViPipe)
         return -1;
     }
 
-    stNRAttr.bEnable = stISPCfgPipeParam[ViPipe].stStaticBNRS.bEnable;
-    stNRAttr.bNrLscEnable = stISPCfgPipeParam[ViPipe].stStaticBNRS.bNrLscEnable;
-    stNRAttr.u8BnrLscMaxGain = stISPCfgPipeParam[ViPipe].stStaticBNRS.u8BnrMaxGain;
-    stNRAttr.u16BnrLscCmpStrength = stISPCfgPipeParam[ViPipe].stStaticBNRS.u16BnrLscCmpStrength;
-    stNRAttr.enOpType = stISPCfgPipeParam[ViPipe].stStaticBNRS.u8BnrOptype;
+    stNRAttr.bEnable = stISPCfgPipeParam[ViPipe].stBnrParam.bEnable;
+    stNRAttr.bNrLscEnable = stISPCfgPipeParam[ViPipe].stBnrParam.bNrLscEnable;
+    stNRAttr.u8BnrLscMaxGain = stISPCfgPipeParam[ViPipe].stBnrParam.u8BnrMaxGain;
+    stNRAttr.u16BnrLscCmpStrength = stISPCfgPipeParam[ViPipe].stBnrParam.u16BnrLscCmpStrength;
+    stNRAttr.enOpType = stISPCfgPipeParam[ViPipe].stBnrParam.u8BnrOptype;
 
     if(stNRAttr.enOpType == OP_TYPE_AUTO)
     {
-        for(i = 0; i < 4;i++)
+        for(i = 0; i < ISP_BAYER_CHN_NUM;i++)
         {
-            for(j = 0; j < 16;j++)
+            for(j = 0; j < ISP_AUTO_ISO_STRENGTH_NUM;j++)
             {
-                stNRAttr.stAuto.au8ChromaStr[i][j] = stISPCfgPipeParam[ViPipe].stStaticBNRS.au8ChromaStr[i][j];
-                stNRAttr.stAuto.au16CoarseStr[i][j] = stISPCfgPipeParam[ViPipe].stStaticBNRS.au16CoarseStr[i][j];
+                stNRAttr.stAuto.au8ChromaStr[i][j] = stISPCfgPipeParam[ViPipe].stBnrParam.au8ChromaStr[i][j];
+                stNRAttr.stAuto.au16CoarseStr[i][j] = stISPCfgPipeParam[ViPipe].stBnrParam.au16CoarseStr[i][j];
             }
         }
 
-        for(i = 0;i < 16;i++)
+        for(i = 0;i < ISP_AUTO_ISO_STRENGTH_NUM;i++)
         {
-            stNRAttr.stAuto.au8FineStr[i] = stISPCfgPipeParam[ViPipe].stStaticBNRS.au8FineStr[i];
-            stNRAttr.stAuto.au16CoringWgt[i] = stISPCfgPipeParam[ViPipe].stStaticBNRS.au16CoringWgt[i];
+            stNRAttr.stAuto.au8FineStr[i] = stISPCfgPipeParam[ViPipe].stBnrParam.au8FineStr[i];
+            stNRAttr.stAuto.au16CoringWgt[i] = stISPCfgPipeParam[ViPipe].stBnrParam.au16CoringWgt[i];
         }
 
         for(i = 0;i < 4;i++)
         {
-            stNRAttr.stWdr.au8WDRFrameStr[i] = stISPCfgPipeParam[ViPipe].stStaticBNRS.au8WDRFrameStr[i];
+            stNRAttr.stWdr.au8WDRFrameStr[i] = stISPCfgPipeParam[ViPipe].stBnrParam.au8WDRFrameStr[i];
         }
     }
 
@@ -3519,45 +3463,6 @@ static int ISPCFG_SetNR(VI_PIPE ViPipe)
     if(s32Ret != HI_SUCCESS)
     {
         prtMD("HI_MPI_ISP_SetNRAttr is failed! s32Ret = %#x\n",s32Ret);
-        return -1;
-    }
-
-    return 0;
-}
-
-//无人脸时设置曝光权重
-int ISPCFG_SetNormalStatictics(VI_PIPE ViPipe)
-{
-    HI_S32 i = 0;
-    HI_S32 j = 0;
-    HI_S32 s32Ret = HI_SUCCESS;
-    ISP_STATISTICS_CFG_S stStaCfg = {0};
-
-    if (ViPipe >= VI_MAX_PIPE_NUM)
-    {
-        prtMD("invalid input ViPipe = %d\n", ViPipe);
-        return -1;
-    }
-
-    s32Ret = HI_MPI_ISP_GetStatisticsConfig(ViPipe, &stStaCfg);
-    if(s32Ret != HI_SUCCESS)
-    {
-        prtMD("HI_MPI_ISP_GetStatisticsConfig is failed! s32Ret = %#x\n",s32Ret);
-        return -1;
-    }
-
-    for (i = 0; i < AE_ZONE_ROW; i++)
-    {
-        for (j = 0; j < AE_ZONE_COLUMN; j++)
-        {
-            stStaCfg.stAECfg.au8Weight[i][j] = stISPCfgPipeParam[ViPipe].stStatistics.au8AEWeight[i][j];
-        }
-    }
-
-    s32Ret = HI_MPI_ISP_SetStatisticsConfig(ViPipe, &stStaCfg);
-    if(s32Ret != HI_SUCCESS)
-    {
-        prtMD("HI_MPI_ISP_SetStatisticsConfig is failed! s32Ret = %#x\n",s32Ret);
         return -1;
     }
 
@@ -3574,138 +3479,145 @@ int ISPCFG_GetParam(VI_PIPE viPipe, ISPCFG_PARAM_S *pIspParam)
         return -1;
     }
 
-    s32Ret = ISPCFG_GetBypassParam(viPipe, &stISPCfgPipeParam[viPipe].stModuleState);
+    /* 加载ini文件中参数 */
+    s32Ret = ISPCFG_GetBypass(viPipe, &stISPCfgPipeParam[viPipe].stBypassParam);
     if(0 != s32Ret)
     {
-        prtMD("ISPCFG_GetBypassParam error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
+        prtMD("ISPCFG_GetBypass error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
         goto ret;
     }
 
-    /* 加载ini文件中参数 */
-    s32Ret = ISPCFG_GetBlackValue(viPipe, &stISPCfgPipeParam[viPipe].stStaticBlackLevel);
+    s32Ret = ISPCFG_GetBlackValue(viPipe, &stISPCfgPipeParam[viPipe].stBlackParam);
     if (0 != s32Ret)
     {
         prtMD("ISPCFG_GetBlackValue error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
         goto ret;
     }
 
-    s32Ret = ISPCFG_GetStaticAe(viPipe, &stISPCfgPipeParam[viPipe].stStaticAe);
+    s32Ret = ISPCFG_GetAE(viPipe, &stISPCfgPipeParam[viPipe].stAeParam);
     if (0 != s32Ret)
     {
-        prtMD("SCENE_LoadStaticAE error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
+        prtMD("ISPCFG_GetAE error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
         goto ret;
     }
 
-    s32Ret = ISPCFG_GetStaticAwb(viPipe, &stISPCfgPipeParam[viPipe].stStaticAwb);
+    s32Ret = ISPCFG_GetAWB(viPipe, &stISPCfgPipeParam[viPipe].stAwbParam);
     if (0 != s32Ret)
     {
-        prtMD("ISPCFG_GetStaticAwb error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
+        prtMD("ISPCFG_GetAWB error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
         goto ret;
     }
 
-    s32Ret = ISPCFG_GetWdrExposure(viPipe, &stISPCfgPipeParam[viPipe].stStaticWdrExposure);
+    s32Ret = ISPCFG_GetWdrExposure(viPipe, &stISPCfgPipeParam[viPipe].stWdrAeParam);
     if (0 != s32Ret)
     {
         prtMD("ISPCFG_GetWdrExposure error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
         goto ret;
     }
 
-    s32Ret = ISPCFG_GetStaticSaturation(viPipe, &stISPCfgPipeParam[viPipe].stStaticSaturation);
+    s32Ret = ISPCFG_GetSaturation(viPipe, &stISPCfgPipeParam[viPipe].stSaturationParam);
     if (0 != s32Ret)
     {
-        prtMD("ISPCFG_GetStaticSaturation error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
+        prtMD("ISPCFG_GetSaturation error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
         goto ret;
     }
 
-    s32Ret = ISPCFG_GetStaticDRC(viPipe, &stISPCfgPipeParam[viPipe].stStaticDrc);
+    s32Ret = ISPCFG_GetDRC(viPipe, &stISPCfgPipeParam[viPipe].stDrcParam);
     if (0 != s32Ret)
     {
-        prtMD("ISPCFG_GetStaticDRC error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
+        prtMD("ISPCFG_GetDRC error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
         goto ret;
     }
 
-    s32Ret = ISPCFG_GetStaticCCM(viPipe, &stISPCfgPipeParam[viPipe].stStaticCCMAttr);
+    s32Ret = ISPCFG_GetCCM(viPipe, &stISPCfgPipeParam[viPipe].stCcmParam);
     if (0 != s32Ret)
     {
-        prtMD("ISPCFG_GetStaticCCM error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
+        prtMD("ISPCFG_GetCCM error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
         goto ret;
     }
 
-    s32Ret = ISPCFG_GetStaticDehaze(viPipe, &stISPCfgPipeParam[viPipe].stStaticDehaze);
+    s32Ret = ISPCFG_GetDehaze(viPipe, &stISPCfgPipeParam[viPipe].stDehazeParam);
     if (0 != s32Ret)
     {
-        prtMD("ISPCFG_GetStaticDehaze error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
+        prtMD("ISPCFG_GetDehaze error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
         goto ret;
     }
 
     //曝光权重
-    s32Ret = ISPCFG_GetStaticStatistics(viPipe, &stISPCfgPipeParam[viPipe].stStatistics);
+    s32Ret = ISPCFG_GetStatistics(viPipe, &stISPCfgPipeParam[viPipe].stStatisticsParam);
     if (0 != s32Ret)
     {
-        prtMD("ISPCFG_GetStaticStatistics error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
+        prtMD("ISPCFG_GetStatistics error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
         goto ret;
     }
 
-    s32Ret = ISPCFG_GetStaticCSC(viPipe, &stISPCfgPipeParam[viPipe].stStaticCsc);
+    s32Ret = ISPCFG_GetCSC(viPipe, &stISPCfgPipeParam[viPipe].stCscParam);
     if (0 != s32Ret)
     {
-        prtMD("ISPCFG_GetStaticCSC error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
+        prtMD("ISPCFG_GetCSC error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
         goto ret;
     }
 
-    s32Ret = ISPCFG_GetStaticLDCI(viPipe, &stISPCfgPipeParam[viPipe].stStaticLdci);
+    s32Ret = ISPCFG_GetLDCI(viPipe, &stISPCfgPipeParam[viPipe].stLdciParam);
     if (0 != s32Ret)
     {
-        prtMD("ISPCFG_GetStaticLDCI error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
+        prtMD("ISPCFG_GetLDCI error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
         goto ret;
     }
 
-    s32Ret = ISPCFG_GetStaticShading(viPipe, &stISPCfgPipeParam[viPipe].stStaticShading);
+    s32Ret = ISPCFG_GetShading(viPipe, &stISPCfgPipeParam[viPipe].stShadingParam);
     if (0 != s32Ret)
     {
-        prtMD("ISPCFG_GetStaticShading error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
+        prtMD("ISPCFG_GetShading error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
         goto ret;
     }
 
-    s32Ret = ISPCFG_GetStaticSharpen(viPipe, &stISPCfgPipeParam[viPipe].stStaticSharpen);
+    s32Ret = ISPCFG_GetSharpen(viPipe, &stISPCfgPipeParam[viPipe].stSharpenParam);
     if (0 != s32Ret)
     {
-        prtMD("ISPCFG_GetStaticSharpen error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
+        prtMD("ISPCFG_GetSharpen error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
         goto ret;
     }
 
-    s32Ret = ISPCFG_GetStaticDemosaic(viPipe, &stISPCfgPipeParam[viPipe].stStaticDemosaic);
+    s32Ret = ISPCFG_GetDemosaic(viPipe, &stISPCfgPipeParam[viPipe].stDemosaicParam);
     if (0 != s32Ret)
     {
-        prtMD("ISPCFG_GetStaticDemosaic error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
+        prtMD("ISPCFG_GetDemosaic error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
         goto ret;
     }
 
-    s32Ret = ISPCFG_GetDynamic3DNR(viPipe, &stISPCfgPipeParam[viPipe].stDynamicThreeDNR);
+    s32Ret = ISPCFG_GetViNR(viPipe, &stISPCfgPipeParam[viPipe].stViNrxParam);
     if (0 != s32Ret)
     {
-        prtMD("ISPCFG_GetDynamic3DNR error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
+        prtMD("ISPCFG_GetViNR error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
         goto ret;
     }
 
-    s32Ret = ISPCFG_GetStaticFSWDR(viPipe, &stISPCfgPipeParam[viPipe].stStaticWDRFS);
+    s32Ret = ISPCFG_GetVpssNR(viPipe, &stISPCfgPipeParam[viPipe].stVpssNrxParam);
     if (0 != s32Ret)
     {
-        prtMD("ISPCFG_GetStaticFSWDR error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
+        prtMD("ISPCFG_GetVpssNR error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
         goto ret;
     }
 
-    s32Ret = ISPCFG_GetDynamicGamma(viPipe, &stISPCfgPipeParam[viPipe].stDynamicGamma);
+    s32Ret = ISPCFG_GetFSWDR(viPipe, &stISPCfgPipeParam[viPipe].stWdrfsParam);
     if (0 != s32Ret)
     {
-        prtMD("ISPCFG_GetDynamicGamma error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
+        prtMD("ISPCFG_GetFSWDR error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
         goto ret;
     }
 
-    s32Ret = ISPCFG_GetStaticBNR(viPipe, &stISPCfgPipeParam[viPipe].stStaticBNRS);
+    s32Ret = ISPCFG_GetGamma(viPipe, &stISPCfgPipeParam[viPipe].stGammaParam);
     if (0 != s32Ret)
     {
-        prtMD("ISPCFG_GetStaticBNR error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
+        prtMD("ISPCFG_GetGamma error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
+        goto ret;
+    }
+
+    s32Ret = ISPCFG_GetBNR(viPipe, &stISPCfgPipeParam[viPipe].stBnrParam);
+    if (0 != s32Ret)
+    {
+        prtMD("ISPCFG_GetBNR error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
         goto ret;
     }
 
@@ -3734,34 +3646,34 @@ int ISPCFG_SetParam(VI_PIPE viPipe, ISPCFG_PARAM_S *pIspParam)    //增加宽动
     }
 
     /* 0-设置黑电平 */
-    s32Ret = ISPCFG_SetStaticBlackLevel(viPipe);
+    s32Ret = ISPCFG_SetBlackLevel(viPipe);
     if (0 != s32Ret)
     {
-        prtMD("ISPCFG_SetStaticBlackLevel error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
+        prtMD("ISPCFG_SetBlackLevel error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
         goto ret;
     }
 
     /* 1-设置自动曝光 */
-    s32Ret = ISPCFG_SetDynamicAE(viPipe);
+    s32Ret = ISPCFG_SetAE(viPipe);
     if (0 != s32Ret)
     {
-        prtMD("ISPCFG_SetDynamicAE error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
+        prtMD("ISPCFG_SetAE error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
         goto ret;
     }
 
     /* 2-设置自动白平衡 */
-    s32Ret = ISPCFG_SetStaticAWB(viPipe);
+    s32Ret = ISPCFG_SetAWB(viPipe);
     if (0 != s32Ret)
     {
-        prtMD("ISPCFG_SetStaticAWB error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
+        prtMD("ISPCFG_SetAWB error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
         goto ret;
     }
 
     /* 3-设置wdr宽动态 */
-    s32Ret = ISPCFG_SetWDRExposure(viPipe);
+    s32Ret = ISPCFG_SetWdrAE(viPipe);
     if (0 != s32Ret)
     {
-        prtMD("ISPCFG_SetWDRExposure error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
+        prtMD("ISPCFG_SetWdrAE error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
         goto ret;
     }
 
@@ -3829,7 +3741,6 @@ int ISPCFG_SetParam(VI_PIPE viPipe, ISPCFG_PARAM_S *pIspParam)    //增加宽动
         goto ret;
     }
 
-#if 1
     /* 12-设置Demosaic */
     s32Ret = ISPCFG_SetDemosaic(viPipe);
     if (0 != s32Ret)
@@ -3837,7 +3748,6 @@ int ISPCFG_SetParam(VI_PIPE viPipe, ISPCFG_PARAM_S *pIspParam)    //增加宽动
         prtMD("ISPCFG_SetDemosaic error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
         goto ret;
     }
-#endif
 
     /* 13-设置gamma */
     s32Ret = ISPCFG_SetGamma(viPipe);
@@ -3846,6 +3756,22 @@ int ISPCFG_SetParam(VI_PIPE viPipe, ISPCFG_PARAM_S *pIspParam)    //增加宽动
         prtMD("ISPCFG_SetGamma error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
         goto ret;
     }
+
+#if 0
+    s32Ret = ISPCFG_SetViNR(viPipe, &stISPCfgPipeParam[viPipe].stViNrxParam);
+    if (0 != s32Ret)
+    {
+        prtMD("ISPCFG_GetViNR error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
+        goto ret;
+    }
+
+    s32Ret = ISPCFG_SetVpssNR(viPipe, &stISPCfgPipeParam[viPipe].stVpssNrxParam);
+    if (0 != s32Ret)
+    {
+        prtMD("ISPCFG_GetVPssNR error! viPipe = %d, s32Ret = %#x\n", viPipe, s32Ret);
+        goto ret;
+    }
+#endif
 
     /* 14-设置WDRFS */
     s32Ret = ISPCFG_SetFSWDR(viPipe);

@@ -3,6 +3,7 @@
 
 #include "hi_comm_isp.h"
 #include "hi_type.h"
+#include <stdbool.h>
 
 #ifdef __cplusplus
 #if __cplusplus
@@ -74,7 +75,7 @@ typedef struct
     HI_U8  u8AutoSpeed;
     HI_U16 u16AutoBlackSpeedBias;
     HI_U8  u8AutoTolerance;
-    HI_U8  u8AutostaticCompesation[16];
+    HI_U8  u8AutostaticCompesation;
     HI_U16 u16AutoEVBias;
     HI_BOOL bAutoAEStrategMode;
     HI_U16 u16AutoHistRatioSlope;
@@ -82,7 +83,7 @@ typedef struct
     HI_U16 u16AutoBlackDelayFrame;
     HI_U16 u16AutoWhiteDelayFrame;  //原先已经存在的
     HI_BOOL enFSWDRMode;
-} ISPCFG_STATIC_AE_S;
+} ISPCFG_AE_PARAM_S;
 
 typedef struct
 {
@@ -93,7 +94,7 @@ typedef struct
     HI_U16 u16Speed;
     HI_U16 u16RatioBias;
     HI_U32 au32ExpRatio[3];
-} ISPCFG_STATIC_WDR_AE_S;
+} ISPCFG_WDR_AE_PARAM_S;
 
 typedef struct
 {
@@ -130,7 +131,7 @@ typedef struct
     HI_U8  u8SecondPole;
     HI_U8  u8Stretch;
     HI_U8  u8Compress;
-} ISPCFG_STATIC_DRC_S;
+} ISPCFG_DRC_PARAM_S;
 
 typedef struct
 {
@@ -139,7 +140,7 @@ typedef struct
     HI_BOOL  bTempActEn;
     HI_U16   u16CCMTabNum;
     ISP_COLORMATRIX_PARAM_S astCCMTab[7];
-}ISPCFG_STATIC_CCM_S;
+}ISPCFG_CCM_PARAM_S;
 
 typedef struct
 {
@@ -151,7 +152,7 @@ typedef struct
     HI_U16  u16prfltIncrCoef;
     HI_U16  u16prfltDecrCoef;
     HI_U8   au8DehazeLut[256];
-} ISPCFG_STATIC_DEHAZE_S;
+} ISPCFG_DEHAZE_PARAM_S;
 
 typedef struct
 {
@@ -159,12 +160,12 @@ typedef struct
     HI_U8   u8LDCIOpType;
     HI_U16  u16ManualBlcCtrl;
     HI_U16  u16AutoBlcCtrl[16];
-} ISPCFG_STATIC_LDCI_S;
+} ISPCFG_LDCI_PARAM_S;
 
 typedef struct
 {
     HI_U8 au8AEWeight[AE_ZONE_ROW][AE_ZONE_COLUMN];
-} ISPCFG_STATIC_STATISTICSCFG_S;
+} ISPCFG_STATISTICS_PARAM_S;
 
 //add awb para
 typedef struct
@@ -180,7 +181,7 @@ typedef struct
     HI_U16  u16AutoZoneSel;
     HI_U16  u16AutoHighColorTemp;
     HI_U16  u16AutoLowColorTemp;
-} ISPCFG_STATIC_AWB_S;
+} ISPCFG_AWB_PARAM_S;
 
 typedef struct
 {
@@ -190,19 +191,19 @@ typedef struct
     HI_U8 u8Luma;
     HI_U8 u8Contr;
     HI_U8 u8Satu;
-} ISPCFG_STATIC_CSC_S;
+} ISPCFG_CSC_PARAM_S;
 
 typedef struct
 {
     HI_BOOL bEnable;
-} ISPCFG_STATIC_SHADING_S;
+} ISPCFG_SHADING_PARAM_S;
 
 typedef struct
 {
     HI_BOOL bOpType;
     HI_U8   u8ManualSat;
     HI_U8   au8AutoSat[ISP_AUTO_ISO_STRENGTH_NUM];
-} ISPCFG_STATIC_SATURATION_S;
+} ISPCFG_SATURATION_PARAM_S;
 
 typedef struct
 {
@@ -232,10 +233,10 @@ typedef struct
     HI_U8   AutoBGain[16];
     HI_U8   AutoSkinGain[16];
     HI_U8   AutoMaxSharpGain[16];
-    HI_U8   AutoLumaWgt[16][32];
-    HI_U16  au16TextureStr[16][32];
-    HI_U16  au16EdgeStr[16][32];
-} ISPCFG_STATIC_SHARPEN_S;
+    HI_U8   AutoLumaWgt[ISP_SHARPEN_LUMA_NUM][ISP_AUTO_ISO_STRENGTH_NUM];
+    HI_U16  au16TextureStr[ISP_SHARPEN_GAIN_NUM][ISP_AUTO_ISO_STRENGTH_NUM];
+    HI_U16  au16EdgeStr[ISP_SHARPEN_GAIN_NUM][ISP_AUTO_ISO_STRENGTH_NUM];
+} ISPCFG_SHARPEN_PARAM_S;
 
 typedef struct
 {
@@ -253,131 +254,7 @@ typedef struct
     HI_U8   u8AutoColorNoiseStrF[16];
     HI_U8   u8AutoColorNoiseThdY[16];
     HI_U8   u8AutoColorNoiseStrY[16];
-} ISPCFG_STATIC_DEMOSAIC_S;
-
-typedef struct
-{
-    HI_S32 IES0, IES1, IES2, IES3;
-    HI_S32 IEDZ;
-} ISPCFG_VI_3DNR_IE_S;
-
-typedef struct
-{
-    HI_S32 SPN6, SFR;
-    HI_S32 SBN6, PBR6;
-    HI_S32 SRT0, SRT1, JMODE, DeIdx;
-    HI_S32 DeRate, SFR6[3];
-
-    HI_S32 SFS1, SFT1, SBR1;
-    HI_S32 SFS2, SFT2, SBR2;
-    HI_S32 SFS4, SFT4, SBR4;
-
-    HI_S32 STH1,  SFN1, NRyEn, SFN0;
-    HI_S32 STH2,  SFN2, BWSF4, kMode;
-    HI_S32 STH3,  SFN3, TriTh;
-} ISPCFG_VI_3DNR_SF_S;
-
-typedef struct
-{
-    ISPCFG_VI_3DNR_IE_S IEy;
-    ISPCFG_VI_3DNR_SF_S SFy;
-} ISPCFG_VI_3DNR_S;
-
-typedef struct
-{
-    HI_S32 IES0, IES1, IES2, IES3;
-    HI_S32 IEDZ;
-} ISPCFG_VPSS_3DNR_IE_S;
-
-typedef struct
-{
-    HI_S32 GMEMode;
-} ISPCFG_VPSS_3DNR_GMC_S;
-
-typedef struct
-{
-    HI_S32 SPN6, SFR;
-    HI_S32 SBN6, PBR6;
-    HI_S32 SRT0, SRT1, JMODE, DeIdx;
-    HI_S32 DeRate, SFR6[3];
-
-    HI_S32 SFS1, SFT1, SBR1;
-    HI_S32 SFS2, SFT2, SBR2;
-    HI_S32 SFS4, SFT4, SBR4;
-
-    HI_S32 STH1,  SFN1, SFN0, NRyEn;
-    HI_S32 STH2,  SFN2, BWSF4, kMode;
-    HI_S32 STH3,  SFN3, TriTh;
-
-    HI_S32 SBSk[32], SDSk[32];
-} ISPCFG_VPSS_3DNR_SF_S;
-
-typedef struct
-{
-    HI_S32 MADZ0, MAI00, MAI01, MAI02, biPath;
-    HI_S32 MADZ1, MAI10, MAI11, MAI12;
-    HI_S32 MABR0, MABR1;
-
-    HI_S32 MATH0, MATE0, MATW;
-    HI_S32 MATH1, MATE1;
-    HI_S32 MASW;
-    HI_S32 MABW0, MABW1;
-} ISPCFG_VPSS_3DNR_MD_S;
-
-typedef struct
-{
-    HI_S32 advMATH, RFDZ;
-    HI_S32 RFUI, RFSLP, bRFU;
-} ISPCFG_VPSS_3DNR_RF_S;
-
-typedef struct
-{
-    HI_S32 TFS0, TDZ0, TDX0;
-    HI_S32 TFS1, TDZ1, TDX1;
-    HI_S32 SDZ0, STR0, DZMode0;
-    HI_S32 SDZ1, STR1, DZMode1;
-
-    HI_S32 TFR0[7], TSS0, TSI0;
-    HI_S32 TFR1[7], TSS1, TSI1;
-
-    HI_S32 RFI, tEdge;
-    HI_S32 bRef;
-} ISPCFG_VPSS_3DNR_TF_S;
-
-typedef struct
-{
-    HI_S32 SFC, TFC;
-    HI_S32 CTFS;
-} ISPCFG_3DNR_VPSS_PNRC_S;
-
-typedef struct
-{
-    ISPCFG_VPSS_3DNR_IE_S IEy;
-    ISPCFG_VPSS_3DNR_SF_S SFy;
-    ISPCFG_VPSS_3DNR_TF_S TFy;
-    ISPCFG_VPSS_3DNR_MD_S MDy;
-} ISPCFG_VPSS_3DNR_NRC_S;
-
-typedef struct
-{
-    ISPCFG_VPSS_3DNR_IE_S  IEy[3];
-    ISPCFG_VPSS_3DNR_GMC_S  GMC;
-    ISPCFG_VPSS_3DNR_SF_S  SFy[3];
-    ISPCFG_VPSS_3DNR_MD_S  MDy[2];
-    ISPCFG_VPSS_3DNR_RF_S  RFs;
-    ISPCFG_VPSS_3DNR_TF_S  TFy[2];
-    ISPCFG_3DNR_VPSS_PNRC_S pNRc;
-    ISPCFG_VPSS_3DNR_NRC_S  NRc;
-} ISPCFG_VPSS_3DNR_S;
-
-typedef struct
-{
-    HI_U32 u32ThreeDNRCount;
-    HI_U16 u16VI_3DNRStartPoint;
-    HI_U32 au32ThreeDNRIso[15];
-    ISPCFG_VI_3DNR_S astThreeDNRVIValue[15];
-    ISPCFG_VPSS_3DNR_S astThreeDNRVPSSValue[15];
-} ISPCFG_DYNAMIC_THREEDNR_S;
+} ISPCFG_DEMOSAIC_PARAM_S;
 
 typedef struct
 {
@@ -389,9 +266,9 @@ typedef struct
     HI_U16 au16Table[10][1025];
     #endif
     HI_BOOL bEnable;
-    HI_U16 u16Table[25][41];   //25*41=1025
+    HI_U16 u16Table[GAMMA_NODE_NUM];
     int enCurveType;
-} ISPCFG_DYNAMIC_GAMMA_S;
+} ISPCFG_GAMMA_PARAM_S;
 
 typedef struct
 {
@@ -400,12 +277,12 @@ typedef struct
     HI_U8   u8BnrMaxGain;
     HI_U16  u16BnrLscCmpStrength;
     HI_U8   u8BnrOptype;
-    HI_U8   au8ChromaStr[4][16];
-    HI_U8   au8FineStr[16];
-    HI_U16  au16CoringWgt[16];
-    HI_U16  au16CoarseStr[4][16];
-    HI_U8   au8WDRFrameStr[4];
-}ISPCFG_STATIC_BNR_S;
+    HI_U8   au8ChromaStr[ISP_BAYER_CHN_NUM][ISP_AUTO_ISO_STRENGTH_NUM];
+    HI_U8   au8FineStr[ISP_AUTO_ISO_STRENGTH_NUM];
+    HI_U16  au16CoringWgt[ISP_AUTO_ISO_STRENGTH_NUM];
+    HI_U16  au16CoarseStr[ISP_BAYER_CHN_NUM][ISP_AUTO_ISO_STRENGTH_NUM];
+    HI_U8   au8WDRFrameStr[ISP_BAYER_CHN_NUM];
+}ISPCFG_BNR_PARAM_S;
 
 typedef struct
 {
@@ -422,48 +299,59 @@ typedef struct
     HI_U8   u8WDRMdtMdtStillThd;
     HI_U8   u8WDRMdtMdtLongBlend;
     HI_U8   u8WDRMdtOpType;
-    HI_U8   au8AutoMdThrLowGain[16];
-    HI_U8   au8AutoMdThrHigGain[16];
+    HI_U8   au8AutoMdThrLowGain[ISP_AUTO_ISO_STRENGTH_NUM];
+    HI_U8   au8AutoMdThrHigGain[ISP_AUTO_ISO_STRENGTH_NUM];
     HI_U16  u16FusionFusionThr[4];
-} ISPCFG_STATIC_WDRFS_S;
+} ISPCFG_WDRFS_PARAM_S;
 
 typedef struct
 {
-    ISPCFG_BYPASS_PARAM_S stModuleState;
-    ISPCFG_BLACK_PARAM_S  stStaticBlackLevel;
-    ISPCFG_STATIC_AE_S     stStaticAe;
-    ISPCFG_STATIC_WDR_AE_S stStaticWdrExposure;
-    ISPCFG_STATIC_DRC_S  stStaticDrc;
-    ISPCFG_STATIC_CCM_S  stStaticCCMAttr;
-    ISPCFG_STATIC_DEHAZE_S stStaticDehaze;
-    ISPCFG_STATIC_LDCI_S stStaticLdci;
-    ISPCFG_STATIC_STATISTICSCFG_S stStatistics;
-    ISPCFG_STATIC_AWB_S stStaticAwb;
-    ISPCFG_STATIC_CSC_S stStaticCsc;
-    ISPCFG_STATIC_SHADING_S stStaticShading;
-    ISPCFG_STATIC_SATURATION_S  stStaticSaturation;
-    ISPCFG_STATIC_SHARPEN_S  stStaticSharpen;
-    ISPCFG_STATIC_DEMOSAIC_S  stStaticDemosaic;
-    ISPCFG_DYNAMIC_THREEDNR_S stDynamicThreeDNR;
-    ISPCFG_DYNAMIC_GAMMA_S stDynamicGamma;
-    ISPCFG_STATIC_WDRFS_S stStaticWDRFS;
-    ISPCFG_STATIC_BNR_S   stStaticBNRS;
+    bool bOpen;
+    VI_PIPE_NRX_PARAM_S stNrParam;
+}ISPCFG_VI_NR_PARAM_S;
+
+typedef struct
+{
+    bool bOpen;
+    VPSS_GRP_NRX_PARAM_S stNrParam;
+}ISPCFG_VPSS_NR_PARAM_S;
+
+typedef struct
+{
+    ISPCFG_BYPASS_PARAM_S stBypassParam;
+    ISPCFG_BLACK_PARAM_S stBlackParam;
+    ISPCFG_AE_PARAM_S stAeParam;
+    ISPCFG_WDR_AE_PARAM_S stWdrAeParam;
+    ISPCFG_DRC_PARAM_S stDrcParam;
+    ISPCFG_CCM_PARAM_S stCcmParam;
+    ISPCFG_DEHAZE_PARAM_S stDehazeParam;
+    ISPCFG_LDCI_PARAM_S stLdciParam;
+    ISPCFG_STATISTICS_PARAM_S stStatisticsParam;
+    ISPCFG_AWB_PARAM_S stAwbParam;
+    ISPCFG_CSC_PARAM_S stCscParam;
+    ISPCFG_SHADING_PARAM_S stShadingParam;
+    ISPCFG_SATURATION_PARAM_S stSaturationParam;
+    ISPCFG_SHARPEN_PARAM_S stSharpenParam;
+    ISPCFG_DEMOSAIC_PARAM_S stDemosaicParam;
+    ISPCFG_VI_NR_PARAM_S stViNrxParam;
+    ISPCFG_VPSS_NR_PARAM_S stVpssNrxParam;
+    ISPCFG_GAMMA_PARAM_S stGammaParam;
+    ISPCFG_WDRFS_PARAM_S stWdrfsParam;
+    ISPCFG_BNR_PARAM_S stBnrParam;
 } ISPCFG_PARAM_S;
 
 int ISPCFG_LoadFile(VI_PIPE viPipe, char *pFileName);
 int ISPCFG_UnloadFile(VI_PIPE viPipe);
-unsigned int ISPCFG_GetValue(const VI_PIPE viPipe, const char *pString);
+int ISPCFG_GetValue(const VI_PIPE viPipe, const char *pString);
 int ISPCFG_SetValue(const VI_PIPE viPipe, const char *pKeyString,char *pValue);
 int ISPCFG_GetString(const VI_PIPE viPipe, char **pString, const char *pKey);
 int ISPCFG_SetLongFrameAE(VI_PIPE ViPipe);
 int ISPCFG_SetStatistics(VI_PIPE ViPipe);
 int ISPCFG_SetDemosaic(VI_PIPE ViPipe);
-int ISPCFG_SetPipeParam(VI_PIPE ViPipe, VPSS_GRP VpssGrp);
-int ISPCFG_SetNormalStatictics(VI_PIPE ViPipe);
 int ISPCFG_GetParam(VI_PIPE ViPipe, ISPCFG_PARAM_S *pIspParam);
 int ISPCFG_SetParam(VI_PIPE ViPipe, ISPCFG_PARAM_S *pIspParam);
 int ISPCFG_SetLDCI(VI_PIPE ViPipe);
-int ISPCFG_GetStaticFSWDR(VI_PIPE viPipe, ISPCFG_STATIC_WDRFS_S *pStaticWDRFs);
+int ISPCFG_GetFSWDR(VI_PIPE viPipe, ISPCFG_WDRFS_PARAM_S *pStaticWDRFs);
 int ISPCFG_SetBypass(VI_PIPE ViPipe);
 
 
