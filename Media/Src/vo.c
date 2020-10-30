@@ -40,10 +40,10 @@ int Media_Vo_InitDev(VO_DEV VoDev, MEDIA_LCD_IDX_E lcdTypeIdx)
     {
         stPubAttr.stSyncInfo.bSynm = 0;
         stPubAttr.stSyncInfo.bIop = 1;
-        stPubAttr.stSyncInfo.u16Vact = dispWidth;
+        stPubAttr.stSyncInfo.u16Vact = dispHeight;
         stPubAttr.stSyncInfo.u16Vbb = 18;
         stPubAttr.stSyncInfo.u16Vfb = 16;
-        stPubAttr.stSyncInfo.u16Hact = dispHeight;
+        stPubAttr.stSyncInfo.u16Hact = dispWidth;
         stPubAttr.stSyncInfo.u16Hbb = 64;
         stPubAttr.stSyncInfo.u16Hfb = 136;
         stPubAttr.stSyncInfo.u16Hpw = 4;
@@ -82,6 +82,8 @@ int Media_Vo_InitDev(VO_DEV VoDev, MEDIA_LCD_IDX_E lcdTypeIdx)
         prtMD("unsupported lcdTypeIdx! please check lcdTypeIdx = %d!\n", lcdTypeIdx);
         return HI_FAILURE;
     }
+
+    prtMD("dispWidth = %d, dispHeight = %d\n", dispWidth, dispHeight);
 
     s32Ret = HI_MPI_VO_SetPubAttr(VoDev, &stPubAttr);
     if (s32Ret != HI_SUCCESS)
@@ -242,6 +244,8 @@ int Media_Vo_Init(MEDIA_LCD_IDX_E lcdTypeIdx)
         return 0;
     }
 
+    prtMD("lcdTypeIdx = %d\n", lcdTypeIdx);
+
     if (bInitFlag == 1)
     {
         prtMD("VO has been inited!\n");
@@ -262,14 +266,15 @@ int Media_Vo_Init(MEDIA_LCD_IDX_E lcdTypeIdx)
         return s32Ret;
     }
 
-#if 0
-    s32Ret = Media_Vo_InitMipiTx(lcdTypeIdx);
-    if (HI_SUCCESS != s32Ret)
+    if (lcdTypeIdx != LCD_IDX_3_480X640)
     {
-        prtMD("Media_Vo_InitMipiTx error! s32Ret = %#x\n", s32Ret);
-        return s32Ret;
+        s32Ret = Media_Vo_InitMipiTx(lcdTypeIdx);
+        if (HI_SUCCESS != s32Ret)
+        {
+            prtMD("Media_Vo_InitMipiTx error! s32Ret = %#x\n", s32Ret);
+            return s32Ret;
+        }
     }
-#endif
 
     bInitFlag = 1;
 

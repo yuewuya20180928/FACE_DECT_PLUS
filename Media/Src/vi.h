@@ -9,7 +9,7 @@
 extern "C" {
 #endif
 
-int Media_VideoIn_GetConfig(MEDIA_VI_PARAM_S *pViParam, unsigned int sensorNum);
+int Media_VideoIn_GetConfig(MEDIA_VI_PARAM_S *pViParam, SENSOR_PARAM_S *pSensorParam);
 
 int Media_VideoIn_StartMipiRx(MEDIA_VI_PARAM_S *pViParam);
 

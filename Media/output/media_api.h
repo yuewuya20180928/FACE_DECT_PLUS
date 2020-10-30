@@ -14,13 +14,37 @@ extern "C" {
 #define STREAM_TYPE_AUDIO 0x0002                /* 音频流 */
 #define STREAM_TYPE_PRIVT 0x0004                /* 私有流 */
 
+/* sensor类型定义 */
+typedef enum
+{
+    SONY_IMX327_MIPI_2M_30FPS_12BIT = 0,
+    SONY_IMX327_MIPI_2M_30FPS_12BIT_WDR2TO1,
+    SONY_IMX327_2L_MIPI_2M_30FPS_12BIT,
+    SONY_IMX327_2L_MIPI_2M_30FPS_12BIT_WDR2TO1,
+    SONY_IMX327_2L_MIPI_720P_30FPS_12BIT,
+
+    GALAXYCORE_GC2145_MIPI_UXGA_30FPS_10BIT,        /* 1600 * 1200 */
+    GALAXYCORE_GC2145_MIPI_960P_30FPS_10BIT,        /* 1280 * 960 */
+
+    VI_SNS_TYPE_BUTT,
+} VI_SNS_TYPE_E;
+
+/*　LCD类型 */
+typedef enum
+{
+    LCD_IDX_7_600X1024_RP = 0,
+    LCD_IDX_3_480X640,
+
+    LCD_IDX_BUTT,
+}MEDIA_LCD_IDX_E;
+
 /* 枚举sensor类型 */
 typedef enum
 {
-    MEDIA_SENSOR_RGB = 0,
-    MEDIA_SENSOR_IR,
-    MEDIA_SENSOR_BUTT,
-}MEDIA_SENSOR_E;
+    SENSOR_TYPE_RGB = 0,
+    SENSOR_TYPE_IR,
+    SENSOR_TYPE_BUTT,
+}SENSOR_TYPE_E;
 
 typedef struct
 {
@@ -124,11 +148,23 @@ typedef struct
     AUDIO_PARAM_S stAudioParam;     /* 音频参数 */
 }MEDIA_RECORD_S;
 
-int Media_Init(unsigned int sensorNumber);
+typedef struct
+{
+    unsigned int sensorNumber;                          /* sensor的个数 */
+    VI_SNS_TYPE_E enSensorIdx[MAX_SENSOR_NUMBER];       /* 具体sensor工作类型 */
+}SENSOR_PARAM_S;
 
-int Media_SetVideoDisp(MEDIA_SENSOR_E sensorIdx, MEDIA_VIDEO_DISP_S *pDispParam);
+typedef struct
+{
+    SENSOR_PARAM_S stSensorParam;                       /* sensor初始化参数 */
+    MEDIA_LCD_IDX_E enLcdIdx;                           /* LCD参数 */
+}INIT_PARAM_S;
 
-int Media_SetRecord(MEDIA_SENSOR_E sensorIdx, VIDEO_STREAM_E videoStreamType, MEDIA_RECORD_S *pRecord);
+int Media_Init(INIT_PARAM_S *stSensorParam);
+
+int Media_SetVideoDisp(SENSOR_TYPE_E sensorIdx, MEDIA_VIDEO_DISP_S *pDispParam);
+
+int Media_SetRecord(SENSOR_TYPE_E sensorIdx, VIDEO_STREAM_E videoStreamType, MEDIA_RECORD_S *pRecord);
 
 #ifdef __cplusplus
 }

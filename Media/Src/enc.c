@@ -310,7 +310,7 @@ int Media_Enc_StartVideo(unsigned int encChan, VIDEO_PARAM_S *pVideoParam)
 }
 
 /* 设置音频编码参数 */
-int Media_Enc_SetAudio(MEDIA_SENSOR_E sensorIdx, VIDEO_STREAM_E videoStreamType, AUDIO_PARAM_S *pAudioParam)
+int Media_Enc_SetAudio(SENSOR_TYPE_E sensorIdx, VIDEO_STREAM_E videoStreamType, AUDIO_PARAM_S *pAudioParam)
 {
     int ret = 0;
 

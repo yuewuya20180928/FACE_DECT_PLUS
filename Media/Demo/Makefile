@@ -2,6 +2,8 @@ CC=arm-himix200-linux-gcc
 CXX=arm-himix200-linux-g++
 
 INCLUDE = -I ../output \
+		  -I ./include/json \
+		  -I ./include \
 
 #海思平台库
 MPI_LIB_PATH := ./Lib/hisi3516dv300/hi_mpp
@@ -32,6 +34,7 @@ MPI_LIBS += -L $(MPI_LIB_PATH)/ -ldnvqe
 MPI_LIBS += -L $(MPI_LIB_PATH)/ -l_hidehaze
 MPI_LIBS += -L $(MPI_LIB_PATH)/ -l_hiir_auto
 
+OPENLIBS += -L ./Lib/json -ljsoncpp
 
 CFLAGS += -Wall -O2 $(INCLUDE) -Wmisleading-indentation
 CLFLAGS += -lpthread -lm -ldl  -lstdc++ -fno-aggressive-loop-optimizations -ffunction-sections -fdata-sections -O0 -fstack-protector -fPIC -Wno-date-time 
@@ -47,7 +50,7 @@ LIBS += -L ./Lib/media -lmedia
 LIBS += -L ./Lib/sensor -lsns_imx327
 LIBS += -L ./Lib/sensor -lsns_imx327_2L
 LIBS += -L ./Lib/sensor -lsns_gc2145
-LIBS += $(MPI_LIBS)
+LIBS += $(MPI_LIBS) $(OPENLIBS)
 
 .PHONY : clean $(DECODE_TEST_TARGET)
 

@@ -11,7 +11,7 @@ int Media_Vpss_InitModule(void)
     return 0;
 }
 
-int Media_Vpss_InitGroup(MEDIA_SENSOR_E enSensorIdx, unsigned int w, unsigned int h)
+int Media_Vpss_InitGroup(SENSOR_TYPE_E enSensorIdx, unsigned int w, unsigned int h)
 {
     VPSS_PARAM_S *pVpssParam = NULL;
     unsigned int vpssGrp = -1;
@@ -19,7 +19,7 @@ int Media_Vpss_InitGroup(MEDIA_SENSOR_E enSensorIdx, unsigned int w, unsigned in
     VPSS_GRP_ATTR_S stVpssGrpAttr;
     VPSS_GRP_HDL_S *pHandle = NULL;
 
-    if (enSensorIdx >= MEDIA_SENSOR_BUTT)
+    if (enSensorIdx >= SENSOR_TYPE_BUTT)
     {
         prtMD("invalid input enSensorIdx = %d\n", enSensorIdx);
         return -1;
@@ -84,7 +84,7 @@ int Media_Vpss_InitGroup(MEDIA_SENSOR_E enSensorIdx, unsigned int w, unsigned in
     return ret;
 }
 
-int Media_Vpss_StartChn(MEDIA_SENSOR_E sensorIdx, VPSS_CHN VpssChn, MEDIA_RECT_S *pRect)
+int Media_Vpss_StartChn(SENSOR_TYPE_E sensorIdx, VPSS_CHN VpssChn, MEDIA_RECT_S *pRect)
 {
     VPSS_PARAM_S *pVpssParam = NULL;
     VPSS_GRP_HDL_S *pVpssGrpHdl = NULL;
@@ -95,7 +95,7 @@ int Media_Vpss_StartChn(MEDIA_SENSOR_E sensorIdx, VPSS_CHN VpssChn, MEDIA_RECT_S
     unsigned int height = 0;
     HI_S32 s32Ret = HI_SUCCESS;
 
-    if (pRect == NULL || sensorIdx >= MEDIA_SENSOR_BUTT)
+    if (pRect == NULL || sensorIdx >= SENSOR_TYPE_BUTT)
     {
         prtMD("invalid input pRect = %p, sensorIdx = %d\n", pRect, sensorIdx);
         return -1;
@@ -164,7 +164,7 @@ int Media_Vpss_StartChn(MEDIA_SENSOR_E sensorIdx, VPSS_CHN VpssChn, MEDIA_RECT_S
     return HI_SUCCESS;
 }
 
-int Media_Vpss_BindVo(MEDIA_SENSOR_E sensorIdx, MEDIA_BIND_INFO_S *pDst)
+int Media_Vpss_BindVo(SENSOR_TYPE_E sensorIdx, MEDIA_BIND_INFO_S *pDst)
 {
     VPSS_PARAM_S *pVpssParam = NULL;
     VPSS_GRP_HDL_S *pVpssGrpHdl = NULL;
@@ -197,7 +197,7 @@ int Media_Vpss_BindVo(MEDIA_SENSOR_E sensorIdx, MEDIA_BIND_INFO_S *pDst)
     return s32Ret;
 }
 
-int Media_Vpss_BindVi(MEDIA_SENSOR_E sensorIdx, MEDIA_BIND_INFO_S *pSrc)
+int Media_Vpss_BindVi(SENSOR_TYPE_E sensorIdx, MEDIA_BIND_INFO_S *pSrc)
 {
     VPSS_PARAM_S *pVpssParam = NULL;
     VPSS_GRP_HDL_S *pVpssGrpHdl = NULL;

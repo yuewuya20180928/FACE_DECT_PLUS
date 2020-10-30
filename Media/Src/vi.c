@@ -291,16 +291,19 @@ VI_CHN_ATTR_S CHN_ATTR_960P_420_SDR8_LINEAR =
     { -1, -1}
 };
 
-int Media_VideoIn_GetConfig(MEDIA_VI_PARAM_S *pViParam, unsigned int sensorNum)
+int Media_VideoIn_GetConfig(MEDIA_VI_PARAM_S *pViParam, SENSOR_PARAM_S *pSensorParam)
 {
     unsigned int i = 0;
     unsigned int idx = 0;
+    unsigned int sensorNum = 0;
 
-    if (pViParam == NULL)
+    if ((pViParam == NULL) || (pSensorParam == NULL))
     {
-        prtMD("ivnalid pViParam = %p\n", pViParam);
+        prtMD("invalid input pViParam = %p, pSensorParam = %p\n", pViParam, pSensorParam);
         return -1;
     }
+
+    sensorNum = pSensorParam->sensorNumber;
 
     if (sensorNum > MAX_SENSOR_NUMBER)
     {
@@ -314,12 +317,8 @@ int Media_VideoIn_GetConfig(MEDIA_VI_PARAM_S *pViParam, unsigned int sensorNum)
     {
         pViParam->s32WorkingViId[i] = i;
 
-        #if 1
         /* 设置sensor类型 */
-        pViParam->stViInfo[i].stSnsInfo.enSnsType = GALAXYCORE_GC2145_MIPI_UXGA_30FPS_10BIT;
-        #else
-        pViParam->stViInfo[i].stSnsInfo.enSnsType = SONY_IMX327_2L_MIPI_720P_30FPS_12BIT;
-        #endif
+        pViParam->stViInfo[i].stSnsInfo.enSnsType = pSensorParam->enSensorIdx[i];
 
         pViParam->stViInfo[i].stSnsInfo.MipiDev = i;
         pViParam->stViInfo[i].stSnsInfo.s32BusId = i;

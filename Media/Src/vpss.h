@@ -27,13 +27,13 @@ typedef struct
 }VPSS_PARAM_S;
 
 
-int Media_Vpss_InitGroup(MEDIA_SENSOR_E enSensorIdx, unsigned int w, unsigned int h);
+int Media_Vpss_InitGroup(SENSOR_TYPE_E enSensorIdx, unsigned int w, unsigned int h);
 
-int Media_Vpss_StartChn(MEDIA_SENSOR_E sensorIdx, VPSS_CHN VpssChn, MEDIA_RECT_S *pRect);
+int Media_Vpss_StartChn(SENSOR_TYPE_E sensorIdx, VPSS_CHN VpssChn, MEDIA_RECT_S *pRect);
 
-int Media_Vpss_BindVo(MEDIA_SENSOR_E sensorIdx, MEDIA_BIND_INFO_S *pDst);
+int Media_Vpss_BindVo(SENSOR_TYPE_E sensorIdx, MEDIA_BIND_INFO_S *pDst);
 
-int Media_Vpss_BindVi(MEDIA_SENSOR_E sensorIdx, MEDIA_BIND_INFO_S *pSrc);
+int Media_Vpss_BindVi(SENSOR_TYPE_E sensorIdx, MEDIA_BIND_INFO_S *pSrc);
 
 #ifdef __cplusplus
 }

@@ -7,18 +7,27 @@
 #include "vo.h"
 #include "enc.h"
 
-MEDIA_SENSOR_E sensorIdx[MAX_SENSOR_NUMBER] =
+SENSOR_TYPE_E sensorIdx[MAX_SENSOR_NUMBER] =
 {
-    MEDIA_SENSOR_RGB,
-    MEDIA_SENSOR_IR
+    SENSOR_TYPE_RGB,
+    SENSOR_TYPE_IR
 };
 
 /* 初始化媒体库 */
-int Media_Init(unsigned int sensorNumber)
+int Media_Init(INIT_PARAM_S *pSensorParam)
 {
     unsigned int i = 0;
     int ret = 0;
-    MEDIA_LCD_IDX_E lcdTypeIdx = LCD_IDX_3_480X640;     //屏幕类型根据实际情况进行设定,媒体需要兼容
+    unsigned int sensorNumber = 0;
+
+    if (pSensorParam == NULL)
+    {
+        prtMD("invalid input pSensorParam = %p\n", pSensorParam);
+        return -1;
+    }
+
+    //屏幕类型后继由应用应用,媒体需要兼容所有产品支持的屏幕类型
+    MEDIA_LCD_IDX_E lcdTypeIdx = pSensorParam->enLcdIdx;
 
     MEDIA_VI_PARAM_S stViParam = {0};
     MEDIA_BIND_INFO_S stSrcInfo = {0};
@@ -30,7 +39,7 @@ int Media_Init(unsigned int sensorNumber)
 
     prtMD("Date:%s, Time:%s\n", __DATE__, __TIME__);
 
-    ret = Media_VideoIn_GetConfig(&stViParam, sensorNumber);
+    ret = Media_VideoIn_GetConfig(&stViParam, &pSensorParam->stSensorParam);
     if (HI_SUCCESS != ret)
     {
         prtMD("Media_VideoIn_GetConfig error! ret = %#x\n", ret);
@@ -78,6 +87,8 @@ int Media_Init(unsigned int sensorNumber)
         return -1;
     }
 
+    sensorNumber = pSensorParam->stSensorParam.sensorNumber;
+
     /* 初始化VPSS */
     for (i = 0; i < sensorNumber; i++)
     {
@@ -121,7 +132,7 @@ int TL_ALG_Init(void)
 }
 
 /* 设置视频显示状态 */
-int Media_SetVideoDisp(MEDIA_SENSOR_E sensorIdx, MEDIA_VIDEO_DISP_S *pDispParam)
+int Media_SetVideoDisp(SENSOR_TYPE_E sensorIdx, MEDIA_VIDEO_DISP_S *pDispParam)
 {
     HI_S32 s32Ret = HI_SUCCESS;
     VO_LAYER voLayer = 0;
@@ -134,7 +145,7 @@ int Media_SetVideoDisp(MEDIA_SENSOR_E sensorIdx, MEDIA_VIDEO_DISP_S *pDispParam)
         return -1;
     }
 
-    if (sensorIdx >= MEDIA_SENSOR_BUTT)
+    if (sensorIdx >= SENSOR_TYPE_BUTT)
     {
         prtMD("invalid input sensorIdx = %d\n", sensorIdx);
         return -1;
@@ -160,7 +171,7 @@ int Media_SetVideoDisp(MEDIA_SENSOR_E sensorIdx, MEDIA_VIDEO_DISP_S *pDispParam)
         stDst.devNo = voLayer;
         stDst.chnNo = voChn;
 
-        s32Ret = Media_Vpss_BindVo(MEDIA_SENSOR_RGB, &stDst);
+        s32Ret = Media_Vpss_BindVo(SENSOR_TYPE_RGB, &stDst);
         if (HI_SUCCESS != s32Ret)
         {
             prtMD("Media_Vpss_StartChn error! s32Ret = %#x\n", s32Ret);
@@ -202,7 +213,7 @@ int Media_SetVideoDisp(MEDIA_SENSOR_E sensorIdx, MEDIA_VIDEO_DISP_S *pDispParam)
 }
 
 /* 设置录像参数 */
-int Media_SetRecord(MEDIA_SENSOR_E sensorIdx, VIDEO_STREAM_E videoStreamType, MEDIA_RECORD_S *pRecord)
+int Media_SetRecord(SENSOR_TYPE_E sensorIdx, VIDEO_STREAM_E videoStreamType, MEDIA_RECORD_S *pRecord)
 {
     int ret = 0;
     MEDIA_RECT_S stRect = {0};
@@ -231,7 +242,7 @@ int Media_SetRecord(MEDIA_SENSOR_E sensorIdx, VIDEO_STREAM_E videoStreamType, ME
         return -1;
     }
 
-    if (sensorIdx == MEDIA_SENSOR_IR)
+    if (sensorIdx == SENSOR_TYPE_IR)
     {
         vpssGrp = 1;
     }

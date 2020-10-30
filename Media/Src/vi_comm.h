@@ -2,26 +2,13 @@
 #define __VI_COMM_H__
 
 #include "media_com.h"
+#include "media_api.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #define WDR_MAX_PIPE_NUM        4
-
-typedef enum
-{
-    SONY_IMX327_MIPI_2M_30FPS_12BIT = 0,
-    SONY_IMX327_MIPI_2M_30FPS_12BIT_WDR2TO1,
-    SONY_IMX327_2L_MIPI_2M_30FPS_12BIT,
-    SONY_IMX327_2L_MIPI_2M_30FPS_12BIT_WDR2TO1,
-    SONY_IMX327_2L_MIPI_720P_30FPS_12BIT,
-
-    GALAXYCORE_GC2145_MIPI_UXGA_30FPS_10BIT,        /* 1600 * 1200 */
-    GALAXYCORE_GC2145_MIPI_960P_30FPS_10BIT,        /* 1280 * 960 */
-
-    VI_SNS_TYPE_BUTT,
-} VI_SNS_TYPE_E;
 
 typedef struct
 {
