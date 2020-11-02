@@ -88,17 +88,17 @@ int GetConfigParam(const char *pData, CONFIG_PARAM_S *pConfigParam)
     /* 还需要设置开启关闭状态和编码类型 */
     pConfigParam->stRecordParam.stVideoParam.bOpen = true;          /* 编码功能默认开启 */
 
-    if (strcmp(ENCODE_PARAM[encType]["type"], "H265") == 0)
+    if ((ENCODE_PARAM[encType]["type"] == "H265") == 0)
     {
         /* H265 */
         pConfigParam->stRecordParam.stVideoParam.enType = ENCODE_TYPE_H265;
     }
-    else if (strcmp(ENCODE_PARAM[encType]["type"], "H264") == 0)
+    else if ((ENCODE_PARAM[encType]["type"] == "H264") == 0)
     {
         /* H264 */
         pConfigParam->stRecordParam.stVideoParam.enType = ENCODE_TYPE_H264;
     }
-    else if (strcmp(ENCODE_PARAM[encType]["type"], "JPEG") == 0)
+    else if ((ENCODE_PARAM[encType]["type"] == "JPEG") == 0)
     {
         pConfigParam->stRecordParam.stVideoParam.enType = ENCODE_TYPE_JPEG;
     }
