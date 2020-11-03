@@ -14,17 +14,20 @@ SENSOR_TYPE_E sensorIdx[MAX_SENSOR_NUMBER] =
 };
 
 /* 初始化媒体库 */
-int Media_Init(INIT_PARAM_S *pSensorParam)
+int Media_Init(unsigned int chan, unsigned int param, void *pBuf)
 {
     unsigned int i = 0;
     int ret = 0;
     unsigned int sensorNumber = 0;
+    INIT_PARAM_S *pSensorParam = NULL;
 
-    if (pSensorParam == NULL)
+    if (pBuf == NULL)
     {
-        prtMD("invalid input pSensorParam = %p\n", pSensorParam);
+        prtMD("invalid input pBuf = %p\n", pBuf);
         return -1;
     }
+
+    pSensorParam = (INIT_PARAM_S *)pBuf;
 
     //屏幕类型后继由应用应用,媒体需要兼容所有产品支持的屏幕类型
     MEDIA_LCD_IDX_E lcdTypeIdx = pSensorParam->enLcdIdx;
@@ -132,18 +135,24 @@ int TL_ALG_Init(void)
 }
 
 /* 设置视频显示状态 */
-int Media_SetVideoDisp(SENSOR_TYPE_E sensorIdx, MEDIA_VIDEO_DISP_S *pDispParam)
+int Media_SetVideoDisp(unsigned int chan, unsigned int param, void *pBuf)
 {
     HI_S32 s32Ret = HI_SUCCESS;
     VO_LAYER voLayer = 0;
     VO_CHN voChn = 0;
     MEDIA_BIND_INFO_S stDst = {0};
+    SENSOR_TYPE_E sensorIdx = SENSOR_TYPE_RGB;
+    MEDIA_VIDEO_DISP_S *pDispParam = NULL;
 
-    if (pDispParam == NULL)
+    if (pBuf == NULL)
     {
-        prtMD("invalid input pDispParam = %p\n", pDispParam);
+        prtMD("invalid input pBuf = %p\n", pBuf);
         return -1;
     }
+
+    pDispParam = (MEDIA_VIDEO_DISP_S *)pBuf;
+
+    sensorIdx = chan;
 
     if (sensorIdx >= SENSOR_TYPE_BUTT)
     {
@@ -213,7 +222,7 @@ int Media_SetVideoDisp(SENSOR_TYPE_E sensorIdx, MEDIA_VIDEO_DISP_S *pDispParam)
 }
 
 /* 设置录像参数 */
-int Media_SetRecord(SENSOR_TYPE_E sensorIdx, VIDEO_STREAM_E videoStreamType, MEDIA_RECORD_S *pRecord)
+int Media_SetRecord(unsigned int chan, unsigned int param, void *pBuf)
 {
     int ret = 0;
     MEDIA_RECT_S stRect = {0};
@@ -223,6 +232,9 @@ int Media_SetRecord(SENSOR_TYPE_E sensorIdx, VIDEO_STREAM_E videoStreamType, MED
     VIDEO_PARAM_S *pVideoParam = NULL;
     MPP_CHN_S stSrcChn = {0};
     MPP_CHN_S stDstChn = {0};
+    SENSOR_TYPE_E sensorIdx = chan;
+    VIDEO_STREAM_E videoStreamType = param;
+    MEDIA_RECORD_S *pRecord = NULL;
 
     if (sensorIdx >= MAX_SENSOR_NUMBER)
     {
@@ -236,11 +248,13 @@ int Media_SetRecord(SENSOR_TYPE_E sensorIdx, VIDEO_STREAM_E videoStreamType, MED
         return -1;
     }
 
-    if (pRecord == NULL)
+    if (pBuf == NULL)
     {
-        prtMD("invalid input pRecord = %p\n", pRecord);
+        prtMD("invalid input pBuf = %p\n", pBuf);
         return -1;
     }
+
+    pRecord = (MEDIA_RECORD_S *)pBuf;
 
     if (sensorIdx == SENSOR_TYPE_IR)
     {

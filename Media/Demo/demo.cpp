@@ -120,26 +120,26 @@ int main()
     s32Ret = GetConfigParam("/opt/config.json", &stConfigParam);
 
     /* 初始化媒体基础模块 */
-    s32Ret = Media_Init(&stConfigParam.stInitParam);
+    s32Ret = DSP_Init(&stConfigParam.stInitParam);
     if (0 != s32Ret)
     {
-        printf("Media_Init error! s32Ret = %#x\n", s32Ret);
+        printf("DSP_Init error! s32Ret = %#x\n", s32Ret);
         return -1;
     }
 
     /* 设置显示相关区域 */
-    s32Ret = Media_SetVideoDisp(SENSOR_TYPE_RGB, &stConfigParam.stDispParam);
+    s32Ret = DSP_SetVideoDisp(SENSOR_TYPE_RGB, &stConfigParam.stDispParam);
     if (0 != s32Ret)
     {
-        printf("Media_SetVideoDisp error! s32Ret = %#x\n", s32Ret);
+        printf("DSP_SetVideoDisp error! s32Ret = %#x\n", s32Ret);
         return -1;
     }
 
     /* 开启RGB sensor的录像功能 */
-    s32Ret = Media_SetRecord(SENSOR_TYPE_RGB, VIDEO_STREAM_MAIN, &stConfigParam.stRecordParam);
+    s32Ret = DSP_SetRecord(SENSOR_TYPE_RGB, VIDEO_STREAM_MAIN, &stConfigParam.stRecordParam);
     if (0 != s32Ret)
     {
-        printf("Media_SetRecord error! s32Ret = %#x\n", s32Ret);
+        printf("DSP_SetRecord error! s32Ret = %#x\n", s32Ret);
     }
 
     while (1)

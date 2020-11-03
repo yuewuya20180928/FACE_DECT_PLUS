@@ -160,11 +160,11 @@ typedef struct
     MEDIA_LCD_IDX_E enLcdIdx;                           /* LCD参数 */
 }INIT_PARAM_S;
 
-int Media_Init(INIT_PARAM_S *stSensorParam);
+int DSP_Init(INIT_PARAM_S *stSensorParam);
 
-int Media_SetVideoDisp(SENSOR_TYPE_E sensorIdx, MEDIA_VIDEO_DISP_S *pDispParam);
+int DSP_SetVideoDisp(SENSOR_TYPE_E sensorIdx, MEDIA_VIDEO_DISP_S *pDispParam);
 
-int Media_SetRecord(SENSOR_TYPE_E sensorIdx, VIDEO_STREAM_E videoStreamType, MEDIA_RECORD_S *pRecord);
+int DSP_SetRecord(SENSOR_TYPE_E sensorIdx, VIDEO_STREAM_E videoStreamType, MEDIA_RECORD_S *pRecord);
 
 #ifdef __cplusplus
 }

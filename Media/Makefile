@@ -21,14 +21,12 @@ LIBDIR = ./output/
 BINDIR = ./Bin/$(platform)
 
 # 目标依赖关系 
-LIB_TARGET = $(LIBDIR)/libmedia.so
-
-DEMO_MEDIA_LIB_PATH = ./Demo/Lib/media
+LIB_TARGET = $(LIBDIR)/dspzx
 
 # 头文件路径
 LIBS_INC += -I ./Include \
 			-I ./Include/hisi/$(platform)/mpp \
-			-I ./common \
+			-I ./Common \
 			-I ./output \
 			-I ./Src \
 
@@ -53,15 +51,44 @@ $(shell mkdir -p ${LIBDIR})
 $(shell mkdir -p ${BINDIR})
 $(foreach dir,$(SRCS_PATH),$(shell mkdir -p ${COMPILE_PATH}/${dir}))
 
-all: $(LIB_TARGET) demo
+MPI_LIB_PATH := ./Lib/hisi3516dv300/hi_mpp
+
+MPI_LIBS += -L $(MPI_LIB_PATH)/ -laaccomm
+MPI_LIBS += -L $(MPI_LIB_PATH)/ -laacenc
+MPI_LIBS += -L $(MPI_LIB_PATH)/ -laacdec
+MPI_LIBS += -L $(MPI_LIB_PATH)/ -l_hicalcflicker
+MPI_LIBS += -L $(MPI_LIB_PATH)/ -lmd
+MPI_LIBS += -L $(MPI_LIB_PATH)/ -lnnie
+MPI_LIBS += -L $(MPI_LIB_PATH)/ -l_hiae
+MPI_LIBS += -L $(MPI_LIB_PATH)/ -l_hiawb_natura
+MPI_LIBS += -L $(MPI_LIB_PATH)/ -lhi_cipher
+MPI_LIBS += -L $(MPI_LIB_PATH)/ -lmpi
+MPI_LIBS += -L $(MPI_LIB_PATH)/ -ltde
+MPI_LIBS += -L $(MPI_LIB_PATH)/ -lhdmi
+#MPI_LIBS += -L $(MPI_LIB_PATH)/ -lsvpruntime
+MPI_LIBS += -L $(MPI_LIB_PATH)/ -lupvqe
+MPI_LIBS += -L $(MPI_LIB_PATH)/ -l_hildci
+MPI_LIBS += -L $(MPI_LIB_PATH)/ -live
+MPI_LIBS += -L $(MPI_LIB_PATH)/ -lisp
+MPI_LIBS += -L $(MPI_LIB_PATH)/ -lhifisheyecalibrate
+MPI_LIBS += -L $(MPI_LIB_PATH)/ -lVoiceEngine
+MPI_LIBS += -L $(MPI_LIB_PATH)/ -lsecurec
+MPI_LIBS += -L $(MPI_LIB_PATH)/ -l_hidrc
+MPI_LIBS += -L $(MPI_LIB_PATH)/ -l_hiawb
+MPI_LIBS += -L $(MPI_LIB_PATH)/ -ldnvqe
+MPI_LIBS += -L $(MPI_LIB_PATH)/ -l_hidehaze
+MPI_LIBS += -L $(MPI_LIB_PATH)/ -l_hiir_auto
+
+LIBS += -L ./output -lsns_imx327
+LIBS += -L ./output -lsns_imx327_2L
+LIBS += -L ./output -lsns_gc2145
+LIBS += $(MPI_LIBS)
+
+all: $(LIB_TARGET)
 
 $(LIB_TARGET): $(LIB_OBJS)
-	$(CC) -shared -fPIC $(CFLAGS) -o $@ $^
+	$(CC) $(CFLAGS) -o $@ $^ -Wl,--start-group -lm -ldl $(LIBS) -Wl,--end-group
 	# -Wl,--start-group $(LIBS) -Wl,--end-group
-
-demo:
-	$(shell cp ${LIB_TARGET} ${DEMO_MEDIA_LIB_PATH} -f)
-	make -C Demo
 
 ${COMPILE_PATH}/%.o:%.c
 	$(CC) -c $(CFLAGS) $(CFLAGS_NDBG) $< -o $@

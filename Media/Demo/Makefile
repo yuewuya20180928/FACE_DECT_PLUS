@@ -6,33 +6,6 @@ INCLUDE = -I ../output \
 		  -I ./include \
 
 #海思平台库
-MPI_LIB_PATH := ./Lib/hisi3516dv300/hi_mpp
-
-MPI_LIBS += -L $(MPI_LIB_PATH)/ -laaccomm
-MPI_LIBS += -L $(MPI_LIB_PATH)/ -laacenc
-MPI_LIBS += -L $(MPI_LIB_PATH)/ -laacdec
-MPI_LIBS += -L $(MPI_LIB_PATH)/ -l_hicalcflicker
-MPI_LIBS += -L $(MPI_LIB_PATH)/ -lmd
-MPI_LIBS += -L $(MPI_LIB_PATH)/ -lnnie
-MPI_LIBS += -L $(MPI_LIB_PATH)/ -l_hiae
-MPI_LIBS += -L $(MPI_LIB_PATH)/ -l_hiawb_natura
-MPI_LIBS += -L $(MPI_LIB_PATH)/ -lhi_cipher
-MPI_LIBS += -L $(MPI_LIB_PATH)/ -lmpi
-MPI_LIBS += -L $(MPI_LIB_PATH)/ -ltde
-MPI_LIBS += -L $(MPI_LIB_PATH)/ -lhdmi
-MPI_LIBS += -L $(MPI_LIB_PATH)/ -lsvpruntime
-MPI_LIBS += -L $(MPI_LIB_PATH)/ -lupvqe
-MPI_LIBS += -L $(MPI_LIB_PATH)/ -l_hildci
-MPI_LIBS += -L $(MPI_LIB_PATH)/ -live
-MPI_LIBS += -L $(MPI_LIB_PATH)/ -lisp
-MPI_LIBS += -L $(MPI_LIB_PATH)/ -lhifisheyecalibrate
-MPI_LIBS += -L $(MPI_LIB_PATH)/ -lVoiceEngine
-MPI_LIBS += -L $(MPI_LIB_PATH)/ -lsecurec
-MPI_LIBS += -L $(MPI_LIB_PATH)/ -l_hidrc
-MPI_LIBS += -L $(MPI_LIB_PATH)/ -l_hiawb
-MPI_LIBS += -L $(MPI_LIB_PATH)/ -ldnvqe
-MPI_LIBS += -L $(MPI_LIB_PATH)/ -l_hidehaze
-MPI_LIBS += -L $(MPI_LIB_PATH)/ -l_hiir_auto
 
 OPENLIBS += -L ./Lib/json -ljsoncpp
 
@@ -46,10 +19,7 @@ TARGET := $(SRCS:%.c=%)
 
 DECODE_TEST_TARGET = test
 
-LIBS += -L ./Lib/media -lmedia
-LIBS += -L ./Lib/sensor -lsns_imx327
-LIBS += -L ./Lib/sensor -lsns_imx327_2L
-LIBS += -L ./Lib/sensor -lsns_gc2145
+LIBS += -L ./Lib/media -lDspApi
 LIBS += $(MPI_LIBS) $(OPENLIBS)
 
 .PHONY : clean $(DECODE_TEST_TARGET)
