@@ -5,6 +5,7 @@
 
 static bool bCmdTskInited = false;
 static CMD_STATUS_S *pCmdStatus = NULL;
+static void *pDspBuf = NULL;                        /* 命令缓冲数据 */
 static DSP_CMD_S stHostCmd[HOST_CMD_MAX_NUM] =
 {
     {HOST_CMD_DSP_INIT, 1, 1, sizeof(INIT_PARAM_S), Media_Init},
@@ -25,8 +26,6 @@ int InitDspCmd(void)
         return -1;
     }
 
-    prtMD("[server] shmid = %d, errno = %d\n", shmid, errno);
-
     pAddr = shmat(shmid, NULL, 0);
     if (pAddr == NULL)
     {
@@ -43,8 +42,6 @@ int InitDspCmd(void)
         return -1;
     }
 
-    prtMD("[server] shmid = %d, errno = %d\n", shmid, errno);
-
     pAddr = shmat(shmid, NULL, 0);
     if (pAddr == NULL)
     {
@@ -52,7 +49,7 @@ int InitDspCmd(void)
         return -1;
     }
 
-    pCmdStatus->stCmdInfo.pbuf = (void *)pAddr;
+    pDspBuf = pAddr;
 
     return 0;
 }
@@ -62,7 +59,7 @@ void *Tsk_Cmd(void *argc)
     HOST_DSP_CMD_FUNC pfunc = NULL;          /* 回调函数 */
     unsigned int cmdIdx = 0;
 
-    if (pCmdStatus == NULL || pCmdStatus->stCmdInfo.pbuf == NULL)
+    if (pCmdStatus == NULL || pDspBuf == NULL)
     {
         prtMD("invalid input pCmdInfo = %p\n", pCmdStatus);
         return NULL;
@@ -81,14 +78,23 @@ void *Tsk_Cmd(void *argc)
         }
 
         cmdIdx = pCmdStatus->cmdIdx;
+        if (cmdIdx >= HOST_CMD_DSP_BUTT)
+        {
+            prtMD("invalid cmdIdx = %d\n", cmdIdx);
+            pCmdStatus->bNewCmd = 0;
+            usleep(5 * 1000);
+            continue;
+        }
 
         pfunc = stHostCmd[cmdIdx].pFunc;
         if (pfunc)
         {
-            pfunc(pCmdStatus->stCmdInfo.chan, pCmdStatus->stCmdInfo.param, pCmdStatus->stCmdInfo.pbuf);
+            pfunc(pCmdStatus->chan, pCmdStatus->param, pDspBuf);
         }
 
         pCmdStatus->bNewCmd = 0;
+
+        usleep(5 * 1000);
     }
 }
 
@@ -136,7 +142,7 @@ int main(int argc, char **argv)
 
     while (1)
     {
-        usleep(20 * 1000);
+        usleep(5000 * 1000);
         continue;
     }
 

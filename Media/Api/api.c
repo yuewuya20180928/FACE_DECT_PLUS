@@ -4,8 +4,8 @@
 #include <string.h>
 
 static unsigned int bApiFirstInited = 0;
-CMD_STATUS_S *pApiCmd = NULL;
-
+static CMD_STATUS_S *pApiCmd = NULL;
+static void *pApiBuf = NULL;
 
 int DSP_API_Init(void)
 {
@@ -14,7 +14,7 @@ int DSP_API_Init(void)
 
     if (bApiFirstInited == 1)
     {
-        return -1;
+        return 0;
     }
 
     shmid = shmget(SHM_CMD_KEY, SHM_CMD_LENTH, IPC_CREAT);
@@ -47,9 +47,11 @@ int DSP_API_Init(void)
         return -1;
     }
 
-    pApiCmd->stCmdInfo.pbuf = pAddr;
+    pApiBuf = pAddr;
 
     bApiFirstInited = 1;
+
+    printf("DSP_API_Init OK! %d\n", pApiCmd->bNewCmd);
 
     return 0;
 }
@@ -64,39 +66,43 @@ int DSP_API_SendCmd(HOST_CMD_S *pHostCmd)
         return -1;
     }
 
-    DSP_API_Init();
-
     while (pApiCmd->bNewCmd == 1)
     {
-        printf("dsp is not ready! please check!\n");
-        usleep(10 * 1000);
+        usleep(50 * 1000);
 
         waitCount ++;
 
-        if (waitCount >= 5)
+        if (waitCount >= 100)
         {
             return -1;
         }
     }
 
     pApiCmd->cmdIdx = pHostCmd->cmdIdx;
-    pApiCmd->stCmdInfo.chan = pHostCmd->chan;
-    pApiCmd->stCmdInfo.param = pHostCmd->param;
-    memcpy(pApiCmd->stCmdInfo.pbuf, pHostCmd->pBuf, pHostCmd->bufLenth);
+    pApiCmd->chan = pHostCmd->chan;
+    pApiCmd->param = pHostCmd->param;
+    pApiCmd->bufLenth = pHostCmd->bufLenth;
+    memcpy(pApiBuf, pHostCmd->pBuf, pHostCmd->bufLenth);
+
     pApiCmd->bNewCmd = 1;
 
     return 0;
 }
 
-int DSP_Init(INIT_PARAM_S *pSensorParam)
+int DSP_Init(void)
+{
+    return DSP_API_Init();
+}
+
+int DSP_SetMedia(INIT_PARAM_S *pMediaParam)
 {
     int ret = 0;
     HOST_CMD_S stCmdSend = {0};
 
     /* 参数有效性校验 */
-    if (pSensorParam == NULL)
+    if (pMediaParam == NULL)
     {
-        printf("invalid input pSensorParam = %p\n", pSensorParam);
+        printf("invalid input pMediaParam = %p\n", pMediaParam);
         return -1;
     }
 
@@ -105,7 +111,7 @@ int DSP_Init(INIT_PARAM_S *pSensorParam)
     stCmdSend.bHaveBuf = 1;
     stCmdSend.bReturn = 1;
     stCmdSend.bufLenth = sizeof(INIT_PARAM_S);
-    stCmdSend.pBuf = (void *)pSensorParam;
+    stCmdSend.pBuf = (void *)pMediaParam;
 
     /* 赋值完成后调用发送接口发送主机命令 */
     ret = DSP_API_SendCmd(&stCmdSend);

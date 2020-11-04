@@ -29,6 +29,13 @@ int Media_Init(unsigned int chan, unsigned int param, void *pBuf)
 
     pSensorParam = (INIT_PARAM_S *)pBuf;
 
+    prtMD("[Media_Init]: %#x %#x %#x, %#x, %#x\n",
+        pSensorParam->stSensorParam.sensorNumber,
+        pSensorParam->stSensorParam.enSensorIdx[0],
+        pSensorParam->enLcdIdx,
+        chan,
+        param);
+
     //屏幕类型后继由应用应用,媒体需要兼容所有产品支持的屏幕类型
     MEDIA_LCD_IDX_E lcdTypeIdx = pSensorParam->enLcdIdx;
 

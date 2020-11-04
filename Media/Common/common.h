@@ -42,17 +42,11 @@ typedef enum
 /* 命令信息 */
 typedef struct
 {
+    unsigned int bNewCmd;               /* 是否有新的命令 */
+    unsigned int cmdIdx;                /* 命令号 */
     unsigned int chan;                  /* 命令通道 */
     unsigned int param;                 /* 命令参数 */
-    void *pbuf;                         /* 命令缓冲地址 */
-}CMD_INFO_S;
-
-/* 命令状态 */
-typedef struct
-{
-    unsigned char bNewCmd;              /* 是否有新的命令 */
-    unsigned char cmdIdx;               /* 命令号 */
-    CMD_INFO_S stCmdInfo;               /* 命令信息 */
+    unsigned int bufLenth;              /* 命令缓冲长度 */
 }CMD_STATUS_S;
 
 

@@ -119,11 +119,19 @@ int main()
     /* 从配置文件中获取配置参数 */
     s32Ret = GetConfigParam("/opt/config.json", &stConfigParam);
 
-    /* 初始化媒体基础模块 */
-    s32Ret = DSP_Init(&stConfigParam.stInitParam);
+    /* 初始化DSP模块 */
+    s32Ret = DSP_Init();
     if (0 != s32Ret)
     {
         printf("DSP_Init error! s32Ret = %#x\n", s32Ret);
+        return -1;
+    }
+
+    /* 设置媒体参数 */
+    s32Ret = DSP_SetMedia(&stConfigParam.stInitParam);
+    if (0 != s32Ret)
+    {
+        printf("DSP_SetMedia error! s32Ret = %#x\n", s32Ret);
         return -1;
     }
 

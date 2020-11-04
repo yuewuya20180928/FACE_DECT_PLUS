@@ -305,6 +305,8 @@ int Media_VideoIn_GetConfig(MEDIA_VI_PARAM_S *pViParam, SENSOR_PARAM_S *pSensorP
 
     sensorNum = pSensorParam->sensorNumber;
 
+    prtMD("sensorNum = %d\n", sensorNum);
+
     if (sensorNum > MAX_SENSOR_NUMBER)
     {
         prtMD("invalid input sensorNum = %d\n", sensorNum);
