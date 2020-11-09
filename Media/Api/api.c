@@ -185,4 +185,28 @@ int DSP_SetRecord(SENSOR_TYPE_E sensorIdx, VIDEO_STREAM_E videoStreamType, MEDIA
     return 0;
 }
 
+int DSP_SetTime(unsigned int bDispTime)
+{
+    int ret = 0;
+    HOST_CMD_S stCmdSend = {0};
+
+    /* 对命令结构体参数赋值 */
+    stCmdSend.cmdIdx = HOST_CMD_DSP_SHOWTIME;
+    stCmdSend.bHaveBuf = 0;
+    stCmdSend.chan = 0;
+    stCmdSend.param = bDispTime;
+    stCmdSend.bReturn = 0;
+    stCmdSend.bufLenth = 0;
+    stCmdSend.pBuf = NULL;
+
+    /* 赋值完成后调用发送接口发送主机命令 */
+    ret = DSP_API_SendCmd(&stCmdSend);
+    if (0 != ret)
+    {
+        printf("DSP_API_SendCmd error! ret = %#x\n", ret);
+        return ret;
+    }
+
+    return 0;
+}
 

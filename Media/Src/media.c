@@ -6,6 +6,7 @@
 #include "module.h"
 #include "vo.h"
 #include "enc.h"
+#include "osd.h"
 
 SENSOR_TYPE_E sensorIdx[MAX_SENSOR_NUMBER] =
 {
@@ -129,6 +130,14 @@ int Media_Init(unsigned int chan, unsigned int param, void *pBuf)
     if (HI_SUCCESS != ret)
     {
         prtMD("Media_Vo_Init error! ret = %#x\n", ret);
+        return -1;
+    }
+
+    /* 初始化时间OSD处理线程 */
+    ret = Media_Osd_InitTsk();
+    if (HI_SUCCESS != ret)
+    {
+        prtMD("Media_Osd_InitTsk error! ret = %#x\n", ret);
         return -1;
     }
 
@@ -362,4 +371,22 @@ int Media_SetRecord(unsigned int chan, unsigned int param, void *pBuf)
 
     return 0;
 }
+
+/* 设置时间OSD参数 */
+int Media_SetTime(unsigned int chan, unsigned int param, void *pBuf)
+{
+    if (param == 1)
+    {
+        /* 开启OSD时间显示 */
+        Media_Osd_StartTime();
+    }
+    else
+    {
+        /* 关闭OSD时间显示 */
+        Media_Osd_StopTime();
+    }
+
+    return 0;
+}
+
 

@@ -42,6 +42,7 @@
 #include <unistd.h>
 #include <signal.h>
 #include <stdbool.h>
+#include <time.h>
 
 #include "hi_common.h"
 #include "hi_buffer.h"

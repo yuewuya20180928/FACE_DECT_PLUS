@@ -148,6 +148,15 @@ int main()
     if (0 != s32Ret)
     {
         printf("DSP_SetRecord error! s32Ret = %#x\n", s32Ret);
+        return -1;
+    }
+
+    /* 开启时间OSD的显示功能 */
+    s32Ret = DSP_SetTime(1);
+    if (0 != s32Ret)
+    {
+        printf("DSP_SetTime error! s32Ret = %#x\n", s32Ret);
+        return -1;
     }
 
     while (1)

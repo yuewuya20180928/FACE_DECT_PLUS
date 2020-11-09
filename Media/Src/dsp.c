@@ -11,6 +11,7 @@ static DSP_CMD_S stHostCmd[HOST_CMD_MAX_NUM] =
     {HOST_CMD_DSP_INIT, 1, 1, sizeof(INIT_PARAM_S), Media_Init},
     {HOST_CMD_DSP_SET_DISP, 1, 1, sizeof(MEDIA_VIDEO_DISP_S), Media_SetVideoDisp},
     {HOST_CMD_DSP_INIT, 1, 1, sizeof(MEDIA_RECORD_S), Media_SetRecord},
+    {HOST_CMD_DSP_SHOWTIME, 1, 1, 0, Media_SetTime},
 };
 
 int InitDspCmd(void)
@@ -110,7 +111,7 @@ int InitCmdTsk(void)
 
     bCmdTskInited = true;
 
-    /* 创建线程实时读取编码之后的码流 */
+    /* 创建主机命令处理线程 */
     ret = pthread_create(&pThrd, NULL, Tsk_Cmd, NULL);
     if (0 != ret)
     {

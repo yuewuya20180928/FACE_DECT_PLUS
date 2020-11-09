@@ -35,6 +35,7 @@ typedef enum
     HOST_CMD_DSP_INIT = 0,              /* 初始化主机命令 */
     HOST_CMD_DSP_SET_DISP,              /* 显示设置 */
     HOST_CMD_DSP_SET_RECORD,            /* 设置录像 */
+    HOST_CMD_DSP_SHOWTIME,              /* 开启OSD显示 */
 
     HOST_CMD_DSP_BUTT,
 }CMD_IDX_E;

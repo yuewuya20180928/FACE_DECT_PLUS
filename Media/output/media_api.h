@@ -168,6 +168,8 @@ int DSP_SetVideoDisp(SENSOR_TYPE_E sensorIdx, MEDIA_VIDEO_DISP_S *pDispParam);
 
 int DSP_SetRecord(SENSOR_TYPE_E sensorIdx, VIDEO_STREAM_E videoStreamType, MEDIA_RECORD_S *pRecord);
 
+int DSP_SetTime(unsigned int bDispTime);
+
 #ifdef __cplusplus
 }
 #endif

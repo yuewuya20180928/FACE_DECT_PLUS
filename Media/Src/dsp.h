@@ -19,7 +19,7 @@ typedef struct
 int Media_Init(unsigned int chan, unsigned int param, void *pBuf);
 int Media_SetVideoDisp(unsigned int chan, unsigned int param, void *pBuf);
 int Media_SetRecord(unsigned int chan, unsigned int param, void *pBuf);
-
+int Media_SetTime(unsigned int chan, unsigned int param, void *pBuf);
 
 
 #ifdef __cplusplus

@@ -29,6 +29,8 @@ LIBS_INC += -I ./Include \
 			-I ./Common \
 			-I ./output \
 			-I ./Src \
+			-I ./Include/SDL2 \
+			-I ./Include/SDL2_ttf \
 
 CFLAGS += $(LIBS_INC)
 
@@ -82,6 +84,11 @@ MPI_LIBS += -L $(MPI_LIB_PATH)/ -l_hiir_auto
 LIBS += -L ./output -lsns_imx327
 LIBS += -L ./output -lsns_imx327_2L
 LIBS += -L ./output -lsns_gc2145
+LIBS += -L ./Lib/SDL2_ttf -lSDL2_ttf
+LIBS += -L ./Lib/SDL2 -lSDL2
+LIBS += -L ./Lib/freetype -lfreetype
+LIBS += -L ./Lib/png -lpng
+LIBS += -L ./Lib/z -lz
 LIBS += $(MPI_LIBS)
 
 all: $(LIB_TARGET)
