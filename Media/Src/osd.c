@@ -54,22 +54,24 @@ int Media_Osd_Char2Pic_TEST(char *pString)
     }
 
     memset(pFormat,0,sizeof(SDL_PixelFormat));
-    pFormat->BitsPerPixel = 16;
+    pFormat->BitsPerPixel = 32;
     pFormat->BytesPerPixel = 2;
     pFormat->Rmask = 0x00ff0000;//0x00FF0000
     pFormat->Gmask = 0x0000ff00;//0x0000FF00
     pFormat->Bmask = 0x000000ff;//0x000000FF
-    pFormat->Amask = 0xff000000;
+    pFormat->Amask = 0xff000000;//0xFF000000
 
+    /* 转换为bmp */
     pTempSurface = SDL_ConvertSurface(pTextSurface, pFormat, 0);
     if (NULL == pTempSurface)
     {
-        prtMD("SDL_ConvertSurface error!\n");
+        prtMD("SDL_ConvertSurface error! w = %d, h = %d, stride = %d\n", pTextSurface->w, pTextSurface->h, pTextSurface->pitch);
         ret = -1;
         goto exit4;
     }
     else
     {
+        /* 存图 */
         ret = SDL_SaveBMP(pTempSurface, "/opt/sdl_osd.bmp");
         if (0 != ret)
         {
