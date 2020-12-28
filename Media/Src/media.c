@@ -133,14 +133,6 @@ int Media_Init(unsigned int chan, unsigned int param, void *pBuf)
         return -1;
     }
 
-    /* 初始化时间OSD处理线程 */
-    ret = Media_Osd_InitTsk();
-    if (HI_SUCCESS != ret)
-    {
-        prtMD("Media_Osd_InitTsk error! ret = %#x\n", ret);
-        return -1;
-    }
-
     return 0;
 }
 
@@ -375,6 +367,22 @@ int Media_SetRecord(unsigned int chan, unsigned int param, void *pBuf)
 /* 设置时间OSD参数 */
 int Media_SetTime(unsigned int chan, unsigned int param, void *pBuf)
 {
+    int ret = 0;
+    static unsigned int flag = 0;
+
+    if (flag == 0)
+    {
+        /* 初始化OSD */
+        ret = Media_Osd_Init();
+        if (HI_SUCCESS != ret)
+        {
+            prtMD("Media_Osd_InitTsk error! ret = %#x\n", ret);
+            return -1;
+        }
+
+        flag = 1;
+    }
+
     if (param == 1)
     {
         /* 开启OSD时间显示 */

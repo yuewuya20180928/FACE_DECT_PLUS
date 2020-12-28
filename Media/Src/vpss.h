@@ -9,6 +9,7 @@
 extern "C" {
 #endif
 
+#define VPSS_CHN_FOR_RGN 0
 #define VPSS_CHN_FOR_VO 1
 #define VPSS_CHN_FOR_ALG 2
 #define VPSS_CHN_FOR_ENC_MAIN 2//(1+3)
